@@ -10,7 +10,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { Car, MapPin, Clock, CreditCard, Star, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Navigation, Wifi, ShieldCheck, ZapFast, HelpCircle, Calendar as CalendarIconBase } from 'lucide-react';
+import { Car, MapPin, Clock, CreditCard, Star, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Navigation, Wifi, ShieldCheck, Zap, HelpCircle, Calendar as CalendarIconBase } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 // Mock parking data
@@ -114,7 +114,7 @@ const ParkingDetails = () => {
       case 'camera':
         return <Wifi className="h-4 w-4" />;
       case 'ev_charging':
-        return <ZapFast className="h-4 w-4" />;
+        return <Zap className="h-4 w-4" />; // Changed from ZapFast to Zap which is available
       default:
         return <HelpCircle className="h-4 w-4" />;
     }
