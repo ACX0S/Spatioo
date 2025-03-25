@@ -1,186 +1,260 @@
 
-import { Outlet, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Car, MapPin, Menu, User, X } from "lucide-react";
+import { 
+  Car, 
+  Map, 
+  User, 
+  Calendar, 
+  Settings, 
+  Menu, 
+  X, 
+  ChevronLeft, 
+  Search, 
+  Bell,
+  HelpCircle 
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Layout = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [pageTitle, setPageTitle] = useState("Spatioo");
+
+  const getPageTitle = (pathname: string) => {
+    switch (pathname) {
+      case "/":
+        return "Encontre vagas";
+      case "/explore":
+        return "Explorar";
+      case "/dashboard":
+        return "Meus agendamentos";
+      case "/admin":
+        return "Gerenciar vagas";
+      default:
+        if (pathname.includes("/parking/")) {
+          return "Detalhes do Estacionamento";
+        }
+        return "Spatioo";
+    }
+  };
+
+  useEffect(() => {
+    setPageTitle(getPageTitle(location.pathname));
+    
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [location.pathname]);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
-      <header className="relative z-40 border-b bg-background/80 backdrop-blur-md">
-        <div className="container flex h-16 items-center justify-between px-4 md:px-6">
-          <div className="flex items-center gap-2">
-            <Link
-              to="/"
-              className="flex items-center gap-2 font-semibold text-xl text-foreground"
-            >
-              <Car className="h-6 w-6 text-spatioo-green" />
-              <span>Spatioo</span>
-            </Link>
+      <header 
+        className={cn(
+          "sticky top-0 z-40 w-full transition-all duration-200",
+          isScrolled ? "bg-background/95 backdrop-blur-md shadow-sm" : "bg-background"
+        )}
+      >
+        <div className="container px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {location.pathname !== "/" && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="rounded-full" 
+                onClick={() => navigate(-1)}
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+            )}
+            <h1 className="text-lg font-semibold">{pageTitle}</h1>
           </div>
           
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
-            <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
-              Home
-            </Link>
-            <Link to="/explore" className="text-muted-foreground hover:text-foreground transition-colors">
-              Explore
-            </Link>
-            <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
-              Dashboard
-            </Link>
-            <Link to="/admin" className="text-muted-foreground hover:text-foreground transition-colors">
-              Parking Owner
-            </Link>
-            <ThemeToggle />
-            <Button className="bg-spatioo-green hover:bg-spatioo-green-dark text-white">
-              <User className="h-4 w-4 mr-2" />
-              Login
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" className="rounded-full">
+              <Bell className="h-5 w-5" />
             </Button>
-          </nav>
-          
-          {/* Mobile Navigation */}
-          <div className="flex md:hidden items-center gap-2">
+            
             <ThemeToggle />
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={() => setIsMenuOpen(true)}
-              className="rounded-full"
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
+            
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-full">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="bg-background border-border">
+                <div className="flex flex-col h-full">
+                  <div className="flex items-center gap-3 mb-8">
+                    <Car className="h-8 w-8 text-spatioo-green" />
+                    <span className="font-semibold text-xl">Spatioo</span>
+                  </div>
+                  
+                  <div className="flex flex-col gap-1">
+                    <Link 
+                      to="/" 
+                      className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-accent transition-colors"
+                    >
+                      <Map className="h-5 w-5 text-spatioo-green" />
+                      <span>Encontre vagas</span>
+                    </Link>
+                    <Link 
+                      to="/explore" 
+                      className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-accent transition-colors"
+                    >
+                      <Search className="h-5 w-5 text-spatioo-green" />
+                      <span>Explorar</span>
+                    </Link>
+                    <Link 
+                      to="/dashboard" 
+                      className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-accent transition-colors"
+                    >
+                      <Calendar className="h-5 w-5 text-spatioo-green" />
+                      <span>Meus agendamentos</span>
+                    </Link>
+                    <Link 
+                      to="/admin" 
+                      className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-accent transition-colors"
+                    >
+                      <Car className="h-5 w-5 text-spatioo-green" />
+                      <span>Gerenciar vagas</span>
+                    </Link>
+                    <hr className="my-2 border-border" />
+                    <Link 
+                      to="/settings" 
+                      className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-accent transition-colors"
+                    >
+                      <Settings className="h-5 w-5" />
+                      <span>Configurações</span>
+                    </Link>
+                    <Link 
+                      to="/login" 
+                      className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-accent transition-colors"
+                    >
+                      <User className="h-5 w-5" />
+                      <span>Minha conta</span>
+                    </Link>
+                  </div>
+                  
+                  <div className="mt-auto">
+                    <div className="bg-card rounded-lg p-4 border border-border">
+                      <h3 className="font-medium mb-2">Precisa de ajuda?</h3>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        Nossa equipe está pronta para te ajudar com qualquer dúvida.
+                      </p>
+                      <Button 
+                        variant="outline" 
+                        className="w-full justify-start gap-2 rounded-md"
+                      >
+                        <HelpCircle className="h-4 w-4" />
+                        Central de ajuda
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
         
-        {/* Mobile Menu */}
-        <div 
-          className={cn(
-            "fixed inset-0 z-50 bg-background/80 backdrop-blur-sm md:hidden transition-opacity duration-200",
-            isMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-          )}
-        >
-          <div className="fixed inset-y-0 right-0 w-full max-w-xs bg-background shadow-lg p-6 flex flex-col h-full">
-            <div className="flex items-center justify-between mb-8">
-              <Link
-                to="/"
-                className="flex items-center gap-2 font-semibold text-xl"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Car className="h-6 w-6 text-spatioo-green" />
-                <span>Spatioo</span>
-              </Link>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => setIsMenuOpen(false)}
-                className="rounded-full"
-              >
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
-            <nav className="flex flex-col gap-6 flex-1">
-              <Link 
-                to="/" 
-                className="text-lg font-medium text-foreground" 
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Home
-              </Link>
-              <Link 
-                to="/explore" 
-                className="text-lg font-medium text-foreground" 
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Explore
-              </Link>
-              <Link 
-                to="/dashboard" 
-                className="text-lg font-medium text-foreground" 
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Dashboard
-              </Link>
-              <Link 
-                to="/admin" 
-                className="text-lg font-medium text-foreground" 
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Parking Owner
-              </Link>
-            </nav>
-            <div className="mt-auto pt-6">
-              <Button className="w-full bg-spatioo-green hover:bg-spatioo-green-dark text-white">
-                <User className="h-4 w-4 mr-2" />
-                Login
-              </Button>
+        {/* Search Bar - Only shown on main page */}
+        {location.pathname === "/" && (
+          <div className="container px-4 pb-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input 
+                placeholder="Buscar estacionamentos..." 
+                className="pl-9 h-12 bg-card rounded-full"
+              />
             </div>
           </div>
-        </div>
+        )}
       </header>
       
       {/* Main Content */}
       <main className="flex-1">
-        <Outlet />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="h-full"
+          >
+            <Outlet />
+          </motion.div>
+        </AnimatePresence>
       </main>
       
-      {/* Footer */}
-      <footer className="border-t bg-background">
-        <div className="container px-4 md:px-6 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 font-semibold text-xl">
-                <Car className="h-6 w-6 text-spatioo-green" />
-                <span>Spatioo</span>
-              </div>
-              <p className="text-muted-foreground text-sm">
-                Find and book parking spaces easily with Spatioo. Save time and money on your next parking.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-medium text-foreground mb-4">About</h3>
-              <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">How it works</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">For Parking Owners</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">FAQ</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-medium text-foreground mb-4">Legal</h3>
-              <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Cookie Policy</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-medium text-foreground mb-4">Contact</h3>
-              <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">Support</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">contact@spatioo.com</a></li>
-                <li><a href="#" className="flex items-center gap-1 hover:text-foreground transition-colors">
-                  <MapPin className="h-4 w-4" /> Find us
-                </a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="flex justify-between items-center mt-8 pt-8 border-t text-sm text-muted-foreground">
-            <p>© 2023 Spatioo. All rights reserved.</p>
-            <div className="flex items-center gap-4">
-              <a href="#" className="hover:text-foreground transition-colors">Instagram</a>
-              <a href="#" className="hover:text-foreground transition-colors">Twitter</a>
-              <a href="#" className="hover:text-foreground transition-colors">LinkedIn</a>
-            </div>
-          </div>
+      {/* Bottom Navigation Bar */}
+      <nav className="sticky bottom-0 z-40 bg-background/95 backdrop-blur-md border-t border-border h-16 w-full">
+        <div className="h-full grid grid-cols-4">
+          <Link 
+            to="/" 
+            className={cn(
+              "flex flex-col items-center justify-center",
+              location.pathname === "/" ? "text-spatioo-green" : "text-muted-foreground"
+            )}
+          >
+            <Map className="h-5 w-5" />
+            <span className="text-xs mt-1">Mapa</span>
+          </Link>
+          
+          <Link 
+            to="/explore" 
+            className={cn(
+              "flex flex-col items-center justify-center",
+              location.pathname === "/explore" ? "text-spatioo-green" : "text-muted-foreground"
+            )}
+          >
+            <Search className="h-5 w-5" />
+            <span className="text-xs mt-1">Explorar</span>
+          </Link>
+          
+          <Link 
+            to="/dashboard" 
+            className={cn(
+              "flex flex-col items-center justify-center",
+              location.pathname === "/dashboard" ? "text-spatioo-green" : "text-muted-foreground"
+            )}
+          >
+            <Calendar className="h-5 w-5" />
+            <span className="text-xs mt-1">Reservas</span>
+          </Link>
+          
+          <Link 
+            to="/login" 
+            className={cn(
+              "flex flex-col items-center justify-center",
+              location.pathname.includes("/login") ? "text-spatioo-green" : "text-muted-foreground"
+            )}
+          >
+            <User className="h-5 w-5" />
+            <span className="text-xs mt-1">Perfil</span>
+          </Link>
         </div>
-      </footer>
+      </nav>
+      
+      {/* Floating Help Button */}
+      <div className="fixed bottom-20 right-4 z-50">
+        <Button 
+          size="icon" 
+          className="h-12 w-12 rounded-full shadow-lg bg-spatioo-green text-black hover:bg-spatioo-green-dark"
+        >
+          <HelpCircle className="h-6 w-6" />
+        </Button>
+      </div>
     </div>
   );
 };
