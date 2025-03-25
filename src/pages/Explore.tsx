@@ -8,9 +8,23 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { Car, Clock, Filter, MapPin, Search, CalendarIcon, Menu, X, ChevronLeft, List, Navigation, Layers } from 'lucide-react';
+import { 
+  Car, 
+  Clock, 
+  Filter, 
+  MapPin, 
+  Search, 
+  CalendarIcon, 
+  Menu, 
+  X, 
+  ChevronLeft, 
+  List, 
+  Navigation, 
+  Layers 
+} from 'lucide-react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import '@/styles/map.css';
 
 // Mock parking data with real coordinates
 const MOCK_PARKINGS = [
@@ -18,7 +32,7 @@ const MOCK_PARKINGS = [
     id: '1',
     name: 'Downtown Secure Parking',
     address: 'Rua Conselheiro Lafayette, 180, São Caetano do Sul',
-    coordinates: [-46.5697, -23.6227], // Long, Lat for São Caetano do Sul
+    coordinates: [-46.5697, -23.6227] as [number, number], // Long, Lat for São Caetano do Sul
     distance: '0.3',
     price: '5.50',
     rating: 4.8,
@@ -29,7 +43,7 @@ const MOCK_PARKINGS = [
     id: '2',
     name: 'Central Park & Go',
     address: 'Av. Goiás, 1500, São Caetano do Sul',
-    coordinates: [-46.5750, -23.6180],
+    coordinates: [-46.5750, -23.6180] as [number, number],
     distance: '0.7',
     price: '4.25',
     rating: 4.5,
@@ -40,7 +54,7 @@ const MOCK_PARKINGS = [
     id: '3',
     name: 'Riverside Parking Complex',
     address: 'Rua Amazonas, 800, São Caetano do Sul',
-    coordinates: [-46.5650, -23.6250],
+    coordinates: [-46.5650, -23.6250] as [number, number],
     distance: '1.2',
     price: '3.75',
     rating: 4.2,
@@ -51,7 +65,7 @@ const MOCK_PARKINGS = [
     id: '4',
     name: 'North Station Parking',
     address: 'Rua Manoel Coelho, 500, São Caetano do Sul',
-    coordinates: [-46.5720, -23.6190],
+    coordinates: [-46.5720, -23.6190] as [number, number],
     distance: '1.5',
     price: '4.00',
     rating: 4.4,
@@ -437,7 +451,7 @@ const Explore = () => {
               </div>
               
               <div className="flex gap-2">
-                <Button asChild className="flex-1 bg-spatioo-green hover:bg-spatioo-green-dark text-white">
+                <Button asChild className="flex-1 bg-spatioo-green hover:bg-spatioo-green-dark text-black font-medium">
                   <Link to={`/parking/${selectedParking.id}`}>
                     Book Now
                   </Link>
@@ -495,7 +509,7 @@ const Explore = () => {
                 </div>
                 
                 <div className="flex gap-2 mt-3">
-                  <Button asChild size="sm" className="flex-1 bg-spatioo-green hover:bg-spatioo-green-dark text-white text-xs">
+                  <Button asChild size="sm" className="flex-1 bg-spatioo-green hover:bg-spatioo-green-dark text-black font-medium text-xs">
                     <Link to={`/parking/${parking.id}`}>
                       Book Now
                     </Link>
@@ -510,30 +524,6 @@ const Explore = () => {
           </div>
         </div>
       </div>
-      
-      {/* Add custom styles for map markers */}
-      <style jsx global>{`
-        .parking-marker {
-          cursor: pointer;
-        }
-        
-        .maplibregl-ctrl-bottom-right {
-          bottom: 20px !important;
-          right: 20px !important;
-        }
-        
-        .maplibregl-ctrl-group {
-          background-color: rgba(255, 255, 255, 0.9) !important;
-          border-radius: 8px !important;
-          overflow: hidden;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
-        }
-        
-        .maplibregl-ctrl button {
-          width: 36px !important;
-          height: 36px !important;
-        }
-      `}</style>
     </div>
   );
 };

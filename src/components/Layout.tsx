@@ -13,7 +13,8 @@ import {
   ChevronLeft, 
   Search, 
   Bell,
-  HelpCircle 
+  HelpCircle,
+  Compass
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -29,8 +30,8 @@ const Layout = () => {
 
   const getPageTitle = (pathname: string) => {
     switch (pathname) {
-      case "/":
-        return "Encontre vagas";
+      case "/home":
+        return "Spatioo";
       case "/explore":
         return "Explorar";
       case "/dashboard":
@@ -56,6 +57,22 @@ const Layout = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [location.pathname]);
 
+  const isActive = (path: string) => {
+    if (path === "/home" && location.pathname === "/home") {
+      return true;
+    }
+    if (path === "/explore" && location.pathname === "/explore") {
+      return true;
+    }
+    if (path === "/dashboard" && location.pathname === "/dashboard") {
+      return true;
+    }
+    if (path === "/login" && location.pathname === "/login") {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
@@ -67,7 +84,7 @@ const Layout = () => {
       >
         <div className="container px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {location.pathname !== "/" && (
+            {location.pathname !== "/home" && (
               <Button 
                 variant="ghost" 
                 size="icon" 
@@ -102,17 +119,17 @@ const Layout = () => {
                   
                   <div className="flex flex-col gap-1">
                     <Link 
-                      to="/" 
+                      to="/home" 
                       className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-accent transition-colors"
                     >
                       <Map className="h-5 w-5 text-spatioo-green" />
-                      <span>Encontre vagas</span>
+                      <span>Home</span>
                     </Link>
                     <Link 
                       to="/explore" 
                       className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-accent transition-colors"
                     >
-                      <Search className="h-5 w-5 text-spatioo-green" />
+                      <Compass className="h-5 w-5 text-spatioo-green" />
                       <span>Explorar</span>
                     </Link>
                     <Link 
@@ -166,19 +183,6 @@ const Layout = () => {
             </Sheet>
           </div>
         </div>
-        
-        {/* Search Bar - Only shown on main page */}
-        {location.pathname === "/" && (
-          <div className="container px-4 pb-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input 
-                placeholder="Buscar estacionamentos..." 
-                className="pl-9 h-12 bg-card rounded-full"
-              />
-            </div>
-          </div>
-        )}
       </header>
       
       {/* Main Content */}
@@ -201,24 +205,24 @@ const Layout = () => {
       <nav className="sticky bottom-0 z-40 bg-background/95 backdrop-blur-md border-t border-border h-16 w-full">
         <div className="h-full grid grid-cols-4">
           <Link 
-            to="/" 
+            to="/home" 
             className={cn(
               "flex flex-col items-center justify-center",
-              location.pathname === "/" ? "text-spatioo-green" : "text-muted-foreground"
+              isActive("/home") ? "text-spatioo-green" : "text-muted-foreground"
             )}
           >
             <Map className="h-5 w-5" />
-            <span className="text-xs mt-1">Mapa</span>
+            <span className="text-xs mt-1">Home</span>
           </Link>
           
           <Link 
             to="/explore" 
             className={cn(
               "flex flex-col items-center justify-center",
-              location.pathname === "/explore" ? "text-spatioo-green" : "text-muted-foreground"
+              isActive("/explore") ? "text-spatioo-green" : "text-muted-foreground"
             )}
           >
-            <Search className="h-5 w-5" />
+            <Compass className="h-5 w-5" />
             <span className="text-xs mt-1">Explorar</span>
           </Link>
           
@@ -226,7 +230,7 @@ const Layout = () => {
             to="/dashboard" 
             className={cn(
               "flex flex-col items-center justify-center",
-              location.pathname === "/dashboard" ? "text-spatioo-green" : "text-muted-foreground"
+              isActive("/dashboard") ? "text-spatioo-green" : "text-muted-foreground"
             )}
           >
             <Calendar className="h-5 w-5" />
@@ -237,7 +241,7 @@ const Layout = () => {
             to="/login" 
             className={cn(
               "flex flex-col items-center justify-center",
-              location.pathname.includes("/login") ? "text-spatioo-green" : "text-muted-foreground"
+              isActive("/login") ? "text-spatioo-green" : "text-muted-foreground"
             )}
           >
             <User className="h-5 w-5" />

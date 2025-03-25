@@ -1,901 +1,684 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 import { 
-  BarChart, 
-  Bell, 
-  Building, 
-  Calendar, 
-  Car, 
-  CreditCard, 
-  DollarSign, 
-  Edit, 
-  FileText, 
-  History, 
-  Home, 
-  LogOut, 
+  Calendar as CalendarIcon, 
   MapPin, 
-  ParkingCircle, 
-  PlusCircle, 
-  Settings, 
+  Car, 
+  Clock, 
+  CreditCard, 
+  AlertCircle, 
+  ChevronRight, 
+  CheckCircle, 
+  X, 
+  Plus, 
+  Edit, 
   Trash, 
-  Upload, 
-  User, 
-  Users 
+  Filter, 
+  Search,
+  PieChart
 } from 'lucide-react';
+import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 
-// Mock parking facilities data
-const PARKING_FACILITIES = [
+// Mock data for parking spots
+const PARKING_SPOTS = [
   {
-    id: '1',
+    id: 'spot-1',
     name: 'Downtown Secure Parking',
-    address: '123 Main St, Downtown',
+    address: 'Rua Conselheiro Lafayette, 180, São Caetano do Sul',
     totalSpots: 45,
     availableSpots: 12,
-    bookedToday: 15,
-    revenue: 324.50,
+    pricePerHour: 5.50,
+    features: ['covered', 'security', 'camera'],
     status: 'active',
   },
   {
-    id: '2',
+    id: 'spot-2',
     name: 'Central Park & Go',
-    address: '456 Oak Ave, Central District',
+    address: 'Av. Goiás, 1500, São Caetano do Sul',
     totalSpots: 60,
     availableSpots: 8,
-    bookedToday: 27,
-    revenue: 487.25,
+    pricePerHour: 4.25,
+    features: ['covered', 'ev_charging'],
     status: 'active',
+  },
+  {
+    id: 'spot-3',
+    name: 'Riverside Parking Complex',
+    address: 'Rua Amazonas, 800, São Caetano do Sul',
+    totalSpots: 120,
+    availableSpots: 35,
+    pricePerHour: 3.75,
+    features: ['security'],
+    status: 'under_review',
   },
 ];
 
-// Mock bookings data
-const BOOKINGS = [
+// Mock data for reservations
+const RESERVATIONS = [
   {
-    id: '1001',
-    facility: 'Downtown Secure Parking',
-    customerName: 'Michael Johnson',
-    date: 'Today, 2:00 PM - 6:00 PM',
-    price: '$22.00',
+    id: 'res-1',
+    parkingName: 'Downtown Secure Parking',
+    spotId: 'A12',
+    customerName: 'Maria Silva',
+    date: '2023-06-15',
+    startTime: '14:00',
+    endTime: '18:00',
+    price: 22.00,
     status: 'active',
-    spotNumber: 'A-15',
   },
   {
-    id: '1002',
-    facility: 'Central Park & Go',
-    customerName: 'Sarah Williams',
-    date: 'Today, 10:00 AM - 12:00 PM',
-    price: '$8.50',
+    id: 'res-2',
+    parkingName: 'Downtown Secure Parking',
+    spotId: 'A08',
+    customerName: 'João Pereira',
+    date: '2023-06-15',
+    startTime: '10:00',
+    endTime: '12:00',
+    price: 11.00,
     status: 'completed',
-    spotNumber: 'B-22',
   },
   {
-    id: '1003',
-    facility: 'Downtown Secure Parking',
-    customerName: 'Robert Davis',
-    date: 'Today, 4:00 PM - 8:00 PM',
-    price: '$22.00',
+    id: 'res-3',
+    parkingName: 'Central Park & Go',
+    spotId: 'B07',
+    customerName: 'Ana Torres',
+    date: '2023-06-18',
+    startTime: '09:00',
+    endTime: '11:00',
+    price: 8.50,
     status: 'upcoming',
-    spotNumber: 'A-08',
   },
   {
-    id: '1004',
-    facility: 'Central Park & Go',
-    customerName: 'Jennifer Miller',
-    date: 'Tomorrow, 9:00 AM - 11:00 AM',
-    price: '$8.50',
+    id: 'res-4',
+    parkingName: 'Central Park & Go',
+    spotId: 'B12',
+    customerName: 'Carlos Mendes',
+    date: '2023-06-18',
+    startTime: '12:00',
+    endTime: '15:00',
+    price: 12.75,
     status: 'upcoming',
-    spotNumber: 'C-15',
+  },
+  {
+    id: 'res-5',
+    parkingName: 'Downtown Secure Parking',
+    spotId: 'A15',
+    customerName: 'Luisa Costa',
+    date: '2023-06-14',
+    startTime: '13:00',
+    endTime: '17:00',
+    price: 22.00,
+    status: 'completed',
   },
 ];
+
+// Mock data for earnings
+const EARNINGS_DATA = {
+  totalEarnings: 3867.50,
+  monthlyEarnings: 1245.75,
+  weeklyEarnings: 376.25,
+  earningsByMonth: [
+    { name: 'Jan', earnings: 850.25 },
+    { name: 'Feb', earnings: 920.75 },
+    { name: 'Mar', earnings: 810.50 },
+    { name: 'Apr', earnings: 1050.25 },
+    { name: 'May', earnings: 990.00 },
+    { name: 'Jun', earnings: 1245.75 },
+  ],
+  earningsByParking: [
+    { name: 'Downtown Secure', value: 2200.50 },
+    { name: 'Central Park & Go', value: 1100.75 },
+    { name: 'Riverside', value: 566.25 },
+  ],
+  occupancyRate: 68,
+};
+
+// Chart colors
+const CHART_COLORS = ['#00e879', '#33ec91', '#66f0aa'];
 
 const ParkingOwnerDashboard = () => {
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [showAddFacilityForm, setShowAddFacilityForm] = useState(false);
+  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [activeTab, setActiveTab] = useState('parking-spots');
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
-  const totalRevenue = PARKING_FACILITIES.reduce((acc, facility) => acc + facility.revenue, 0);
-  const totalBookings = BOOKINGS.length;
-  const totalAvailableSpots = PARKING_FACILITIES.reduce((acc, facility) => acc + facility.availableSpots, 0);
+  // Format status for display
+  const formatStatus = (status: string) => {
+    switch (status) {
+      case 'active':
+        return { label: 'Ativo', color: 'bg-green-500/20 text-green-600 dark:bg-green-900/40 dark:text-green-400' };
+      case 'upcoming':
+        return { label: 'Agendado', color: 'bg-orange-500/20 text-orange-600 dark:bg-orange-900/40 dark:text-orange-400' };
+      case 'completed':
+        return { label: 'Concluído', color: 'bg-blue-500/20 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400' };
+      case 'under_review':
+        return { label: 'Em análise', color: 'bg-yellow-500/20 text-yellow-600 dark:bg-yellow-900/40 dark:text-yellow-400' };
+      default:
+        return { label: status, color: 'bg-gray-500/20 text-gray-600 dark:bg-gray-900/40 dark:text-gray-400' };
+    }
+  };
   
   return (
-    <div className="page-transition">
-      <section className="py-8 md:py-12 bg-background">
-        <div className="container px-4 md:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
-              <div className="space-y-6">
-                <div className="p-6 rounded-xl glass-card">
-                  <div className="flex items-center space-x-4">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src="" />
-                      <AvatarFallback className="bg-spatioo-green text-white">PC</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h2 className="text-lg font-bold">Parking Co.</h2>
-                      <p className="text-sm text-muted-foreground">Business Account</p>
+    <div className="container p-4 max-w-6xl mx-auto">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold mb-1">Painel do Proprietário</h1>
+        <p className="text-muted-foreground">Gerencie seus estacionamentos e acompanhe seus ganhos</p>
+      </div>
+      
+      <Tabs defaultValue="parking-spots" value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid grid-cols-3 mb-6">
+          <TabsTrigger value="parking-spots">Meus estacionamentos</TabsTrigger>
+          <TabsTrigger value="reservations">Reservas</TabsTrigger>
+          <TabsTrigger value="earnings">Ganhos</TabsTrigger>
+        </TabsList>
+        
+        {/* Parking Spots Tab */}
+        <TabsContent value="parking-spots" className="space-y-4">
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar estacionamentos..."
+                  className="pl-9 pr-4 w-[300px]"
+                />
+              </div>
+              <Button variant="outline" size="sm" className="gap-1">
+                <Filter className="h-4 w-4" />
+                Filtros
+              </Button>
+            </div>
+            
+            <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+              <DialogTrigger asChild>
+                <Button className="bg-spatioo-green hover:bg-spatioo-green-dark text-black font-medium">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Adicionar novo
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                  <DialogTitle>Adicionar novo estacionamento</DialogTitle>
+                  <DialogDescription>
+                    Preencha as informações abaixo para cadastrar um novo local de estacionamento.
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <div className="grid gap-4 py-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Nome do estacionamento</label>
+                    <Input placeholder="Ex.: Estacionamento Central" />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Endereço completo</label>
+                    <Input placeholder="Rua, número, bairro, cidade" />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Total de vagas</label>
+                      <Input type="number" placeholder="Ex.: 50" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Preço por hora (R$)</label>
+                      <Input type="number" step="0.01" placeholder="Ex.: 5.50" />
                     </div>
                   </div>
-                  <div className="mt-6 space-y-2">
-                    <Button 
-                      variant="ghost" 
-                      className={cn(
-                        "w-full justify-start",
-                        activeTab === 'dashboard' && "bg-secondary"
-                      )}
-                      onClick={() => setActiveTab('dashboard')}
-                    >
-                      <Home className="mr-2 h-4 w-4" />
-                      Dashboard
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      className={cn(
-                        "w-full justify-start",
-                        activeTab === 'facilities' && "bg-secondary"
-                      )}
-                      onClick={() => setActiveTab('facilities')}
-                    >
-                      <Building className="mr-2 h-4 w-4" />
-                      Parking Facilities
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      className={cn(
-                        "w-full justify-start",
-                        activeTab === 'bookings' && "bg-secondary"
-                      )}
-                      onClick={() => setActiveTab('bookings')}
-                    >
-                      <Calendar className="mr-2 h-4 w-4" />
-                      Bookings
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      className={cn(
-                        "w-full justify-start",
-                        activeTab === 'revenue' && "bg-secondary"
-                      )}
-                      onClick={() => setActiveTab('revenue')}
-                    >
-                      <DollarSign className="mr-2 h-4 w-4" />
-                      Revenue
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      className={cn(
-                        "w-full justify-start",
-                        activeTab === 'notifications' && "bg-secondary"
-                      )}
-                      onClick={() => setActiveTab('notifications')}
-                    >
-                      <Bell className="mr-2 h-4 w-4" />
-                      Notifications
-                      <Badge className="ml-auto bg-spatioo-green text-white">3</Badge>
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      className={cn(
-                        "w-full justify-start",
-                        activeTab === 'settings' && "bg-secondary"
-                      )}
-                      onClick={() => setActiveTab('settings')}
-                    >
-                      <Settings className="mr-2 h-4 w-4" />
-                      Settings
-                    </Button>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Características</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="flex items-center">
+                        <input type="checkbox" id="covered" className="mr-2" />
+                        <label htmlFor="covered" className="text-sm">Coberto</label>
+                      </div>
+                      <div className="flex items-center">
+                        <input type="checkbox" id="security" className="mr-2" />
+                        <label htmlFor="security" className="text-sm">Segurança 24h</label>
+                      </div>
+                      <div className="flex items-center">
+                        <input type="checkbox" id="camera" className="mr-2" />
+                        <label htmlFor="camera" className="text-sm">Câmeras</label>
+                      </div>
+                      <div className="flex items-center">
+                        <input type="checkbox" id="ev_charging" className="mr-2" />
+                        <label htmlFor="ev_charging" className="text-sm">Carregamento EV</label>
+                      </div>
+                    </div>
                   </div>
-                  <div className="mt-6 pt-6 border-t">
-                    <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-foreground">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Sign Out
-                    </Button>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Descrição</label>
+                    <textarea 
+                      className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      placeholder="Descreva o seu estacionamento..."
+                      rows={3}
+                    ></textarea>
                   </div>
                 </div>
                 
-                <div className="p-6 rounded-xl border bg-background">
-                  <h3 className="font-medium mb-3">Need Help?</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Questions about managing your parking facilities or account? Our business support team is ready to assist.
-                  </p>
-                  <Button variant="outline" className="w-full">
-                    Business Support
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setShowAddDialog(false)}>
+                    Cancelar
                   </Button>
-                </div>
-              </div>
-            </div>
-            
-            {/* Main Content */}
-            <div className="lg:col-span-4">
-              {activeTab === 'dashboard' && (
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">Business Dashboard</h1>
-                    <Button className="bg-spatioo-green hover:bg-spatioo-green-dark text-white">
-                      <PlusCircle className="mr-2 h-4 w-4" />
-                      Add New Facility
-                    </Button>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">
-                          Total Revenue
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">${totalRevenue.toFixed(2)}</div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          +15.3% from last month
-                        </p>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">
-                          Active Bookings
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">{totalBookings}</div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          +8.2% from last month
-                        </p>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">
-                          Available Spots
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">{totalAvailableSpots}</div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Across {PARKING_FACILITIES.length} facilities
-                        </p>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">
-                          Customer Satisfaction
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">4.8/5</div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Based on 126 reviews
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <Card className="lg:col-span-2">
-                      <CardHeader>
-                        <CardTitle>Revenue Overview</CardTitle>
-                        <CardDescription>
-                          Daily revenue for the past 30 days
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="h-[300px] rounded-xl bg-muted flex items-center justify-center">
-                          <BarChart className="h-12 w-12 text-muted-foreground" />
-                          <span className="ml-2 text-muted-foreground">
-                            Revenue Chart Placeholder
-                          </span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Recent Bookings</CardTitle>
-                        <CardDescription>
-                          Latest parking reservations
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          {BOOKINGS.slice(0, 3).map(booking => (
-                            <div key={booking.id} className="flex items-center">
-                              <div className="mr-4 rounded-full w-8 h-8 bg-muted flex items-center justify-center">
-                                <Car className="h-4 w-4 text-muted-foreground" />
-                              </div>
-                              <div className="space-y-0.5">
-                                <p className="text-sm font-medium">{booking.customerName}</p>
-                                <p className="text-xs text-muted-foreground">{booking.facility}</p>
-                              </div>
-                              <Badge 
-                                className={cn(
-                                  "ml-auto",
-                                  booking.status === 'active' 
-                                    ? "bg-green-500 hover:bg-green-600" 
-                                    : booking.status === 'upcoming'
-                                    ? "bg-blue-500 hover:bg-blue-600"
-                                    : "bg-gray-500 hover:bg-gray-600"
-                                )}
-                              >
-                                {booking.status === 'active' 
-                                  ? 'Active' 
-                                  : booking.status === 'upcoming'
-                                  ? 'Upcoming'
-                                  : 'Completed'}
-                              </Badge>
-                            </div>
-                          ))}
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="w-full text-center text-muted-foreground hover:text-foreground"
-                            onClick={() => setActiveTab('bookings')}
-                          >
-                            View All Bookings
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                  
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Your Parking Facilities</CardTitle>
-                      <CardDescription>
-                        Manage your parking locations
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {PARKING_FACILITIES.map(facility => (
-                          <div key={facility.id} className="p-4 rounded-lg border bg-background">
-                            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                              <div className="space-y-2">
-                                <div className="flex items-center">
-                                  <h3 className="font-bold text-foreground">{facility.name}</h3>
-                                  <Badge className="ml-2 bg-green-500 hover:bg-green-600">
-                                    Active
-                                  </Badge>
-                                </div>
-                                <div className="flex items-center text-muted-foreground">
-                                  <MapPin className="h-4 w-4 mr-1" />
-                                  <span className="text-sm">{facility.address}</span>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                  <span className="text-sm text-muted-foreground">
-                                    Total Spots: {facility.totalSpots}
-                                  </span>
-                                  <span className="text-sm text-muted-foreground">
-                                    Available: {facility.availableSpots}
-                                  </span>
-                                </div>
-                              </div>
-                              
-                              <div className="flex flex-col md:items-end gap-2">
-                                <div className="text-lg font-bold text-spatioo-green">
-                                  ${facility.revenue.toFixed(2)}
-                                </div>
-                                <div className="text-sm text-muted-foreground">
-                                  {facility.bookedToday} bookings today
-                                </div>
-                                <div className="flex gap-2">
-                                  <Button variant="outline" size="sm">
-                                    <Edit className="h-3 w-3 mr-1" />
-                                    Edit
-                                  </Button>
-                                  <Button variant="outline" size="sm">
-                                    Manage Spots
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                        
-                        <Button 
-                          className="w-full justify-center border-dashed"
-                          variant="outline"
-                          onClick={() => setShowAddFacilityForm(true)}
-                        >
-                          <PlusCircle className="h-4 w-4 mr-2" />
-                          Add New Parking Facility
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              )}
+                  <Button className="bg-spatioo-green hover:bg-spatioo-green-dark text-black font-medium">
+                    Cadastrar estacionamento
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+          
+          <div className="grid gap-4">
+            {PARKING_SPOTS.map((parking) => {
+              const status = formatStatus(parking.status);
               
-              {activeTab === 'facilities' && (
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">Parking Facilities</h1>
-                    <Button 
-                      className="bg-spatioo-green hover:bg-spatioo-green-dark text-white"
-                      onClick={() => setShowAddFacilityForm(true)}
-                    >
-                      <PlusCircle className="mr-2 h-4 w-4" />
-                      Add New Facility
-                    </Button>
-                  </div>
-                  
-                  {showAddFacilityForm ? (
-                    <Card className="border-2 border-spatioo-green/50">
-                      <CardHeader>
-                        <CardTitle>Add New Parking Facility</CardTitle>
-                        <CardDescription>
-                          Enter the details of your new parking location
+              return (
+                <Card key={parking.id}>
+                  <CardHeader className="pb-2">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle>{parking.name}</CardTitle>
+                        <CardDescription className="flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          {parking.address}
                         </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium">Facility Name</label>
-                              <Input placeholder="e.g. Central Business Parking" />
-                            </div>
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium">Address</label>
-                              <Input placeholder="Full street address" />
-                            </div>
-                          </div>
+                      </div>
+                      <div className={`px-2 py-1 rounded-full text-xs ${status.color}`}>
+                        {status.label}
+                      </div>
+                    </div>
+                  </CardHeader>
+                  
+                  <CardContent className="pb-2">
+                    <div className="grid grid-cols-4 gap-4 mt-2">
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Total de vagas</p>
+                        <p className="font-bold">{parking.totalSpots}</p>
+                      </div>
+                      
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Vagas disponíveis</p>
+                        <p className="font-bold text-spatioo-green">{parking.availableSpots}</p>
+                      </div>
+                      
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Taxa de ocupação</p>
+                        <p className="font-bold">{Math.round(((parking.totalSpots - parking.availableSpots) / parking.totalSpots) * 100)}%</p>
+                      </div>
+                      
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Preço / hora</p>
+                        <p className="font-bold">R$ {parking.pricePerHour.toFixed(2)}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-2 mt-4">
+                      {parking.features.includes('covered') && 
+                        <Badge variant="outline" className="bg-background">Coberto</Badge>
+                      }
+                      {parking.features.includes('security') && 
+                        <Badge variant="outline" className="bg-background">Segurança 24h</Badge>
+                      }
+                      {parking.features.includes('camera') && 
+                        <Badge variant="outline" className="bg-background">Câmeras</Badge>
+                      }
+                      {parking.features.includes('ev_charging') && 
+                        <Badge variant="outline" className="bg-background">Carregamento EV</Badge>
+                      }
+                    </div>
+                  </CardContent>
+                  
+                  <CardFooter className="flex justify-between items-center pt-2">
+                    <div>
+                      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20">
+                            <Trash className="h-4 w-4 mr-1" />
+                            Remover
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Remover estacionamento</DialogTitle>
+                            <DialogDescription>
+                              Tem certeza que deseja remover este estacionamento? Esta ação não pode ser desfeita.
+                            </DialogDescription>
+                          </DialogHeader>
                           
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium">City</label>
-                              <Input placeholder="City" />
-                            </div>
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium">State/Province</label>
-                              <Input placeholder="State" />
-                            </div>
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium">ZIP/Postal Code</label>
-                              <Input placeholder="ZIP Code" />
-                            </div>
-                          </div>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium">Total Parking Spots</label>
-                              <Input type="number" placeholder="e.g. 50" />
-                            </div>
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium">Price per Hour ($)</label>
-                              <Input type="number" placeholder="e.g. 5.00" step="0.01" />
-                            </div>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium">Description</label>
-                            <textarea 
-                              className="w-full h-24 rounded-md border border-input bg-background px-3 py-2 text-sm"
-                              placeholder="Describe your parking facility and any special features..."
-                            ></textarea>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium">Facility Photos</label>
-                            <div className="border-2 border-dashed border-muted-foreground/25 rounded-md p-8 text-center">
-                              <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                              <p className="text-sm text-muted-foreground mb-2">
-                                Drag and drop files here, or click to browse
-                              </p>
-                              <Button variant="outline" size="sm">
-                                Upload Photos
-                              </Button>
-                            </div>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium">Amenities & Features</label>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                              <div className="flex items-center">
-                                <input type="checkbox" id="covered" className="mr-2" />
-                                <label htmlFor="covered" className="text-sm">Covered Parking</label>
-                              </div>
-                              <div className="flex items-center">
-                                <input type="checkbox" id="security" className="mr-2" />
-                                <label htmlFor="security" className="text-sm">24/7 Security</label>
-                              </div>
-                              <div className="flex items-center">
-                                <input type="checkbox" id="ev" className="mr-2" />
-                                <label htmlFor="ev" className="text-sm">EV Charging</label>
-                              </div>
-                              <div className="flex items-center">
-                                <input type="checkbox" id="accessible" className="mr-2" />
-                                <label htmlFor="accessible" className="text-sm">Accessible Spots</label>
-                              </div>
-                              <div className="flex items-center">
-                                <input type="checkbox" id="valet" className="mr-2" />
-                                <label htmlFor="valet" className="text-sm">Valet Service</label>
-                              </div>
-                              <div className="flex items-center">
-                                <input type="checkbox" id="camera" className="mr-2" />
-                                <label htmlFor="camera" className="text-sm">Security Cameras</label>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          <div className="flex justify-end space-x-2 pt-4">
-                            <Button 
-                              variant="outline" 
-                              onClick={() => setShowAddFacilityForm(false)}
-                            >
-                              Cancel
-                            </Button>
-                            <Button className="bg-spatioo-green hover:bg-spatioo-green-dark text-white">
-                              Add Facility
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    <div className="space-y-6">
-                      {PARKING_FACILITIES.map(facility => (
-                        <Card key={facility.id}>
-                          <CardHeader>
-                            <div className="flex justify-between items-center">
-                              <div>
-                                <CardTitle>{facility.name}</CardTitle>
-                                <CardDescription>
-                                  <MapPin className="h-3 w-3 inline mr-1" />
-                                  {facility.address}
-                                </CardDescription>
-                              </div>
-                              <Badge className="bg-green-500 hover:bg-green-600">
-                                Active
-                              </Badge>
-                            </div>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                              <div className="flex flex-col items-center p-4 rounded-lg border">
-                                <div className="text-2xl font-bold">{facility.totalSpots}</div>
-                                <div className="text-sm text-muted-foreground">Total Spots</div>
-                              </div>
-                              <div className="flex flex-col items-center p-4 rounded-lg border">
-                                <div className="text-2xl font-bold text-spatioo-green">{facility.availableSpots}</div>
-                                <div className="text-sm text-muted-foreground">Available Now</div>
-                              </div>
-                              <div className="flex flex-col items-center p-4 rounded-lg border">
-                                <div className="text-2xl font-bold">{facility.bookedToday}</div>
-                                <div className="text-sm text-muted-foreground">Bookings Today</div>
-                              </div>
-                              <div className="flex flex-col items-center p-4 rounded-lg border">
-                                <div className="text-2xl font-bold text-spatioo-green">${facility.revenue.toFixed(2)}</div>
-                                <div className="text-sm text-muted-foreground">Revenue Today</div>
-                              </div>
+                          <div className="py-4">
+                            <div className="p-3 border rounded-lg mb-4">
+                              <p className="font-medium">{parking.name}</p>
+                              <p className="text-sm text-muted-foreground">{parking.address}</p>
                             </div>
                             
-                            <div className="mt-6 flex justify-between">
-                              <div className="flex space-x-2">
-                                <Button variant="outline">
-                                  <Edit className="h-4 w-4 mr-2" />
-                                  Edit Details
-                                </Button>
-                                <Button variant="outline">
-                                  <ParkingCircle className="h-4 w-4 mr-2" />
-                                  Manage Spots
-                                </Button>
-                                <Button variant="outline">
-                                  <Users className="h-4 w-4 mr-2" />
-                                  Booking History
-                                </Button>
-                              </div>
-                              <Button variant="outline" className="text-red-500 hover:text-red-700">
-                                <Trash className="h-4 w-4 mr-2" />
-                                Remove
-                              </Button>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                      
-                      <Card className="border-dashed">
-                        <CardContent className="flex flex-col items-center justify-center p-10">
-                          <Building className="h-12 w-12 text-muted-foreground mb-4" />
-                          <h3 className="text-lg font-medium mb-2">Add Another Facility</h3>
-                          <p className="text-muted-foreground text-center max-w-md mb-4">
-                            Increase your capacity and revenue by adding another parking facility to your account.
-                          </p>
-                          <Button 
-                            className="bg-spatioo-green hover:bg-spatioo-green-dark text-white"
-                            onClick={() => setShowAddFacilityForm(true)}
-                          >
-                            <PlusCircle className="mr-2 h-4 w-4" />
-                            Add New Facility
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  )}
-                </div>
-              )}
-              
-              {activeTab === 'bookings' && (
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">Bookings</h1>
-                    <div className="flex gap-2">
-                      <select className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm">
-                        <option>All Facilities</option>
-                        <option>Downtown Secure Parking</option>
-                        <option>Central Park & Go</option>
-                      </select>
-                      <Button variant="outline">
-                        <FileText className="h-4 w-4 mr-2" />
-                        Export
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <Tabs defaultValue="all">
-                    <TabsList className="grid w-full grid-cols-4">
-                      <TabsTrigger value="all">All</TabsTrigger>
-                      <TabsTrigger value="active">Active</TabsTrigger>
-                      <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-                      <TabsTrigger value="completed">Completed</TabsTrigger>
-                    </TabsList>
-                    
-                    <TabsContent value="all" className="space-y-4 pt-4">
-                      <div className="flex justify-between items-center">
-                        <div className="flex gap-2">
-                          <Input placeholder="Search bookings..." className="w-64" />
-                          <Button variant="outline" size="icon">
-                            <Search className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-muted-foreground">
-                            Sort by:
-                          </span>
-                          <select className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm">
-                            <option>Newest First</option>
-                            <option>Oldest First</option>
-                            <option>Price: High to Low</option>
-                            <option>Price: Low to High</option>
-                          </select>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-4">
-                        {BOOKINGS.map(booking => (
-                          <div key={booking.id} className="p-4 rounded-lg border bg-background">
-                            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                              <div className="space-y-2">
-                                <div className="flex items-center">
-                                  <h3 className="font-bold text-foreground">{booking.customerName}</h3>
-                                  <Badge 
-                                    className={cn(
-                                      "ml-2",
-                                      booking.status === 'active' 
-                                        ? "bg-green-500 hover:bg-green-600" 
-                                        : booking.status === 'upcoming'
-                                        ? "bg-blue-500 hover:bg-blue-600"
-                                        : "bg-gray-500 hover:bg-gray-600"
-                                    )}
-                                  >
-                                    {booking.status === 'active' 
-                                      ? 'Active' 
-                                      : booking.status === 'upcoming'
-                                      ? 'Upcoming'
-                                      : 'Completed'}
-                                  </Badge>
-                                </div>
-                                <div className="flex items-center text-muted-foreground">
-                                  <Building className="h-4 w-4 mr-1" />
-                                  <span className="text-sm">{booking.facility}</span>
-                                </div>
-                                <div className="flex items-center text-muted-foreground">
-                                  <Calendar className="h-4 w-4 mr-1" />
-                                  <span className="text-sm">{booking.date}</span>
-                                </div>
-                              </div>
-                              
-                              <div className="flex flex-col md:items-end gap-2">
-                                <div className="text-right">
-                                  <div className="text-lg font-bold text-spatioo-green">{booking.price}</div>
-                                  <div className="text-sm text-muted-foreground">
-                                    Spot: {booking.spotNumber}
-                                  </div>
-                                </div>
-                                
-                                <div className="flex gap-2">
-                                  <Button variant="outline" size="sm">
-                                    <User className="h-3 w-3 mr-1" />
-                                    Customer Info
-                                  </Button>
-                                  <Button variant="outline" size="sm">
-                                    View Details
-                                  </Button>
+                            <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200 dark:border-red-800">
+                              <div className="flex items-start gap-2">
+                                <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5" />
+                                <div>
+                                  <p className="text-sm font-medium text-red-600 dark:text-red-400">Atenção</p>
+                                  <p className="text-sm text-red-600/80 dark:text-red-400/80">
+                                    Ao remover este estacionamento, todas as reservas futuras serão canceladas e os clientes notificados.
+                                  </p>
                                 </div>
                               </div>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                      
-                      <div className="flex justify-center mt-6">
-                        <div className="flex items-center space-x-2">
-                          <Button variant="outline" size="sm" disabled>
-                            Previous
-                          </Button>
-                          <Button variant="outline" size="sm" className="bg-secondary">
-                            1
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            2
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            3
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            Next
-                          </Button>
-                        </div>
-                      </div>
-                    </TabsContent>
+                          
+                          <DialogFooter>
+                            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+                              Cancelar
+                            </Button>
+                            <Button variant="destructive" onClick={() => setShowDeleteDialog(false)}>
+                              Confirmar remoção
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
                     
-                    <TabsContent value="active" className="pt-4">
-                      <div className="p-8 text-center">
-                        <Car className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                        <h3 className="text-lg font-medium mb-2">Active Bookings</h3>
-                        <p className="text-muted-foreground mb-4">
-                          Content for active bookings tab would be displayed here.
-                        </p>
-                      </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="upcoming" className="pt-4">
-                      <div className="p-8 text-center">
-                        <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                        <h3 className="text-lg font-medium mb-2">Upcoming Bookings</h3>
-                        <p className="text-muted-foreground mb-4">
-                          Content for upcoming bookings tab would be displayed here.
-                        </p>
-                      </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="completed" className="pt-4">
-                      <div className="p-8 text-center">
-                        <CheckCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                        <h3 className="text-lg font-medium mb-2">Completed Bookings</h3>
-                        <p className="text-muted-foreground mb-4">
-                          Content for completed bookings tab would be displayed here.
-                        </p>
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </div>
-              )}
-              
-              {activeTab === 'revenue' && (
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">Revenue Reports</h1>
                     <div className="flex gap-2">
-                      <select className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm">
-                        <option>Last 30 Days</option>
-                        <option>This Month</option>
-                        <option>Last Month</option>
-                        <option>This Year</option>
-                      </select>
-                      <Button variant="outline">
-                        <FileText className="h-4 w-4 mr-2" />
-                        Export
+                      <Button variant="outline" size="sm">
+                        <Edit className="h-4 w-4 mr-1" />
+                        Editar
+                      </Button>
+                      <Button size="sm" className="bg-spatioo-green hover:bg-spatioo-green-dark text-black font-medium">
+                        Gerenciar vagas
                       </Button>
                     </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">
-                          Total Revenue
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">${totalRevenue.toFixed(2)}</div>
-                        <p className="text-xs text-green-500 mt-1">
-                          +15.3% from last period
-                        </p>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">
-                          Average Daily Revenue
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">$27.01</div>
-                        <p className="text-xs text-green-500 mt-1">
-                          +5.7% from last period
-                        </p>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">
-                          Occupancy Rate
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">68%</div>
-                        <p className="text-xs text-green-500 mt-1">
-                          +8.2% from last period
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </div>
-                  
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Revenue Trends</CardTitle>
-                      <CardDescription>
-                        Revenue breakdown over the past 30 days
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="h-[400px] rounded-xl bg-muted flex items-center justify-center">
-                        <BarChart className="h-12 w-12 text-muted-foreground" />
-                        <span className="ml-2 text-muted-foreground">
-                          Revenue Trends Chart Placeholder
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Revenue by Facility</CardTitle>
-                        <CardDescription>
-                          Revenue distribution across parking facilities
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="h-[300px] rounded-xl bg-muted flex items-center justify-center">
-                          <PieChart className="h-12 w-12 text-muted-foreground" />
-                          <span className="ml-2 text-muted-foreground">
-                            Revenue by Facility Chart Placeholder
-                          </span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Revenue by Time of Day</CardTitle>
-                        <CardDescription>
-                          When your parking spots generate the most revenue
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="h-[300px] rounded-xl bg-muted flex items-center justify-center">
-                          <BarChart className="h-12 w-12 text-muted-foreground" />
-                          <span className="ml-2 text-muted-foreground">
-                            Revenue by Time Chart Placeholder
-                          </span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-              )}
+                  </CardFooter>
+                </Card>
+              );
+            })}
+          </div>
+        </TabsContent>
+        
+        {/* Reservations Tab */}
+        <TabsContent value="reservations" className="space-y-4">
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex items-center gap-2">
+              <Button 
+                variant={activeTab === 'all' ? 'default' : 'outline'} 
+                size="sm" 
+                className="text-xs"
+                onClick={() => setActiveTab('all')}
+              >
+                Todos
+              </Button>
+              <Button 
+                variant={activeTab === 'active' ? 'default' : 'outline'} 
+                size="sm"
+                className="text-xs"
+                onClick={() => setActiveTab('active')}
+              >
+                Ativos
+              </Button>
+              <Button 
+                variant={activeTab === 'upcoming' ? 'default' : 'outline'} 
+                size="sm"
+                className="text-xs"
+                onClick={() => setActiveTab('upcoming')}
+              >
+                Agendados
+              </Button>
+              <Button 
+                variant={activeTab === 'completed' ? 'default' : 'outline'} 
+                size="sm"
+                className="text-xs"
+                onClick={() => setActiveTab('completed')}
+              >
+                Concluídos
+              </Button>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs gap-1"
+                  >
+                    <CalendarIcon className="h-3 w-3" />
+                    {date ? format(date, 'PPP') : 'Selecionar data'}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              
+              <Button variant="outline" size="sm" className="gap-1">
+                <Filter className="h-4 w-4" />
+                Filtros
+              </Button>
             </div>
           </div>
-        </div>
-      </section>
+          
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Cliente</TableHead>
+                    <TableHead>Estacionamento</TableHead>
+                    <TableHead>Vaga</TableHead>
+                    <TableHead>Data e hora</TableHead>
+                    <TableHead>Valor</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {RESERVATIONS.map((reservation) => {
+                    const status = formatStatus(reservation.status);
+                    
+                    return (
+                      <TableRow key={reservation.id}>
+                        <TableCell className="font-medium">{reservation.customerName}</TableCell>
+                        <TableCell>{reservation.parkingName}</TableCell>
+                        <TableCell>{reservation.spotId}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-col">
+                            <span>{reservation.date}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {reservation.startTime} - {reservation.endTime}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>R$ {reservation.price.toFixed(2)}</TableCell>
+                        <TableCell>
+                          <div className={`px-2 py-1 rounded-full text-xs inline-block ${status.color}`}>
+                            {status.label}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <ChevronRight className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        {/* Earnings Tab */}
+        <TabsContent value="earnings" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <Card>
+              <CardContent className="p-6 flex gap-4 items-center">
+                <div className="h-12 w-12 rounded-full bg-spatioo-green/20 flex items-center justify-center">
+                  <CheckCircle className="h-6 w-6 text-spatioo-green" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Ganhos totais</p>
+                  <p className="text-2xl font-bold">R$ {EARNINGS_DATA.totalEarnings.toFixed(2)}</p>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-6 flex gap-4 items-center">
+                <div className="h-12 w-12 rounded-full bg-blue-500/20 flex items-center justify-center">
+                  <CalendarIcon className="h-6 w-6 text-blue-500" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Ganhos no mês</p>
+                  <p className="text-2xl font-bold">R$ {EARNINGS_DATA.monthlyEarnings.toFixed(2)}</p>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-6 flex gap-4 items-center">
+                <div className="h-12 w-12 rounded-full bg-orange-500/20 flex items-center justify-center">
+                  <PieChart className="h-6 w-6 text-orange-500" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Taxa de ocupação</p>
+                  <p className="text-2xl font-bold">{EARNINGS_DATA.occupancyRate}%</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <Card className="mb-4">
+            <CardHeader>
+              <CardTitle>Ganhos mensais</CardTitle>
+              <CardDescription>Visualize a evolução dos seus ganhos ao longo dos meses</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={EARNINGS_DATA.earningsByMonth}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip 
+                      formatter={(value) => [`R$ ${value}`, 'Ganhos']}
+                      contentStyle={{ 
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)', 
+                        border: '1px solid #eee', 
+                        borderRadius: '8px' 
+                      }}
+                    />
+                    <Bar dataKey="earnings" fill="#00e879" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Ganhos por estacionamento</CardTitle>
+                <CardDescription>Visualize quais estacionamentos geram mais receita</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px] flex items-center justify-center">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsPieChart>
+                      <Pie
+                        data={EARNINGS_DATA.earningsByParking}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={100}
+                        paddingAngle={5}
+                        dataKey="value"
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      >
+                        {EARNINGS_DATA.earningsByParking.map((_, index) => (
+                          <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        formatter={(value) => [`R$ ${value}`, 'Ganhos']}
+                        contentStyle={{ 
+                          backgroundColor: 'rgba(255, 255, 255, 0.9)', 
+                          border: '1px solid #eee', 
+                          borderRadius: '8px' 
+                        }}
+                      />
+                    </RechartsPieChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Extrato financeiro</CardTitle>
+                <CardDescription>Últimos pagamentos recebidos em sua conta</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <CreditCard className="h-5 w-5 text-muted-foreground" />
+                      <div>
+                        <p className="font-medium">Pagamento Spatioo - Junho Semana 2</p>
+                        <p className="text-xs text-muted-foreground">Recebido em 15/06/2023</p>
+                      </div>
+                    </div>
+                    <p className="font-bold text-spatioo-green">+ R$ 376.25</p>
+                  </div>
+                  
+                  <div className="flex justify-between items-center p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <CreditCard className="h-5 w-5 text-muted-foreground" />
+                      <div>
+                        <p className="font-medium">Pagamento Spatioo - Junho Semana 1</p>
+                        <p className="text-xs text-muted-foreground">Recebido em 08/06/2023</p>
+                      </div>
+                    </div>
+                    <p className="font-bold text-spatioo-green">+ R$ 412.50</p>
+                  </div>
+                  
+                  <div className="flex justify-between items-center p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <CreditCard className="h-5 w-5 text-muted-foreground" />
+                      <div>
+                        <p className="font-medium">Pagamento Spatioo - Maio Semana 4</p>
+                        <p className="text-xs text-muted-foreground">Recebido em 01/06/2023</p>
+                      </div>
+                    </div>
+                    <p className="font-bold text-spatioo-green">+ R$ 389.75</p>
+                  </div>
+                  
+                  <Button variant="outline" size="sm" className="w-full">
+                    Ver todos os pagamentos
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
