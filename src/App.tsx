@@ -28,8 +28,8 @@ const App = () => (
         <BrowserRouter>
           <AuthProvider>
             <Routes>
-              {/* Redirect root to explore (main tool) */}
-              <Route path="/" element={<Navigate to="/explore" replace />} />
+              {/* Redirect root to login */}
+              <Route path="/" element={<Navigate to="/login" replace />} />
               <Route path="/login" element={<Login />} />
               <Route path="/" element={<RequireAuth><Layout /></RequireAuth>}>
                 <Route path="home" element={<Home />} />

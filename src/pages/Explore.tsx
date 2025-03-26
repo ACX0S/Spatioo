@@ -1,24 +1,25 @@
 
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, MapPin, Star, Navigation } from 'lucide-react';
+import { MapPin, Star, Navigation } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { fetchAllParkingSpots } from '@/services/parkingService';
 import { ParkingSpot } from '@/types/parking';
-import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import '@/styles/map.css';
+import AutocompleteSearch from '@/components/AutocompleteSearch';
 
 const Explore = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const location = useLocation();
   const [parkingSpots, setParkingSpots] = useState<ParkingSpot[]>([]);
   const [loading, setLoading] = useState(true);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [sortedParkingSpots, setSortedParkingSpots] = useState<(ParkingSpot & { distance?: number })[]>([]);
+  const initialSearch = location.state?.search || '';
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
   
   // Get user's location
   useEffect(() => {
@@ -105,25 +106,34 @@ const Explore = () => {
     setSortedParkingSpots(sorted);
   }, [userLocation, parkingSpots]);
   
+  // Handle search
+  const handleSearch = (query: string) => {
+    setSearchTerm(query);
+  };
+  
+  // Handle direct navigation to spot details
+  const handleParkingSelect = (spot: ParkingSpot) => {
+    window.location.href = `/parking/${spot.id}`;
+  };
+  
   // Filter spots based on search term
   const filteredSpots = sortedParkingSpots.filter(spot => 
-    spot.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    spot.address.toLowerCase().includes(searchTerm.toLowerCase())
+    searchTerm ? (
+      spot.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      spot.address.toLowerCase().includes(searchTerm.toLowerCase())
+    ) : true
   );
   
   return (
     <div className="container mx-auto px-4 py-6">
       <h1 className="text-2xl font-bold mb-6">Encontre Estacionamentos Próximos</h1>
       
-      {/* Search Bar */}
-      <div className="relative mb-6">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input 
-          type="text" 
-          placeholder="Buscar por nome ou endereço" 
-          className="pl-9 pr-4 py-2 w-full"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+      {/* Search Bar with Autocomplete */}
+      <div className="mb-6">
+        <AutocompleteSearch 
+          onSearch={handleSearch}
+          onParkingSelect={handleParkingSelect}
+          placeholder="Buscar por nome ou endereço"
         />
       </div>
       

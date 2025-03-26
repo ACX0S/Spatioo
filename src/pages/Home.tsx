@@ -1,22 +1,19 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Car, MapPin, Clock, Navigation, Search, Star, Compass, TrendingUp, History } from 'lucide-react';
+import { Car, MapPin, Clock, Navigation, Star, Compass, TrendingUp, History } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { ParkingSpot } from '@/types/parking';
 import { toast } from '@/components/ui/use-toast';
-import { searchParkingSpots } from '@/services/parkingService';
+import AutocompleteSearch from '@/components/AutocompleteSearch';
 
 const Home = () => {
   const navigate = useNavigate();
   const { profile } = useAuth();
-  const [searchQuery, setSearchQuery] = useState('');
   const [userLocation, setUserLocation] = useState('Obtendo localização...');
   const [nearbyParkingSpots, setNearbyParkingSpots] = useState<ParkingSpot[]>([]);
   const [popularDestinations, setPopularDestinations] = useState<ParkingSpot[]>([]);
@@ -78,18 +75,16 @@ const Home = () => {
   }, []);
 
   // Handle search submission
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (searchQuery.trim()) {
+  const handleSearch = (query: string) => {
+    if (query.trim()) {
       try {
         // Salvar busca no histórico recente
-        const updatedSearches = [searchQuery, ...recentSearches.filter(s => s !== searchQuery)].slice(0, 4);
+        const updatedSearches = [query, ...recentSearches.filter(s => s !== query)].slice(0, 4);
         setRecentSearches(updatedSearches);
         localStorage.setItem('recentSearches', JSON.stringify(updatedSearches));
         
         // Realizar a busca e navegar para os resultados
-        navigate('/explore', { state: { search: searchQuery } });
+        navigate('/explore', { state: { search: query } });
       } catch (error) {
         console.error('Erro ao realizar busca:', error);
         toast({
@@ -99,6 +94,11 @@ const Home = () => {
         });
       }
     }
+  };
+
+  // Handle parking spot selection
+  const handleParkingSelect = (spot: ParkingSpot) => {
+    navigate(`/parking/${spot.id}`);
   };
 
   // Handle suggestion click
@@ -131,23 +131,11 @@ const Home = () => {
         transition={{ duration: 0.3, delay: 0.1 }}
         className="mb-6"
       >
-        <form onSubmit={handleSearch} className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input
-            type="text"
-            placeholder="Para onde você vai?"
-            className="pl-10 pr-4 h-12 rounded-full bg-card shadow-sm border-input"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <Button 
-            type="submit"
-            size="sm" 
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full bg-spatioo-green hover:bg-spatioo-green-dark text-black h-8"
-          >
-            <Search className="h-4 w-4" />
-          </Button>
-        </form>
+        <AutocompleteSearch 
+          onSearch={handleSearch} 
+          onParkingSelect={handleParkingSelect}
+          placeholder="Para onde você vai?"
+        />
       </motion.div>
 
       {/* Quick Actions */}

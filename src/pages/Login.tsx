@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -12,7 +11,6 @@ import { toast } from '@/components/ui/use-toast';
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const from = (location.state as any)?.from?.pathname || '/home';
   
   const { signIn, signUp, user } = useAuth();
   const [email, setEmail] = useState('');
@@ -231,7 +229,7 @@ const Login = () => {
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="password"
-                    placeholder="••••••••"
+                    placeholder="•••���••••"
                     className="pl-10"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}

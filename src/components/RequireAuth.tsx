@@ -21,7 +21,7 @@ const RequireAuth: React.FC<RequireAuthProps> = ({ children }) => {
   }
 
   if (!user) {
-    // Redirecionar para página de login, mantendo a rota original como state
+    // Redirecionar para página de login
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

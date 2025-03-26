@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useBookings } from '@/hooks/useBookings';
+import ChangePasswordDialog from '@/components/ChangePasswordDialog';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -279,9 +280,13 @@ const Profile = () => {
                       <p className="text-xs text-muted-foreground">Atualizar sua senha de acesso</p>
                     </div>
                   </div>
-                  <Button variant="ghost" size="sm" className="h-9">
-                    <ChevronLeft className="h-4 w-4 rotate-180" />
-                  </Button>
+                  <ChangePasswordDialog 
+                    trigger={
+                      <Button variant="ghost" size="sm" className="h-9">
+                        <ChevronLeft className="h-4 w-4 rotate-180" />
+                      </Button>
+                    } 
+                  />
                 </div>
                 
                 <div className="flex justify-between items-center">
