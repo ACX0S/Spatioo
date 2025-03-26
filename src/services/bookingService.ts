@@ -6,12 +6,21 @@ import { toast } from '@/components/ui/use-toast';
 // Buscar todas as reservas do usuário
 export const fetchUserBookings = async (): Promise<Booking[]> => {
   try {
+    // Get the current user
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      console.log('No authenticated user found');
+      return [];
+    }
+    
     const { data: bookings, error } = await supabase
       .from('bookings')
       .select(`
         *,
         parking_spots:parking_spot_id (name, address)
       `)
+      .eq('user_id', user.id)
       .order('date', { ascending: true })
       .order('start_time', { ascending: true });
     
@@ -22,12 +31,12 @@ export const fetchUserBookings = async (): Promise<Booking[]> => {
       ...booking,
       parkingName: booking.parking_spots?.name,
       parkingAddress: booking.parking_spots?.address,
-      // Ensure status is one of the allowed types
-      status: booking.status as 'active' | 'upcoming' | 'completed' | 'cancelled'
+      // Ensure status is one of the allowed types with type assertion
+      status: (booking.status || 'upcoming') as 'active' | 'upcoming' | 'completed' | 'cancelled'
     }));
   } catch (error: any) {
     console.error('Erro ao buscar reservas:', error.message);
-    throw new Error('Falha ao carregar suas reservas.');
+    return []; // Return empty array instead of throwing
   }
 };
 
@@ -63,8 +72,8 @@ export const createBooking = async (bookingData: Omit<Booking, 'id' | 'user_id' 
       ...data,
       parkingName: data.parking_spots?.name,
       parkingAddress: data.parking_spots?.address,
-      // Ensure status is one of the allowed types
-      status: data.status as 'active' | 'upcoming' | 'completed' | 'cancelled'
+      // Ensure status is one of the allowed types with type assertion
+      status: (data.status || 'upcoming') as 'active' | 'upcoming' | 'completed' | 'cancelled'
     };
   } catch (error: any) {
     console.error('Erro ao criar reserva:', error.message);

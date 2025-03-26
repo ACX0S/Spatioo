@@ -12,8 +12,10 @@ export const useBookings = () => {
   const { user } = useAuth();
 
   const loadBookings = async () => {
+    // If no user, set loading to false and return early
     if (!user) {
       setLoading(false);
+      setBookings([]);
       return;
     }
 
@@ -25,12 +27,17 @@ export const useBookings = () => {
     } catch (err: any) {
       console.error('Erro ao carregar reservas:', err);
       setError(err.message || 'Erro ao carregar suas reservas');
+      
+      // Set empty bookings array to avoid undefined errors
+      setBookings([]);
+      
       toast({
         title: "Erro",
         description: err.message || "Não foi possível carregar suas reservas.",
         variant: "destructive"
       });
     } finally {
+      // Always set loading to false regardless of success or failure
       setLoading(false);
     }
   };
@@ -59,8 +66,16 @@ export const useBookings = () => {
     }
   };
 
+  // Add a timeout to ensure loading state doesn't get stuck
   useEffect(() => {
     loadBookings();
+    
+    // Add a safety timeout to ensure loading state doesn't get stuck
+    const safetyTimeout = setTimeout(() => {
+      if (loading) setLoading(false);
+    }, 5000);
+    
+    return () => clearTimeout(safetyTimeout);
   }, [user]);
 
   return { 

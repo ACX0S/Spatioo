@@ -18,12 +18,13 @@ export const fetchAllParkingSpots = async (): Promise<ParkingSpot[]> => {
     return data || [];
   } catch (error: any) {
     console.error('Failed to fetch parking spots:', error.message);
-    throw new Error('Falha ao buscar estacionamentos');
+    // Return empty array instead of throwing to prevent infinite loading
+    return [];
   }
 };
 
 // Buscar um estacionamento pelo ID
-export const fetchParkingSpotById = async (id: string): Promise<ParkingSpot> => {
+export const fetchParkingSpotById = async (id: string): Promise<ParkingSpot | null> => {
   try {
     const { data, error } = await supabase
       .from('parking_spots')
@@ -36,14 +37,11 @@ export const fetchParkingSpotById = async (id: string): Promise<ParkingSpot> => 
       throw error;
     }
     
-    if (!data) {
-      throw new Error('Estacionamento não encontrado');
-    }
-    
     return data;
   } catch (error: any) {
     console.error('Failed to fetch parking spot:', error.message);
-    throw new Error('Falha ao buscar detalhes do estacionamento');
+    // Return null instead of throwing to prevent infinite loading
+    return null;
   }
 };
 
@@ -63,7 +61,8 @@ export const fetchNearbyParkingSpots = async (): Promise<ParkingSpot[]> => {
     return data || [];
   } catch (error: any) {
     console.error('Failed to fetch nearby spots:', error.message);
-    throw new Error('Falha ao buscar estacionamentos próximos');
+    // Return empty array instead of throwing to prevent infinite loading
+    return [];
   }
 };
 
@@ -84,7 +83,8 @@ export const fetchPopularParkingSpots = async (limit: number = 4): Promise<Parki
     return data || [];
   } catch (error: any) {
     console.error('Failed to fetch popular spots:', error.message);
-    throw new Error('Falha ao buscar estacionamentos populares');
+    // Return empty array instead of throwing to prevent infinite loading
+    return [];
   }
 };
 
@@ -105,6 +105,7 @@ export const searchParkingSpots = async (searchTerm: string): Promise<ParkingSpo
     return data || [];
   } catch (error: any) {
     console.error('Failed to search spots:', error.message);
-    throw new Error('Falha ao buscar resultados da pesquisa');
+    // Return empty array instead of throwing to prevent infinite loading
+    return [];
   }
 };
