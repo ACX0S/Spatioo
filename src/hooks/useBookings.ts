@@ -9,9 +9,14 @@ export const useBookings = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   const loadBookings = async () => {
+    // Don't attempt to load bookings if auth is still loading
+    if (authLoading) {
+      return;
+    }
+    
     // If no user, set loading to false and return early
     if (!user) {
       setLoading(false);
@@ -68,7 +73,10 @@ export const useBookings = () => {
 
   // Add a timeout to ensure loading state doesn't get stuck
   useEffect(() => {
-    loadBookings();
+    // Only load bookings if auth is not loading
+    if (!authLoading) {
+      loadBookings();
+    }
     
     // Add a safety timeout to ensure loading state doesn't get stuck
     const safetyTimeout = setTimeout(() => {
@@ -76,7 +84,7 @@ export const useBookings = () => {
     }, 5000);
     
     return () => clearTimeout(safetyTimeout);
-  }, [user]);
+  }, [user, authLoading]);
 
   return { 
     bookings, 

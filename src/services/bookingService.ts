@@ -36,7 +36,7 @@ export const fetchUserBookings = async (): Promise<Booking[]> => {
     }));
   } catch (error: any) {
     console.error('Erro ao buscar reservas:', error.message);
-    return []; // Return empty array instead of throwing
+    throw new Error('Falha ao carregar suas reservas: ' + error.message);
   }
 };
 
@@ -77,7 +77,7 @@ export const createBooking = async (bookingData: Omit<Booking, 'id' | 'user_id' 
     };
   } catch (error: any) {
     console.error('Erro ao criar reserva:', error.message);
-    throw new Error('Falha ao criar sua reserva.');
+    throw new Error('Falha ao criar sua reserva: ' + error.message);
   }
 };
 
@@ -92,6 +92,6 @@ export const cancelBooking = async (bookingId: string): Promise<void> => {
     if (error) throw error;
   } catch (error: any) {
     console.error('Erro ao cancelar reserva:', error.message);
-    throw new Error('Falha ao cancelar sua reserva.');
+    throw new Error('Falha ao cancelar sua reserva: ' + error.message);
   }
 };

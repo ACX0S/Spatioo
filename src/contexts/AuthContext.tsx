@@ -24,6 +24,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authInitialized, setAuthInitialized] = useState(false);
   const navigate = useNavigate();
 
   // Carregar perfil do usuário
@@ -49,35 +50,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Verificar sessão atual e configurar listener de autenticação
   useEffect(() => {
-    // Configurar listener para mudanças de autenticação PRIMEIRO
+    // Set a safety timeout to prevent infinite loading
+    const safetyTimeout = setTimeout(() => {
+      if (loading && !authInitialized) {
+        console.log('Safety timeout triggered - forcing loading to false');
+        setLoading(false);
+        setAuthInitialized(true);
+      }
+    }, 5000);
+
+    // Configure auth state change listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+      async (event, newSession) => {
+        console.log('Auth state changed:', event, newSession?.user?.email);
         
-        if (session?.user) {
-          await loadUserProfile(session.user.id);
+        setSession(newSession);
+        setUser(newSession?.user ?? null);
+        
+        // Don't make Supabase calls inside the callback directly
+        // Use setTimeout to prevent potential deadlocks
+        if (newSession?.user) {
+          setTimeout(() => {
+            loadUserProfile(newSession.user.id);
+          }, 0);
         } else {
           setProfile(null);
         }
 
         setLoading(false);
+        setAuthInitialized(true);
       }
     );
 
-    // DEPOIS verificar sessão existente
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
+      console.log('Existing session check:', existingSession?.user?.email);
       
-      if (session?.user) {
-        loadUserProfile(session.user.id);
+      setSession(existingSession);
+      setUser(existingSession?.user ?? null);
+      
+      if (existingSession?.user) {
+        loadUserProfile(existingSession.user.id);
       }
       
       setLoading(false);
+      setAuthInitialized(true);
+    }).catch(error => {
+      console.error('Error getting session:', error);
+      setLoading(false);
+      setAuthInitialized(true);
     });
 
     return () => {
+      clearTimeout(safetyTimeout);
       subscription.unsubscribe();
     };
   }, []);
