@@ -42,7 +42,7 @@ export const useBookings = () => {
       setBookings(prev => 
         prev.map(booking => 
           booking.id === bookingId 
-            ? { ...booking, status: 'cancelled' } 
+            ? { ...booking, status: 'cancelled' as const } 
             : booking
         )
       );

@@ -21,7 +21,9 @@ export const fetchUserBookings = async (): Promise<Booking[]> => {
     return (bookings || []).map(booking => ({
       ...booking,
       parkingName: booking.parking_spots?.name,
-      parkingAddress: booking.parking_spots?.address
+      parkingAddress: booking.parking_spots?.address,
+      // Ensure status is one of the allowed types
+      status: booking.status as 'active' | 'upcoming' | 'completed' | 'cancelled'
     }));
   } catch (error: any) {
     console.error('Erro ao buscar reservas:', error.message);
@@ -32,10 +34,18 @@ export const fetchUserBookings = async (): Promise<Booking[]> => {
 // Criar uma nova reserva
 export const createBooking = async (bookingData: Omit<Booking, 'id' | 'user_id' | 'created_at'>): Promise<Booking> => {
   try {
+    // Get the current user
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error('Usuário não autenticado');
+    }
+    
     const { data, error } = await supabase
       .from('bookings')
       .insert({
-        ...bookingData
+        ...bookingData,
+        user_id: user.id // Add the user_id field
       })
       .select(`
         *,
@@ -52,7 +62,9 @@ export const createBooking = async (bookingData: Omit<Booking, 'id' | 'user_id' 
     return {
       ...data,
       parkingName: data.parking_spots?.name,
-      parkingAddress: data.parking_spots?.address
+      parkingAddress: data.parking_spots?.address,
+      // Ensure status is one of the allowed types
+      status: data.status as 'active' | 'upcoming' | 'completed' | 'cancelled'
     };
   } catch (error: any) {
     console.error('Erro ao criar reserva:', error.message);
