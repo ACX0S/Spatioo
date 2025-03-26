@@ -13,6 +13,9 @@ import Dashboard from "./pages/Dashboard";
 import ParkingOwnerDashboard from "./pages/ParkingOwnerDashboard";
 import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout";
+import { AuthProvider } from "./contexts/AuthContext";
+import Profile from "./pages/Profile";
+import RequireAuth from "./components/RequireAuth";
 
 const queryClient = new QueryClient();
 
@@ -23,19 +26,22 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            {/* Redirect root to explore (main tool) */}
-            <Route path="/" element={<Navigate to="/explore" replace />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Layout />}>
-              <Route path="home" element={<Home />} />
-              <Route path="explore" element={<Explore />} />
-              <Route path="parking/:id" element={<ParkingDetails />} />
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route path="admin" element={<ParkingOwnerDashboard />} />
-              <Route path="*" element={<NotFound />} />
-            </Route>
-          </Routes>
+          <AuthProvider>
+            <Routes>
+              {/* Redirect root to explore (main tool) */}
+              <Route path="/" element={<Navigate to="/explore" replace />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/" element={<RequireAuth><Layout /></RequireAuth>}>
+                <Route path="home" element={<Home />} />
+                <Route path="explore" element={<Explore />} />
+                <Route path="parking/:id" element={<ParkingDetails />} />
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="admin" element={<ParkingOwnerDashboard />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="*" element={<NotFound />} />
+              </Route>
+            </Routes>
+          </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>

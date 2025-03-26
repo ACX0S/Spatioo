@@ -1,30 +1,64 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Car, Lock, Mail, User, ChevronLeft, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from '@/components/ui/use-toast';
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as any)?.from?.pathname || '/home';
+  
+  const { signIn, signUp, user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [activeTab, setActiveTab] = useState('login');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  // Redirecionar se o usuário já estiver logado
+  useEffect(() => {
+    if (user) {
+      navigate('/home');
+    }
+  }, [user, navigate]);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // For demo purposes, we're just navigating without actual authentication
-    navigate('/home');
+    if (!email || !password) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Preencha o email e senha para entrar",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    await signIn(email, password);
+    setIsSubmitting(false);
   };
   
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    // For demo purposes, we're just navigating without actual registration
-    navigate('/home');
+    if (!name || !email || !password) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Preencha nome, email e senha para criar uma conta",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    await signUp(email, password, name);
+    setIsSubmitting(false);
   };
 
   return (
@@ -80,6 +114,7 @@ const Login = () => {
                     className="pl-10"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
@@ -99,6 +134,7 @@ const Login = () => {
                     className="pl-10"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
@@ -106,9 +142,10 @@ const Login = () => {
               <Button 
                 type="submit" 
                 className="w-full h-12 rounded-lg bg-spatioo-green hover:bg-spatioo-green-dark text-black font-medium mt-6"
+                disabled={isSubmitting}
               >
-                Entrar
-                <ArrowRight className="ml-2 h-4 w-4" />
+                {isSubmitting ? 'Entrando...' : 'Entrar'}
+                {!isSubmitting && <ArrowRight className="ml-2 h-4 w-4" />}
               </Button>
               
               <div className="relative flex items-center justify-center mt-8">
@@ -153,6 +190,7 @@ const Login = () => {
                     className="pl-10"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
@@ -167,6 +205,7 @@ const Login = () => {
                     className="pl-10"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
@@ -181,6 +220,7 @@ const Login = () => {
                     className="pl-12"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
@@ -195,6 +235,7 @@ const Login = () => {
                     className="pl-10"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
@@ -213,22 +254,14 @@ const Login = () => {
               <Button 
                 type="submit" 
                 className="w-full h-12 rounded-lg bg-spatioo-green hover:bg-spatioo-green-dark text-black font-medium mt-6"
+                disabled={isSubmitting}
               >
-                Criar conta
-                <ArrowRight className="ml-2 h-4 w-4" />
+                {isSubmitting ? 'Processando...' : 'Criar conta'}
+                {!isSubmitting && <ArrowRight className="ml-2 h-4 w-4" />}
               </Button>
             </form>
           </TabsContent>
         </Tabs>
-        
-        {/* Skip login for demo purposes */}
-        <Button 
-          variant="link" 
-          className="mt-6 mx-auto text-muted-foreground"
-          onClick={() => navigate('/home')}
-        >
-          Pular login para demonstração
-        </Button>
       </motion.div>
     </div>
   );

@@ -7,6 +7,10 @@ import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Car, MapPin, Clock, Navigation, Search, Star, Compass, TrendingUp, History } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { ParkingSpot } from '@/types/parking';
+import { toast } from '@/components/ui/use-toast';
 
 // Mock data for recent searches
 const RECENT_SEARCHES = [
@@ -16,77 +20,61 @@ const RECENT_SEARCHES = [
   'Aeroporto de Congonhas'
 ];
 
-// Mock data for suggested locations
-const SUGGESTED_LOCATIONS = [
-  {
-    id: '1',
-    name: 'Centro Empresarial',
-    address: 'Av. Paulista, 1000',
-    distance: '1.2 km',
-    price: 'R$ 5,50/h'
-  },
-  {
-    id: '2',
-    name: 'Shopping Vila Olímpia',
-    address: 'Rua das Olimpíadas, 200',
-    distance: '2.8 km',
-    price: 'R$ 6,00/h'
-  },
-  {
-    id: '3',
-    name: 'Estacionamento Downtown',
-    address: 'Rua Conselheiro Lafayette, 180',
-    distance: '0.5 km',
-    price: 'R$ 4,00/h'
-  }
-];
-
-// Mock data for popular destinations
-const POPULAR_DESTINATIONS = [
-  {
-    id: '1',
-    name: 'Shopping ABC',
-    image: 'https://via.placeholder.com/80',
-    rating: 4.8,
-    spots: 12,
-    distance: '2.3 km'
-  },
-  {
-    id: '2',
-    name: 'Parque Central',
-    image: 'https://via.placeholder.com/80',
-    rating: 4.5,
-    spots: 8,
-    distance: '3.1 km'
-  },
-  {
-    id: '3',
-    name: 'Centro Comercial',
-    image: 'https://via.placeholder.com/80',
-    rating: 4.2,
-    spots: 5,
-    distance: '1.8 km'
-  },
-  {
-    id: '4',
-    name: 'Estádio Municipal',
-    image: 'https://via.placeholder.com/80',
-    rating: 4.7,
-    spots: 20,
-    distance: '4.2 km'
-  }
-];
-
 const Home = () => {
   const navigate = useNavigate();
+  const { profile } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [userLocation, setUserLocation] = useState('Obtendo localização...');
+  const [nearbyParkingSpots, setNearbyParkingSpots] = useState<ParkingSpot[]>([]);
+  const [popularDestinations, setPopularDestinations] = useState<ParkingSpot[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Simulate getting user location
   useEffect(() => {
     setTimeout(() => {
       setUserLocation('São Caetano do Sul, SP');
     }, 1500);
+  }, []);
+
+  // Carregar estacionamentos do Supabase
+  useEffect(() => {
+    const fetchParkingSpots = async () => {
+      try {
+        setLoading(true);
+        
+        // Buscar locais próximos
+        const { data: nearby, error: nearbyError } = await supabase
+          .from('parking_spots')
+          .select('*')
+          .order('rating', { ascending: false })
+          .limit(3);
+          
+        if (nearbyError) throw nearbyError;
+        setNearbyParkingSpots(nearby || []);
+        
+        // Buscar destinos populares
+        const { data: popular, error: popularError } = await supabase
+          .from('parking_spots')
+          .select('*')
+          .order('reviews_count', { ascending: false })
+          .limit(4);
+          
+        if (popularError) throw popularError;
+        setPopularDestinations(popular || []);
+        
+      } catch (error: any) {
+        console.error('Erro ao carregar estacionamentos:', error.message);
+        toast({
+          title: "Erro ao carregar dados",
+          description: "Não foi possível buscar os estacionamentos.",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchParkingSpots();
   }, []);
 
   // Handle search submission
@@ -115,7 +103,7 @@ const Home = () => {
             <MapPin className="h-4 w-4 text-spatioo-green" />
             <span className="text-sm">{userLocation}</span>
           </div>
-          <h1 className="text-2xl font-bold">Olá, Maria!</h1>
+          <h1 className="text-2xl font-bold">Olá, {profile?.name || 'Visitante'}!</h1>
           <p className="text-muted-foreground">Encontre as melhores vagas perto de você</p>
         </motion.div>
       </div>
@@ -181,11 +169,12 @@ const Home = () => {
           </Button>
           
           <Button 
-            variant="outline" 
+            variant="outline"
+            onClick={() => navigate('/profile')} 
             className="flex flex-col items-center justify-center h-20 space-y-1 rounded-xl"
           >
             <History className="h-6 w-6 text-spatioo-green" />
-            <span className="text-xs">Recentes</span>
+            <span className="text-xs">Perfil</span>
           </Button>
         </div>
       </motion.div>
@@ -234,35 +223,45 @@ const Home = () => {
         </div>
         
         <div className="space-y-3">
-          {SUGGESTED_LOCATIONS.map((location) => (
-            <Card 
-              key={location.id} 
-              className="overflow-hidden cursor-pointer hover:bg-muted/40 transition-colors"
-              onClick={() => navigate(`/parking/${location.id}`)}
-            >
-              <CardContent className="p-3 flex justify-between items-center">
-                <div>
-                  <CardTitle className="text-base mb-1">{location.name}</CardTitle>
-                  <div className="flex items-center text-xs text-muted-foreground">
-                    <MapPin className="h-3 w-3 mr-1" />
-                    {location.address}
+          {loading ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-spatioo-green"></div>
+            </div>
+          ) : nearbyParkingSpots.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              Nenhum estacionamento encontrado
+            </div>
+          ) : (
+            nearbyParkingSpots.map((spot) => (
+              <Card 
+                key={spot.id} 
+                className="overflow-hidden cursor-pointer hover:bg-muted/40 transition-colors"
+                onClick={() => navigate(`/parking/${spot.id}`)}
+              >
+                <CardContent className="p-3 flex justify-between items-center">
+                  <div>
+                    <CardTitle className="text-base mb-1">{spot.name}</CardTitle>
+                    <div className="flex items-center text-xs text-muted-foreground">
+                      <MapPin className="h-3 w-3 mr-1" />
+                      {spot.address}
+                    </div>
+                    <div className="flex items-center text-xs mt-1">
+                      <Badge variant="secondary" className="rounded-full mr-2 px-2 py-0 h-5">
+                        <Navigation className="h-3 w-3 mr-1" />
+                        {spot.available_spots} vagas
+                      </Badge>
+                      <Badge variant="outline" className="rounded-full px-2 py-0 h-5 font-medium border-spatioo-green/30 text-spatioo-green bg-spatioo-green/10">
+                        R$ {spot.price_per_hour.toFixed(2)}/h
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="flex items-center text-xs mt-1">
-                    <Badge variant="secondary" className="rounded-full mr-2 px-2 py-0 h-5">
-                      <Navigation className="h-3 w-3 mr-1" />
-                      {location.distance}
-                    </Badge>
-                    <Badge variant="outline" className="rounded-full px-2 py-0 h-5 font-medium border-spatioo-green/30 text-spatioo-green bg-spatioo-green/10">
-                      {location.price}
-                    </Badge>
+                  <div className="bg-spatioo-green/10 h-10 w-10 rounded-full flex items-center justify-center">
+                    <Car className="h-5 w-5 text-spatioo-green" />
                   </div>
-                </div>
-                <div className="bg-spatioo-green/10 h-10 w-10 rounded-full flex items-center justify-center">
-                  <Car className="h-5 w-5 text-spatioo-green" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))
+          )}
         </div>
       </motion.div>
 
@@ -284,29 +283,47 @@ const Home = () => {
         </div>
         
         <div className="grid grid-cols-2 gap-4">
-          {POPULAR_DESTINATIONS.map((destination) => (
-            <Card 
-              key={destination.id} 
-              className="overflow-hidden cursor-pointer hover:bg-muted/40 transition-colors"
-              onClick={() => navigate(`/explore?destination=${destination.name}`)}
-            >
-              <CardContent className="p-3 space-y-2">
-                <div className="bg-muted rounded-lg h-16 w-full flex items-center justify-center">
-                  <Car className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <CardTitle className="text-sm">{destination.name}</CardTitle>
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center">
-                    <Star className="h-3 w-3 text-yellow-500 mr-1" />
-                    <span>{destination.rating}</span>
+          {loading ? (
+            <div className="col-span-2 flex justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-spatioo-green"></div>
+            </div>
+          ) : popularDestinations.length === 0 ? (
+            <div className="col-span-2 text-center py-8 text-muted-foreground">
+              Nenhum destino popular encontrado
+            </div>
+          ) : (
+            popularDestinations.map((destination) => (
+              <Card 
+                key={destination.id} 
+                className="overflow-hidden cursor-pointer hover:bg-muted/40 transition-colors"
+                onClick={() => navigate(`/parking/${destination.id}`)}
+              >
+                <CardContent className="p-3 space-y-2">
+                  <div className="bg-muted rounded-lg h-16 w-full flex items-center justify-center">
+                    {destination.image_url ? (
+                      <img 
+                        src={destination.image_url} 
+                        alt={destination.name} 
+                        className="h-full w-full object-cover" 
+                      />
+                    ) : (
+                      <Car className="h-8 w-8 text-muted-foreground" />
+                    )}
                   </div>
-                  <Badge variant="outline" className="rounded-full px-2 py-0 h-5">
-                    {destination.spots} vagas
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                  <CardTitle className="text-sm">{destination.name}</CardTitle>
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center">
+                      <Star className="h-3 w-3 text-yellow-500 mr-1" />
+                      <span>{destination.rating}</span>
+                    </div>
+                    <Badge variant="outline" className="rounded-full px-2 py-0 h-5">
+                      {destination.available_spots} vagas
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
         </div>
       </motion.div>
     </div>

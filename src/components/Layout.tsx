@@ -14,17 +14,21 @@ import {
   Search, 
   Bell,
   HelpCircle,
-  Compass
+  Compass,
+  LogOut
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Layout = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { profile, signOut } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [pageTitle, setPageTitle] = useState("Spatioo");
 
@@ -38,6 +42,8 @@ const Layout = () => {
         return "Meus agendamentos";
       case "/admin":
         return "Gerenciar vagas";
+      case "/profile":
+        return "Meu Perfil";
       default:
         if (pathname.includes("/parking/")) {
           return "Detalhes do Estacionamento";
@@ -67,10 +73,20 @@ const Layout = () => {
     if (path === "/dashboard" && location.pathname === "/dashboard") {
       return true;
     }
-    if (path === "/login" && location.pathname === "/login") {
+    if (path === "/profile" && location.pathname === "/profile") {
       return true;
     }
     return false;
+  };
+
+  const getInitials = (name: string | null) => {
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   return (
@@ -117,6 +133,30 @@ const Layout = () => {
                     <span className="font-semibold text-xl">Spatioo</span>
                   </div>
                   
+                  <div className="border-b border-border pb-4 mb-4">
+                    <div className="flex items-center gap-3 mb-4">
+                      <Avatar>
+                        <AvatarImage src={profile?.avatar_url || ''} />
+                        <AvatarFallback className="bg-spatioo-green/20 text-spatioo-green">
+                          {getInitials(profile?.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <h3 className="font-medium">{profile?.name || 'Usuário'}</h3>
+                        <p className="text-xs text-muted-foreground">{profile?.phone || 'Perfil não atualizado'}</p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full justify-start gap-2"
+                      onClick={() => navigate('/profile')}
+                    >
+                      <User className="h-4 w-4" />
+                      Gerenciar Perfil
+                    </Button>
+                  </div>
+                  
                   <div className="flex flex-col gap-1">
                     <Link 
                       to="/home" 
@@ -154,13 +194,13 @@ const Layout = () => {
                       <Settings className="h-5 w-5" />
                       <span>Configurações</span>
                     </Link>
-                    <Link 
-                      to="/login" 
-                      className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-accent transition-colors"
+                    <button 
+                      onClick={signOut}
+                      className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-destructive/10 text-destructive transition-colors text-left"
                     >
-                      <User className="h-5 w-5" />
-                      <span>Minha conta</span>
-                    </Link>
+                      <LogOut className="h-5 w-5" />
+                      <span>Sair da conta</span>
+                    </button>
                   </div>
                   
                   <div className="mt-auto">
@@ -238,10 +278,10 @@ const Layout = () => {
           </Link>
           
           <Link 
-            to="/login" 
+            to="/profile" 
             className={cn(
               "flex flex-col items-center justify-center",
-              isActive("/login") ? "text-spatioo-green" : "text-muted-foreground"
+              isActive("/profile") ? "text-spatioo-green" : "text-muted-foreground"
             )}
           >
             <User className="h-5 w-5" />
