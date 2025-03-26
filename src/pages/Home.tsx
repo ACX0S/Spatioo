@@ -11,14 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { ParkingSpot } from '@/types/parking';
 import { toast } from '@/components/ui/use-toast';
-
-// Mock data for recent searches
-const RECENT_SEARCHES = [
-  'Shopping Center',
-  'Teatro Municipal',
-  'Parque Ibirapuera',
-  'Aeroporto de Congonhas'
-];
+import { searchParkingSpots } from '@/services/parkingService';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -28,12 +21,19 @@ const Home = () => {
   const [nearbyParkingSpots, setNearbyParkingSpots] = useState<ParkingSpot[]>([]);
   const [popularDestinations, setPopularDestinations] = useState<ParkingSpot[]>([]);
   const [loading, setLoading] = useState(true);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
-  // Simulate getting user location
+  // Simular obtendo localização do usuário
   useEffect(() => {
     setTimeout(() => {
       setUserLocation('São Caetano do Sul, SP');
     }, 1500);
+    
+    // Carregar buscas recentes do localStorage
+    const savedSearches = localStorage.getItem('recentSearches');
+    if (savedSearches) {
+      setRecentSearches(JSON.parse(savedSearches));
+    }
   }, []);
 
   // Carregar estacionamentos do Supabase
@@ -78,10 +78,26 @@ const Home = () => {
   }, []);
 
   // Handle search submission
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (searchQuery.trim()) {
-      navigate('/explore', { state: { search: searchQuery } });
+      try {
+        // Salvar busca no histórico recente
+        const updatedSearches = [searchQuery, ...recentSearches.filter(s => s !== searchQuery)].slice(0, 4);
+        setRecentSearches(updatedSearches);
+        localStorage.setItem('recentSearches', JSON.stringify(updatedSearches));
+        
+        // Realizar a busca e navegar para os resultados
+        navigate('/explore', { state: { search: searchQuery } });
+      } catch (error) {
+        console.error('Erro ao realizar busca:', error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível completar a busca.",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -163,6 +179,13 @@ const Home = () => {
           <Button 
             variant="outline" 
             className="flex flex-col items-center justify-center h-20 space-y-1 rounded-xl"
+            onClick={() => {
+              if (nearbyParkingSpots.length > 0) {
+                navigate(`/parking/${nearbyParkingSpots[0].id}`);
+              } else {
+                navigate('/explore');
+              }
+            }}
           >
             <Navigation className="h-6 w-6 text-spatioo-green" />
             <span className="text-xs">Próximo</span>
@@ -180,7 +203,7 @@ const Home = () => {
       </motion.div>
 
       {/* Recent Searches */}
-      {RECENT_SEARCHES.length > 0 && (
+      {recentSearches.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -189,7 +212,7 @@ const Home = () => {
         >
           <h2 className="text-lg font-semibold mb-3">Buscas recentes</h2>
           <div className="flex flex-wrap gap-2">
-            {RECENT_SEARCHES.map((search, index) => (
+            {recentSearches.map((search, index) => (
               <Badge 
                 key={index} 
                 variant="outline" 

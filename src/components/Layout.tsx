@@ -289,16 +289,6 @@ const Layout = () => {
           </Link>
         </div>
       </nav>
-      
-      {/* Floating Help Button */}
-      <div className="fixed bottom-20 right-4 z-50">
-        <Button 
-          size="icon" 
-          className="h-12 w-12 rounded-full shadow-lg bg-spatioo-green text-black hover:bg-spatioo-green-dark"
-        >
-          <HelpCircle className="h-6 w-6" />
-        </Button>
-      </div>
     </div>
   );
 };
