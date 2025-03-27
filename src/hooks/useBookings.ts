@@ -59,10 +59,11 @@ export const useBookings = () => {
         )
       );
       toast({
-        title: "Sucesso!",
+        title: "Reserva cancelada",
         description: "Sua reserva foi cancelada com sucesso.",
       });
     } catch (err: any) {
+      console.error('Error canceling booking:', err);
       toast({
         title: "Erro",
         description: err.message || "Não foi possível cancelar sua reserva.",

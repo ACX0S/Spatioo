@@ -21,6 +21,7 @@ interface ChangePasswordDialogProps {
 
 const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({ trigger }) => {
   const { changePassword } = useAuth();
+  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -59,11 +60,23 @@ const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({ trigger }) 
     try {
       setIsSubmitting(true);
       await changePassword(newPassword);
+      
+      toast({
+        title: "Senha alterada com sucesso",
+        description: "Sua senha foi atualizada. Por favor, faça login novamente.",
+      });
+      
       setNewPassword('');
       setConfirmPassword('');
+      setCurrentPassword('');
       setOpen(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error changing password:', error);
+      toast({
+        title: "Erro ao alterar senha",
+        description: error.message || "Não foi possível alterar sua senha. Tente novamente.",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }

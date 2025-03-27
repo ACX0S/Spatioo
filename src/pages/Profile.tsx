@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -7,11 +6,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Mail, Phone, Camera, ChevronLeft, CreditCard, Shield, Bell, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useBookings } from '@/hooks/useBookings';
 import ChangePasswordDialog from '@/components/ChangePasswordDialog';
+import { uploadAvatar, deleteOldAvatar } from '@/services/storageService';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -41,7 +40,7 @@ const Profile = () => {
   };
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files || event.target.files.length === 0) {
+    if (!event.target.files || event.target.files.length === 0 || !user) {
       return;
     }
 
@@ -49,26 +48,17 @@ const Profile = () => {
       setUploading(true);
       
       const file = event.target.files[0];
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user?.id}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
       
-      // Fazer upload da imagem para o storage
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, { upsert: true });
-        
-      if (uploadError) {
-        throw uploadError;
+      // Upload da nova imagem
+      const publicUrl = await uploadAvatar(file, user.id);
+      
+      // Se o usuário já tiver um avatar, excluir o antigo
+      if (profile?.avatar_url) {
+        await deleteOldAvatar(profile.avatar_url, user.id);
       }
       
-      // Obter URL pública da imagem
-      const { data: publicURL } = supabase.storage.from('avatars').getPublicUrl(filePath);
-      
-      if (publicURL) {
-        // Atualizar perfil com nova URL de avatar
-        await updateProfile({ avatar_url: publicURL.publicUrl });
-      }
+      // Atualizar perfil com nova URL de avatar
+      await updateProfile({ avatar_url: publicUrl });
       
       toast({
         title: "Avatar atualizado",
