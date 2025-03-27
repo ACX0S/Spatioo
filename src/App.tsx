@@ -19,33 +19,35 @@ import RequireAuth from "./components/RequireAuth";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="dark" storageKey="spatioo-theme">
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AuthProvider>
-            <Routes>
-              {/* Redirect root to login */}
-              <Route path="/" element={<Navigate to="/login" replace />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/" element={<RequireAuth><Layout /></RequireAuth>}>
-                <Route path="home" element={<Home />} />
-                <Route path="explore" element={<Explore />} />
-                <Route path="parking/:id" element={<ParkingDetails />} />
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path="admin" element={<ParkingOwnerDashboard />} />
-                <Route path="profile" element={<Profile />} />
-                <Route path="*" element={<NotFound />} />
-              </Route>
-            </Routes>
-          </AuthProvider>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="dark" storageKey="spatioo-theme">
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AuthProvider>
+              <Routes>
+                {/* Redirect root to login */}
+                <Route path="/" element={<Navigate to="/login" replace />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/" element={<RequireAuth><Layout /></RequireAuth>}>
+                  <Route path="home" element={<Home />} />
+                  <Route path="explore" element={<Explore />} />
+                  <Route path="parking/:id" element={<ParkingDetails />} />
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="admin" element={<ParkingOwnerDashboard />} />
+                  <Route path="profile" element={<Profile />} />
+                  <Route path="*" element={<NotFound />} />
+                </Route>
+              </Routes>
+            </AuthProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

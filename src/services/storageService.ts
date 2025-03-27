@@ -2,15 +2,15 @@
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 
-// Função para fazer upload de avatar
+// Function to upload avatar
 export const uploadAvatar = async (file: File, userId: string): Promise<string> => {
   try {
-    // Verificar tamanho do arquivo (máximo 2MB)
+    // Check file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
       throw new Error('O arquivo deve ter no máximo 2MB');
     }
     
-    // Verificar tipo do arquivo (apenas imagens)
+    // Check file type (images only)
     if (!file.type.startsWith('image/')) {
       throw new Error('Apenas imagens são permitidas');
     }
@@ -18,8 +18,8 @@ export const uploadAvatar = async (file: File, userId: string): Promise<string> 
     const fileExt = file.name.split('.').pop();
     const fileName = `${userId}/${Date.now()}.${fileExt}`;
     
-    // Fazer upload da imagem
-    const { error: uploadError } = await supabase.storage
+    // Upload the image
+    const { error: uploadError, data: uploadData } = await supabase.storage
       .from('avatars')
       .upload(fileName, file, { upsert: true });
       
@@ -28,7 +28,7 @@ export const uploadAvatar = async (file: File, userId: string): Promise<string> 
       throw new Error('Erro ao fazer upload: ' + uploadError.message);
     }
     
-    // Obter URL pública da imagem
+    // Get public URL of the image
     const { data } = supabase.storage
       .from('avatars')
       .getPublicUrl(fileName);
@@ -44,22 +44,26 @@ export const uploadAvatar = async (file: File, userId: string): Promise<string> 
   }
 };
 
-// Função para excluir avatar antigo
+// Function to delete old avatar
 export const deleteOldAvatar = async (avatarUrl: string, userId: string): Promise<void> => {
   try {
     if (!avatarUrl) return;
     
-    // Extrair o nome do arquivo da URL
+    // Extract filename from the URL
     const urlParts = avatarUrl.split('/');
     const fileName = urlParts.slice(-2).join('/');
     
     if (fileName.startsWith(userId)) {
-      await supabase.storage
+      const { error } = await supabase.storage
         .from('avatars')
         .remove([fileName]);
+        
+      if (error) {
+        console.error('Error deleting old avatar:', error);
+      }
     }
   } catch (error) {
     console.error('Error deleting old avatar:', error);
-    // Não lancar erro para não interromper o fluxo
+    // Don't throw error to avoid interrupting the flow
   }
 };

@@ -1,71 +1,75 @@
 
 import React, { useState } from 'react';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 interface CancelBookingDialogProps {
-  onConfirm: () => Promise<void>;
-  trigger: React.ReactNode;
+  bookingId: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: (bookingId: string) => Promise<void>;
 }
 
-const CancelBookingDialog: React.FC<CancelBookingDialogProps> = ({ 
-  onConfirm,
-  trigger 
-}) => {
+const CancelBookingDialog = ({ 
+  bookingId, 
+  open, 
+  onOpenChange, 
+  onConfirm 
+}: CancelBookingDialogProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [open, setOpen] = useState(false);
 
-  const handleConfirm = async () => {
+  const handleCancel = async () => {
     try {
       setIsLoading(true);
-      await onConfirm();
-      setOpen(false);
+      await onConfirm(bookingId);
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Error canceling booking:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
-        {trigger}
-      </AlertDialogTrigger>
-      <AlertDialogContent className="max-w-[350px]">
-        <AlertDialogHeader>
-          <div className="mx-auto bg-orange-100 p-3 rounded-full mb-2">
-            <AlertTriangle className="h-6 w-6 text-orange-500" />
-          </div>
-          <AlertDialogTitle className="text-center">Cancelar Reserva</AlertDialogTitle>
-          <AlertDialogDescription className="text-center">
-            Tem certeza que deseja cancelar esta reserva? 
-            Esta ação não pode ser desfeita.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter className="flex-col gap-2 sm:flex-col">
-          <AlertDialogAction
-            onClick={handleConfirm}
-            className="w-full bg-red-600 hover:bg-red-700"
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
+            <AlertCircle className="h-5 w-5 text-destructive" />
+            Cancelar Reserva
+          </DialogTitle>
+          <DialogDescription>
+            Tem certeza que deseja cancelar esta reserva?
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="py-3">
+          <p className="text-sm text-muted-foreground">
+            Esta ação não pode ser desfeita. Após o cancelamento, a vaga será liberada para outros usuários.
+          </p>
+        </div>
+        
+        <DialogFooter className="sm:justify-between">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
             disabled={isLoading}
+            className="mt-2 sm:mt-0"
           >
-            {isLoading ? 'Cancelando...' : 'Sim, cancelar reserva'}
-          </AlertDialogAction>
-          <AlertDialogCancel className="w-full mt-0">
-            Não, manter reserva
-          </AlertDialogCancel>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+            Voltar
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={handleCancel}
+            disabled={isLoading}
+            className="min-w-[120px]"
+          >
+            {isLoading ? "Cancelando..." : "Sim, cancelar"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

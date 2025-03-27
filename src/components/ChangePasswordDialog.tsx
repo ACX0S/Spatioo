@@ -1,133 +1,189 @@
 
 import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/use-toast';
-import { Lock } from 'lucide-react';
 
 interface ChangePasswordDialogProps {
   trigger: React.ReactNode;
 }
 
-const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({ trigger }) => {
-  const { changePassword } = useAuth();
+const ChangePasswordDialog = ({ trigger }: ChangePasswordDialogProps) => {
+  const [open, setOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [open, setOpen] = useState(false);
-
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const { changePassword } = useAuth();
+  
+  const resetForm = () => {
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setShowCurrentPassword(false);
+    setShowNewPassword(false);
+    setShowConfirmPassword(false);
+  };
+  
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
+      resetForm();
+    }
+    setOpen(newOpen);
+  };
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!newPassword) {
-      toast({
-        title: "Erro",
-        description: "Por favor, insira uma nova senha.",
-        variant: "destructive",
-      });
-      return;
-    }
-
+    
+    // Validation
     if (newPassword.length < 6) {
       toast({
         title: "Erro",
-        description: "A senha deve ter pelo menos 6 caracteres.",
+        description: "A nova senha deve ter pelo menos 6 caracteres",
         variant: "destructive",
       });
       return;
     }
-
+    
     if (newPassword !== confirmPassword) {
       toast({
         title: "Erro",
-        description: "As senhas não coincidem.",
+        description: "As senhas não coincidem",
         variant: "destructive",
       });
       return;
     }
-
+    
     try {
-      setIsSubmitting(true);
+      setIsLoading(true);
       await changePassword(newPassword);
+      handleOpenChange(false);
       
       toast({
-        title: "Senha alterada com sucesso",
-        description: "Sua senha foi atualizada. Por favor, faça login novamente.",
+        title: "Senha alterada",
+        description: "Sua senha foi alterada com sucesso",
       });
-      
-      setNewPassword('');
-      setConfirmPassword('');
-      setCurrentPassword('');
-      setOpen(false);
     } catch (error: any) {
-      console.error('Error changing password:', error);
       toast({
-        title: "Erro ao alterar senha",
-        description: error.message || "Não foi possível alterar sua senha. Tente novamente.",
+        title: "Erro",
+        description: error.message || "Não foi possível alterar a senha",
         variant: "destructive",
       });
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
-
+  
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogTrigger asChild>
+        {trigger}
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Alterar senha</DialogTitle>
+          <DialogTitle>Alterar Senha</DialogTitle>
           <DialogDescription>
-            Insira sua nova senha abaixo. Após salvar, você precisará fazer login novamente.
+            Defina uma nova senha para sua conta
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
+          {/* Current Password */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Nova senha</label>
+            <label className="text-sm font-medium">Senha Atual</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                type="password"
-                placeholder="Digite sua nova senha"
-                className="pl-10"
+                type={showCurrentPassword ? "text" : "password"}
+                placeholder="Sua senha atual"
+                className="pl-10 pr-10"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+              />
+              <button 
+                type="button"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+              >
+                {showCurrentPassword 
+                  ? <EyeOff className="h-4 w-4 text-muted-foreground" /> 
+                  : <Eye className="h-4 w-4 text-muted-foreground" />
+                }
+              </button>
+            </div>
+          </div>
+          
+          {/* New Password */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Nova Senha</label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type={showNewPassword ? "text" : "password"}
+                placeholder="Sua nova senha"
+                className="pl-10 pr-10"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                disabled={isSubmitting}
               />
+              <button 
+                type="button"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                onClick={() => setShowNewPassword(!showNewPassword)}
+              >
+                {showNewPassword 
+                  ? <EyeOff className="h-4 w-4 text-muted-foreground" /> 
+                  : <Eye className="h-4 w-4 text-muted-foreground" />
+                }
+              </button>
             </div>
           </div>
+          
+          {/* Confirm Password */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Confirmar senha</label>
+            <label className="text-sm font-medium">Confirmar Nova Senha</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 placeholder="Confirme sua nova senha"
-                className="pl-10"
+                className="pl-10 pr-10"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                disabled={isSubmitting}
               />
+              <button 
+                type="button"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword 
+                  ? <EyeOff className="h-4 w-4 text-muted-foreground" /> 
+                  : <Eye className="h-4 w-4 text-muted-foreground" />
+                }
+              </button>
             </div>
           </div>
-          <DialogFooter>
+          
+          <DialogFooter className="pt-4">
             <Button 
-              type="submit" 
-              className="w-full bg-spatioo-green hover:bg-spatioo-green-dark text-black font-medium"
-              disabled={isSubmitting}
+              type="button" 
+              variant="outline" 
+              onClick={() => handleOpenChange(false)}
+              disabled={isLoading}
             >
-              {isSubmitting ? 'Salvando...' : 'Salvar nova senha'}
+              Cancelar
+            </Button>
+            <Button 
+              type="submit"
+              className="bg-spatioo-green hover:bg-spatioo-green-dark text-black font-medium"
+              disabled={isLoading || !newPassword || !confirmPassword}
+            >
+              {isLoading ? "Salvando..." : "Salvar Nova Senha"}
             </Button>
           </DialogFooter>
         </form>

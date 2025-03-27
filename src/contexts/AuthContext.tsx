@@ -28,7 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [authInitialized, setAuthInitialized] = useState(false);
   const navigate = useNavigate();
 
-  // Carregar perfil do usuário
+  // Load user profile
   const loadUserProfile = async (userId: string) => {
     try {
       const { data, error } = await supabase
@@ -45,11 +45,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setProfile(data as Profile);
       }
     } catch (error: any) {
-      console.error('Erro ao carregar perfil:', error.message);
+      console.error('Error loading profile:', error.message);
     }
   };
 
-  // Verificar sessão atual e configurar listener de autenticação
+  // Check current session and set up auth listener
   useEffect(() => {
     // Set a safety timeout to prevent infinite loading
     const safetyTimeout = setTimeout(() => {
@@ -108,7 +108,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  // Login com email e senha
+  // Login with email and password
   const signIn = async (email: string, password: string) => {
     try {
       setLoading(true);
@@ -130,12 +130,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: error.message,
         variant: "destructive",
       });
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  // Cadastro com email e senha
+  // Sign up with email and password
   const signUp = async (email: string, password: string, name: string) => {
     try {
       setLoading(true);
@@ -165,6 +166,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: error.message,
         variant: "destructive",
       });
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -187,7 +189,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Atualizar perfil
+  // Update profile
   const updateProfile = async (updatedProfile: Partial<Profile>) => {
     try {
       if (!user) throw new Error("Usuário não autenticado");
@@ -203,7 +205,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw error;
       }
 
-      // Atualizar o estado local
+      // Update local state
       setProfile(prev => prev ? { ...prev, ...updatedProfile } : null);
       
       toast({
@@ -216,12 +218,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: error.message,
         variant: "destructive",
       });
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  // Mudar senha
+  // Change password
   const changePassword = async (newPassword: string) => {
     try {
       setLoading(true);
@@ -240,11 +243,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       
     } catch (error: any) {
+      console.error('Error changing password:', error);
       toast({
         title: "Erro ao atualizar senha",
         description: error.message,
         variant: "destructive",
       });
+      throw error;
     } finally {
       setLoading(false);
     }
