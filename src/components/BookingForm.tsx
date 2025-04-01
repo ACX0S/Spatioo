@@ -28,7 +28,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
 
   // Fixed duration of 1 hour
   const duration = 1;
-  const totalPrice = parkingSpot.price_per_hour * duration;
   
   const endTime = (): string => {
     const [hours, minutes] = startTime.split(':').map(Number);
@@ -64,7 +63,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
         start_time: startTime,
         end_time: endTime(),
         spot_number: spotNumber,
-        price: totalPrice,
+        price: parkingSpot.price_per_hour,
         status: 'upcoming'
       });
       
@@ -140,27 +139,11 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
 
           {/* Resumo */}
           <div className="bg-muted/30 p-3 rounded-md">
-            <h3 className="font-medium mb-2">Resumo da reserva</h3>
+            <h3 className="font-medium mb-2">Informações</h3>
             <div className="space-y-1 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Data:</span>
-                <span>{format(date, 'dd/MM/yyyy')}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Horário:</span>
-                <span>{startTime} - {endTime()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Duração:</span>
-                <span>1 hora</span>
-              </div>
-              <div className="flex justify-between">
                 <span className="text-muted-foreground">Valor por hora:</span>
-                <span>R$ {parkingSpot.price_per_hour.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between font-medium">
-                <span>Valor total:</span>
-                <span className="text-lg text-spatioo-green">R$ {totalPrice.toFixed(2)}</span>
+                <span className="text-lg text-spatioo-green">R$ {parkingSpot.price_per_hour.toFixed(2)}</span>
               </div>
             </div>
           </div>
