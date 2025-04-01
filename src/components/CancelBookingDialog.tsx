@@ -1,29 +1,37 @@
 
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { AlertCircle } from 'lucide-react';
 
 interface CancelBookingDialogProps {
   bookingId: string;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   onConfirm: (bookingId: string) => Promise<void>;
+  trigger?: React.ReactNode;
 }
 
 const CancelBookingDialog = ({ 
   bookingId, 
   open, 
   onOpenChange, 
-  onConfirm 
+  onConfirm,
+  trigger
 }: CancelBookingDialogProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(open || false);
+
+  const handleOpenChange = (value: boolean) => {
+    setDialogOpen(value);
+    onOpenChange?.(value);
+  };
 
   const handleCancel = async () => {
     try {
       setIsLoading(true);
       await onConfirm(bookingId);
-      onOpenChange(false);
+      handleOpenChange(false);
     } catch (error) {
       console.error("Error canceling booking:", error);
     } finally {
@@ -31,8 +39,10 @@ const CancelBookingDialog = ({
     }
   };
 
+  // If trigger is provided, use DialogTrigger
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open !== undefined ? open : dialogOpen} onOpenChange={handleOpenChange}>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
@@ -53,7 +63,7 @@ const CancelBookingDialog = ({
         <DialogFooter className="sm:justify-between">
           <Button
             variant="outline"
-            onClick={() => onOpenChange(false)}
+            onClick={() => handleOpenChange(false)}
             disabled={isLoading}
             className="mt-2 sm:mt-0"
           >

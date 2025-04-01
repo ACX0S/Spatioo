@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Booking } from '@/types/booking';
@@ -91,7 +91,8 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, onCancelBooking }) =
             
             {(booking.status === 'upcoming' || booking.status === 'active') && (
               <CancelBookingDialog
-                onConfirm={() => onCancelBooking(booking.id)}
+                bookingId={booking.id}
+                onConfirm={onCancelBooking}
                 trigger={
                   <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50">
                     Cancelar

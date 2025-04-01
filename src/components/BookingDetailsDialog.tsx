@@ -1,18 +1,26 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Booking } from '@/types/booking';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/utils';
 import { Calendar, Clock, MapPin, Car, Tag } from 'lucide-react';
 
 interface BookingDetailsDialogProps {
   booking: Booking;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  trigger?: React.ReactNode;
 }
 
-const BookingDetailsDialog = ({ booking, open, onOpenChange }: BookingDetailsDialogProps) => {
+const BookingDetailsDialog = ({ booking, open, onOpenChange, trigger }: BookingDetailsDialogProps) => {
+  const [dialogOpen, setDialogOpen] = useState(open || false);
+
+  const handleOpenChange = (value: boolean) => {
+    setDialogOpen(value);
+    onOpenChange?.(value);
+  };
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('pt-BR', {
@@ -23,7 +31,8 @@ const BookingDetailsDialog = ({ booking, open, onOpenChange }: BookingDetailsDia
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open !== undefined ? open : dialogOpen} onOpenChange={handleOpenChange}>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">Detalhes da Reserva</DialogTitle>
@@ -79,7 +88,7 @@ const BookingDetailsDialog = ({ booking, open, onOpenChange }: BookingDetailsDia
         <DialogFooter>
           <Button 
             variant="outline" 
-            onClick={() => onOpenChange(false)}
+            onClick={() => handleOpenChange(false)}
             className="w-full sm:w-auto"
           >
             Fechar
