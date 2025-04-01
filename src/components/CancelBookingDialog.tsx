@@ -39,7 +39,6 @@ const CancelBookingDialog = ({
     }
   };
 
-  // If trigger is provided, use DialogTrigger
   return (
     <Dialog open={open !== undefined ? open : dialogOpen} onOpenChange={handleOpenChange}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}

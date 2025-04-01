@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Booking } from '@/types/booking';
@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/utils';
 import { Calendar, Clock, MapPin } from 'lucide-react';
-import BookingDetailsDialog from './BookingDetailsDialog';
 import CancelBookingDialog from './CancelBookingDialog';
 
 interface BookingCardProps {
@@ -80,15 +79,6 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, onCancelBooking }) =
           <p className="font-medium">{formatCurrency(booking.price)}</p>
           
           <div className="flex gap-2">
-            <BookingDetailsDialog 
-              booking={booking}
-              trigger={
-                <Button variant="outline" size="sm">
-                  Ver detalhes
-                </Button>
-              }
-            />
-            
             {(booking.status === 'upcoming' || booking.status === 'active') && (
               <CancelBookingDialog
                 bookingId={booking.id}
