@@ -1,24 +1,39 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Car, Lock, Mail, User, ChevronLeft, ArrowRight } from 'lucide-react';
+import { Car, Lock, Mail, User, ChevronLeft, ArrowRight, Eye, EyeOff, MapPin, Home, Building } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/use-toast';
+import { useCep } from '@/hooks/useCep';
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
   const { signIn, signUp, user } = useAuth();
+  const { fetchCep, formatCep, loading: cepLoading, error: cepError } = useCep();
+  
+  // Estados existentes
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [activeTab, setActiveTab] = useState('login');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Novos estados para senha e endereço
+  const [showPassword, setShowPassword] = useState(false);
+  const [cep, setCep] = useState('');
+  const [street, setStreet] = useState('');
+  const [neighborhood, setNeighborhood] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [number, setNumber] = useState('');
+  const [complement, setComplement] = useState('');
 
   // Redirecionar se o usuário já estiver logado
   useEffect(() => {
@@ -26,6 +41,25 @@ const Login = () => {
       navigate('/home');
     }
   }, [user, navigate]);
+
+  const handleCepChange = async (value: string) => {
+    const formattedCep = formatCep(value);
+    setCep(formattedCep);
+
+    if (formattedCep.replace(/\D/g, '').length === 8) {
+      const cepData = await fetchCep(formattedCep);
+      if (cepData) {
+        setStreet(cepData.logradouro);
+        setNeighborhood(cepData.bairro);
+        setCity(cepData.localidade);
+        setState(cepData.uf);
+        toast({
+          title: "CEP encontrado",
+          description: "Endereço preenchido automaticamente",
+        });
+      }
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +83,15 @@ const Login = () => {
       toast({
         title: "Campos obrigatórios",
         description: "Preencha nome, email e senha para criar uma conta",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (cep && (!street || !city || !state)) {
+      toast({
+        title: "Endereço incompleto",
+        description: "Verifique se o CEP foi preenchido corretamente",
         variant: "destructive"
       });
       return;
@@ -127,13 +170,27 @@ const Login = () => {
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className="pl-10"
+                    className="pl-10 pr-10"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isSubmitting}
                   />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={isSubmitting}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </Button>
                 </div>
               </div>
               
@@ -222,6 +279,115 @@ const Login = () => {
                   />
                 </div>
               </div>
+
+              {/* Campos de Endereço */}
+              <div className="border-t pt-4 mt-6">
+                <h3 className="text-sm font-medium mb-4 text-muted-foreground">Endereço (opcional)</h3>
+                
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">CEP</label>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="text"
+                        placeholder="00000-000"
+                        className="pl-10"
+                        value={cep}
+                        onChange={(e) => handleCepChange(e.target.value)}
+                        disabled={isSubmitting || cepLoading}
+                      />
+                      {cepLoading && (
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-spatioo-green"></div>
+                        </div>
+                      )}
+                    </div>
+                    {cepError && (
+                      <p className="text-xs text-destructive">{cepError}</p>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="col-span-2 space-y-2">
+                      <label className="text-sm font-medium">Rua</label>
+                      <div className="relative">
+                        <Home className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          type="text"
+                          placeholder="Nome da rua"
+                          className="pl-10"
+                          value={street}
+                          onChange={(e) => setStreet(e.target.value)}
+                          disabled={isSubmitting}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Número</label>
+                      <Input
+                        type="text"
+                        placeholder="123"
+                        value={number}
+                        onChange={(e) => setNumber(e.target.value)}
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Complemento</label>
+                    <Input
+                      type="text"
+                      placeholder="Apto, casa, etc."
+                      value={complement}
+                      onChange={(e) => setComplement(e.target.value)}
+                      disabled={isSubmitting}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Bairro</label>
+                    <div className="relative">
+                      <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="text"
+                        placeholder="Nome do bairro"
+                        className="pl-10"
+                        value={neighborhood}
+                        onChange={(e) => setNeighborhood(e.target.value)}
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Cidade</label>
+                      <Input
+                        type="text"
+                        placeholder="Nome da cidade"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Estado</label>
+                      <Input
+                        type="text"
+                        placeholder="UF"
+                        value={state}
+                        onChange={(e) => setState(e.target.value)}
+                        disabled={isSubmitting}
+                        maxLength={2}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
               
               <div className="space-y-2">
                 <label className="text-sm font-medium">Senha</label>
@@ -229,7 +395,7 @@ const Login = () => {
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="password"
-                    placeholder="•••���••••"
+                    placeholder="••••••••"
                     className="pl-10"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
