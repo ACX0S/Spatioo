@@ -20,6 +20,7 @@ const Login = () => {
   // Estados existentes
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [activeTab, setActiveTab] = useState('login');
@@ -27,11 +28,10 @@ const Login = () => {
   
   // Novos estados para senha e endereço
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [cep, setCep] = useState('');
   const [street, setStreet] = useState('');
   const [neighborhood, setNeighborhood] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('');
   const [number, setNumber] = useState('');
   const [complement, setComplement] = useState('');
 
@@ -51,8 +51,6 @@ const Login = () => {
       if (cepData) {
         setStreet(cepData.logradouro);
         setNeighborhood(cepData.bairro);
-        setCity(cepData.localidade);
-        setState(cepData.uf);
         toast({
           title: "CEP encontrado",
           description: "Endereço preenchido automaticamente",
@@ -79,19 +77,37 @@ const Login = () => {
   
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !confirmPassword) {
       toast({
         title: "Campos obrigatórios",
-        description: "Preencha nome, email e senha para criar uma conta",
+        description: "Preencha todos os campos obrigatórios",
         variant: "destructive"
       });
       return;
     }
 
-    if (cep && (!street || !city || !state)) {
+    if (password !== confirmPassword) {
+      toast({
+        title: "Senhas não coincidem",
+        description: "A senha e confirmação de senha devem ser iguais",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!cep || cep.replace(/\D/g, '').length !== 8) {
+      toast({
+        title: "CEP obrigatório",
+        description: "Preencha um CEP válido com 8 dígitos",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!street || !neighborhood) {
       toast({
         title: "Endereço incompleto",
-        description: "Verifique se o CEP foi preenchido corretamente",
+        description: "Verifique se o CEP foi preenchido corretamente e carregou o endereço",
         variant: "destructive"
       });
       return;
@@ -236,7 +252,7 @@ const Login = () => {
           <TabsContent value="register">
             <form onSubmit={handleRegister} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Nome completo</label>
+                <label className="text-sm font-medium">Nome completo *</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -246,12 +262,13 @@ const Login = () => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     disabled={isSubmitting}
+                    required
                   />
                 </div>
               </div>
               
               <div className="space-y-2">
-                <label className="text-sm font-medium">Email</label>
+                <label className="text-sm font-medium">Email *</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -261,6 +278,7 @@ const Login = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={isSubmitting}
+                    required
                   />
                 </div>
               </div>
@@ -282,11 +300,11 @@ const Login = () => {
 
               {/* Campos de Endereço */}
               <div className="border-t pt-4 mt-6">
-                <h3 className="text-sm font-medium mb-4 text-muted-foreground">Endereço (opcional)</h3>
+                <h3 className="text-sm font-medium mb-4 text-muted-foreground">Endereço *</h3>
                 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">CEP</label>
+                    <label className="text-sm font-medium">CEP *</label>
                     <div className="relative">
                       <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -296,6 +314,7 @@ const Login = () => {
                         value={cep}
                         onChange={(e) => handleCepChange(e.target.value)}
                         disabled={isSubmitting || cepLoading}
+                        required
                       />
                       {cepLoading && (
                         <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -316,10 +335,11 @@ const Login = () => {
                         <Input
                           type="text"
                           placeholder="Nome da rua"
-                          className="pl-10"
+                          className="pl-10 bg-gray-50"
                           value={street}
                           onChange={(e) => setStreet(e.target.value)}
                           disabled={isSubmitting}
+                          readOnly
                         />
                       </div>
                     </div>
@@ -354,35 +374,11 @@ const Login = () => {
                       <Input
                         type="text"
                         placeholder="Nome do bairro"
-                        className="pl-10"
+                        className="pl-10 bg-gray-50"
                         value={neighborhood}
                         onChange={(e) => setNeighborhood(e.target.value)}
                         disabled={isSubmitting}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Cidade</label>
-                      <Input
-                        type="text"
-                        placeholder="Nome da cidade"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        disabled={isSubmitting}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Estado</label>
-                      <Input
-                        type="text"
-                        placeholder="UF"
-                        value={state}
-                        onChange={(e) => setState(e.target.value)}
-                        disabled={isSubmitting}
-                        maxLength={2}
+                        readOnly
                       />
                     </div>
                   </div>
@@ -390,17 +386,62 @@ const Login = () => {
               </div>
               
               <div className="space-y-2">
-                <label className="text-sm font-medium">Senha</label>
+                <label className="text-sm font-medium">Senha *</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className="pl-10"
+                    className="pl-10 pr-10"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isSubmitting}
+                    required
                   />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={isSubmitting}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Confirmar Senha *</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    className="pl-10 pr-10"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    disabled={isSubmitting}
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    disabled={isSubmitting}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </Button>
                 </div>
               </div>
               
