@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -30,6 +29,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Load user profile
   const loadUserProfile = async (userId: string) => {
     try {
+      console.log('Loading profile for user:', userId);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -41,11 +41,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
+      console.log('Profile loaded:', data);
       if (data) {
         setProfile(data as Profile);
+      } else {
+        console.log('No profile found, this might be expected for new users');
       }
     } catch (error: any) {
       console.error('Error loading profile:', error.message);
+    }
+  };
+
+  // Create user profile if it doesn't exist
+  const createUserProfile = async (userId: string, name: string) => {
+    try {
+      console.log('Creating profile for user:', userId, 'with name:', name);
+      const { data, error } = await supabase
+        .from('profiles')
+        .insert({
+          id: userId,
+          name: name
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating profile:', error);
+        return;
+      }
+
+      console.log('Profile created:', data);
+      setProfile(data as Profile);
+    } catch (error: any) {
+      console.error('Error creating profile:', error.message);
     }
   };
 
@@ -55,7 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Configure auth state change listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, newSession) => {
+      async (event, newSession) => {
         console.log('Auth state changed:', event, newSession?.user?.email);
         
         if (!mounted) return;
@@ -63,13 +91,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(newSession);
         setUser(newSession?.user ?? null);
         
-        // Load profile after state change
+        // Handle profile loading/creation based on event
         if (newSession?.user) {
-          setTimeout(() => {
-            if (mounted) {
-              loadUserProfile(newSession.user.id);
-            }
-          }, 0);
+          if (event === 'SIGNED_UP') {
+            // For new signups, try to create profile
+            const userName = newSession.user.user_metadata?.name || newSession.user.email?.split('@')[0] || 'Usuário';
+            setTimeout(() => {
+              if (mounted) {
+                createUserProfile(newSession.user.id, userName);
+              }
+            }, 100);
+          } else {
+            // For existing users, load profile
+            setTimeout(() => {
+              if (mounted) {
+                loadUserProfile(newSession.user.id);
+              }
+            }, 0);
+          }
         } else {
           setProfile(null);
         }
@@ -109,12 +148,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Login with email and password
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      console.log('Attempting to sign in with:', email);
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       
       if (error) {
+        console.error('Sign in error:', error);
         throw error;
       }
 
+      console.log('Sign in successful:', data);
       toast({
         title: "Login realizado com sucesso",
         description: "Bem-vindo de volta!",
@@ -135,21 +177,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Sign up with email and password
   const signUp = async (email: string, password: string, name: string) => {
     try {
-      const { error } = await supabase.auth.signUp({ 
+      console.log('Attempting to sign up with:', email, 'name:', name);
+      const { data, error } = await supabase.auth.signUp({ 
         email, 
         password,
         options: {
           data: {
-            name
+            name: name
           },
           emailRedirectTo: `${window.location.origin}/`
         }
       });
       
       if (error) {
+        console.error('Sign up error:', error);
         throw error;
       }
 
+      console.log('Sign up successful:', data);
       toast({
         title: "Cadastro realizado com sucesso",
         description: "Verifique seu email para confirmar a conta.",
