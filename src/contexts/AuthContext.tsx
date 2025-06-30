@@ -46,35 +46,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data) {
         setProfile(data as Profile);
       } else {
-        console.log('No profile found, this might be expected for new users');
+        console.log('No profile found for user:', userId);
+        // Profile will be created by the trigger when user signs up
       }
     } catch (error: any) {
       console.error('Error loading profile:', error.message);
-    }
-  };
-
-  // Create user profile if it doesn't exist
-  const createUserProfile = async (userId: string, name: string) => {
-    try {
-      console.log('Creating profile for user:', userId, 'with name:', name);
-      const { data, error } = await supabase
-        .from('profiles')
-        .insert({
-          id: userId,
-          name: name
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error creating profile:', error);
-        return;
-      }
-
-      console.log('Profile created:', data);
-      setProfile(data as Profile);
-    } catch (error: any) {
-      console.error('Error creating profile:', error.message);
     }
   };
 
@@ -92,24 +68,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(newSession);
         setUser(newSession?.user ?? null);
         
-        // Handle profile loading/creation based on event
+        // Handle profile loading based on session
         if (newSession?.user) {
-          if (event === 'SIGNED_UP' || event === 'TOKEN_REFRESHED') {
-            // For new signups or token refresh, try to load profile first
-            const userName = newSession.user.user_metadata?.name || newSession.user.email?.split('@')[0] || 'Usuário';
-            setTimeout(() => {
-              if (mounted) {
-                loadUserProfile(newSession.user.id);
-              }
-            }, 100);
-          } else {
-            // For existing users, load profile
-            setTimeout(() => {
-              if (mounted) {
-                loadUserProfile(newSession.user.id);
-              }
-            }, 0);
-          }
+          // Wait a bit for the database trigger to create the profile
+          setTimeout(() => {
+            if (mounted) {
+              loadUserProfile(newSession.user.id);
+            }
+          }, event === 'SIGNED_IN' ? 100 : 500);
         } else {
           setProfile(null);
         }
@@ -196,12 +162,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       console.log('Sign up successful:', data);
-      toast({
-        title: "Cadastro realizado com sucesso",
-        description: "Verifique seu email para confirmar a conta.",
-      });
       
-      navigate('/home');
+      if (data.user && !data.session) {
+        toast({
+          title: "Cadastro realizado com sucesso",
+          description: "Verifique seu email para confirmar a conta.",
+        });
+      } else if (data.session) {
+        toast({
+          title: "Cadastro realizado com sucesso",
+          description: "Bem-vindo ao Spatioo!",
+        });
+        navigate('/home');
+      }
     } catch (error: any) {
       console.error('Signup error:', error);
       toast({
