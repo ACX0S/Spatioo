@@ -25,7 +25,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [authInitialized, setAuthInitialized] = useState(false);
   const navigate = useNavigate();
 
   // Load user profile
@@ -38,7 +37,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .maybeSingle();
 
       if (error) {
-        throw error;
+        console.error('Error loading profile:', error);
+        return;
       }
 
       if (data) {
@@ -51,40 +51,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Check current session and set up auth listener
   useEffect(() => {
-    // Set a safety timeout to prevent infinite loading
-    const safetyTimeout = setTimeout(() => {
-      if (loading && !authInitialized) {
-        console.log('Safety timeout triggered - forcing loading to false');
-        setLoading(false);
-        setAuthInitialized(true);
-      }
-    }, 5000);
+    let mounted = true;
 
     // Configure auth state change listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, newSession) => {
+      (event, newSession) => {
         console.log('Auth state changed:', event, newSession?.user?.email);
+        
+        if (!mounted) return;
         
         setSession(newSession);
         setUser(newSession?.user ?? null);
         
-        // Don't make Supabase calls inside the callback directly
-        // Use setTimeout to prevent potential deadlocks
+        // Load profile after state change
         if (newSession?.user) {
           setTimeout(() => {
-            loadUserProfile(newSession.user.id);
+            if (mounted) {
+              loadUserProfile(newSession.user.id);
+            }
           }, 0);
         } else {
           setProfile(null);
         }
 
-        setLoading(false);
-        setAuthInitialized(true);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
+    supabase.auth.getSession().then(({ data: { session: existingSession }, error }) => {
+      if (error) {
+        console.error('Error getting session:', error);
+      }
+      
+      if (!mounted) return;
+      
       console.log('Existing session check:', existingSession?.user?.email);
       
       setSession(existingSession);
@@ -95,15 +98,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       setLoading(false);
-      setAuthInitialized(true);
-    }).catch(error => {
-      console.error('Error getting session:', error);
-      setLoading(false);
-      setAuthInitialized(true);
     });
 
     return () => {
-      clearTimeout(safetyTimeout);
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
@@ -111,7 +109,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Login with email and password
   const signIn = async (email: string, password: string) => {
     try {
-      setLoading(true);
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       
       if (error) {
@@ -125,28 +122,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       navigate('/home');
     } catch (error: any) {
+      console.error('Login error:', error);
       toast({
         title: "Erro ao fazer login",
         description: error.message,
         variant: "destructive",
       });
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
   // Sign up with email and password
   const signUp = async (email: string, password: string, name: string) => {
     try {
-      setLoading(true);
       const { error } = await supabase.auth.signUp({ 
         email, 
         password,
         options: {
           data: {
             name
-          }
+          },
+          emailRedirectTo: `${window.location.origin}/`
         }
       });
       
@@ -161,21 +157,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       navigate('/home');
     } catch (error: any) {
+      console.error('Signup error:', error);
       toast({
         title: "Erro ao criar conta",
         description: error.message,
         variant: "destructive",
       });
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
   // Logout
   const signOut = async () => {
     try {
-      setLoading(true);
       await supabase.auth.signOut();
       navigate('/login');
     } catch (error: any) {
@@ -184,8 +178,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: error.message,
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -194,8 +186,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       if (!user) throw new Error("Usuário não autenticado");
 
-      setLoading(true);
-      
       const { error } = await supabase
         .from('profiles')
         .update(updatedProfile)
@@ -219,16 +209,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         variant: "destructive",
       });
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
   // Change password
   const changePassword = async (newPassword: string) => {
     try {
-      setLoading(true);
-      
       const { error } = await supabase.auth.updateUser({ 
         password: newPassword 
       });
@@ -250,8 +236,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         variant: "destructive",
       });
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
