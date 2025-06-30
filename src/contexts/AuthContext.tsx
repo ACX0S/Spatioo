@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -93,12 +94,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // Handle profile loading/creation based on event
         if (newSession?.user) {
-          if (event === 'SIGNED_UP') {
-            // For new signups, try to create profile
+          if (event === 'SIGNED_UP' || event === 'TOKEN_REFRESHED') {
+            // For new signups or token refresh, try to load profile first
             const userName = newSession.user.user_metadata?.name || newSession.user.email?.split('@')[0] || 'Usuário';
             setTimeout(() => {
               if (mounted) {
-                createUserProfile(newSession.user.id, userName);
+                loadUserProfile(newSession.user.id);
               }
             }, 100);
           } else {
