@@ -47,7 +47,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setProfile(data as Profile);
       } else {
         console.log('No profile found for user:', userId);
-        // Profile will be created by the trigger when user signs up
+        // If no profile exists, create one with the user's metadata
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            const userName = user.user_metadata?.name || user.email?.split('@')[0] || 'Usuário';
+            const { data: newProfile, error: insertError } = await supabase
+              .from('profiles')
+              .insert({ 
+                id: userId, 
+                name: userName 
+              })
+              .select()
+              .single();
+            
+            if (insertError) {
+              console.error('Error creating profile:', insertError);
+            } else {
+              console.log('Profile created:', newProfile);
+              setProfile(newProfile as Profile);
+            }
+          }
+        } catch (createError: any) {
+          console.error('Error creating profile:', createError.message);
+        }
       }
     } catch (error: any) {
       console.error('Error loading profile:', error.message);
