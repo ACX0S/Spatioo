@@ -205,15 +205,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       if (!user) throw new Error("Usuário não autenticado");
 
-      const { error } = await supabase
+      console.log('Updating profile for user:', user.id, 'with data:', updatedProfile);
+
+      const { data, error } = await supabase
         .from('profiles')
         .update(updatedProfile)
-        .eq('id', user.id);
+        .eq('id', user.id)
+        .select()
+        .single();
 
       if (error) {
+        console.error('Error updating profile:', error);
         throw error;
       }
 
+      console.log('Profile updated successfully:', data);
+      
       // Update local state
       setProfile(prev => prev ? { ...prev, ...updatedProfile } : null);
       

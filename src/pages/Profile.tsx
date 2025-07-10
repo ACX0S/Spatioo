@@ -226,7 +226,20 @@ const Profile = () => {
                       placeholder="(11) 98765-4321"
                       className="pl-10"
                       value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
+                      onChange={(e) => {
+                        let value = e.target.value.replace(/\D/g, '');
+                        if (value.length <= 11) {
+                          if (value.length >= 11) {
+                            value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+                          } else if (value.length >= 7) {
+                            value = value.replace(/(\d{2})(\d{4})(\d+)/, '($1) $2-$3');
+                          } else if (value.length >= 3) {
+                            value = value.replace(/(\d{2})(\d+)/, '($1) $2');
+                          }
+                          setPhone(value);
+                        }
+                      }}
+                      maxLength={15}
                     />
                   </div>
                 </div>

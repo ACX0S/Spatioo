@@ -149,24 +149,24 @@ const Home = () => {
           <Button 
             variant="outline" 
             onClick={() => navigate('/explore')}
-            className="flex flex-col items-center justify-center h-20 space-y-1 rounded-xl"
+            className="flex flex-col items-center justify-center h-20 space-y-1 rounded-xl hover:bg-primary/10 hover:border-primary/20 transition-colors"
           >
-            <Compass className="h-6 w-6 text-spatioo-green" />
-            <span className="text-xs">Explorar</span>
+            <Compass className="h-6 w-6 text-primary" />
+            <span className="text-xs font-medium">Explorar</span>
           </Button>
           
           <Button 
             variant="outline" 
             onClick={() => navigate('/dashboard')}
-            className="flex flex-col items-center justify-center h-20 space-y-1 rounded-xl"
+            className="flex flex-col items-center justify-center h-20 space-y-1 rounded-xl hover:bg-primary/10 hover:border-primary/20 transition-colors"
           >
-            <Clock className="h-6 w-6 text-spatioo-green" />
-            <span className="text-xs">Reservas</span>
+            <Clock className="h-6 w-6 text-primary" />
+            <span className="text-xs font-medium">Reservas</span>
           </Button>
           
           <Button 
             variant="outline" 
-            className="flex flex-col items-center justify-center h-20 space-y-1 rounded-xl"
+            className="flex flex-col items-center justify-center h-20 space-y-1 rounded-xl hover:bg-primary/10 hover:border-primary/20 transition-colors"
             onClick={() => {
               if (nearbyParkingSpots.length > 0) {
                 navigate(`/parking/${nearbyParkingSpots[0].id}`);
@@ -175,17 +175,17 @@ const Home = () => {
               }
             }}
           >
-            <Navigation className="h-6 w-6 text-spatioo-green" />
-            <span className="text-xs">Próximo</span>
+            <Navigation className="h-6 w-6 text-primary" />
+            <span className="text-xs font-medium">Próximo</span>
           </Button>
           
           <Button 
             variant="outline"
             onClick={() => navigate('/profile')} 
-            className="flex flex-col items-center justify-center h-20 space-y-1 rounded-xl"
+            className="flex flex-col items-center justify-center h-20 space-y-1 rounded-xl hover:bg-primary/10 hover:border-primary/20 transition-colors"
           >
-            <History className="h-6 w-6 text-spatioo-green" />
-            <span className="text-xs">Perfil</span>
+            <History className="h-6 w-6 text-primary" />
+            <span className="text-xs font-medium">Perfil</span>
           </Button>
         </div>
       </motion.div>
