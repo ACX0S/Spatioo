@@ -10,6 +10,7 @@ import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useBookings } from '@/hooks/useBookings';
 import ChangePasswordDialog from '@/components/ChangePasswordDialog';
+import CreateEstacionamentoDialog from '@/components/CreateEstacionamentoDialog';
 import { uploadAvatar, deleteOldAvatar } from '@/services/storageService';
 import { useCep } from '@/hooks/useCep';
 
@@ -26,7 +27,6 @@ const Profile = () => {
   const [number, setNumber] = useState(profile?.number || '');
   const [complement, setComplement] = useState(profile?.complement || '');
   const [neighborhood, setNeighborhood] = useState(profile?.neighborhood || '');
-  const [donoEstacionamento, setDonoEstacionamento] = useState(profile?.dono_estacionamento || false);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -39,7 +39,6 @@ const Profile = () => {
       setNumber(profile.number || '');
       setComplement(profile.complement || '');
       setNeighborhood(profile.neighborhood || '');
-      setDonoEstacionamento(profile.dono_estacionamento || false);
     }
   }, [profile]);
 
@@ -113,8 +112,7 @@ const Profile = () => {
         street, 
         number, 
         complement, 
-        neighborhood,
-        dono_estacionamento: donoEstacionamento
+        neighborhood
       });
       
       toast({
@@ -328,53 +326,17 @@ const Profile = () => {
                </CardContent>
              </Card>
              
-             {/* Configurações de Negócio */}
              <Card>
-               <CardHeader className="pb-4">
-                 <CardTitle>Configurações de Negócio</CardTitle>
-                 <CardDescription>Gerencie suas opções empresariais</CardDescription>
-               </CardHeader>
-               <CardContent className="space-y-4">
-                 <div className="flex items-center justify-between space-x-3">
-                   <div className="flex items-center space-x-3">
-                     <div className="p-2 bg-spatioo-green/20 rounded-lg">
-                       <Building2 className="h-5 w-5 text-spatioo-green" />
-                     </div>
-                     <div>
-                       <p className="font-medium">Sou dono de estacionamento</p>
-                       <p className="text-sm text-muted-foreground">
-                         Ative para gerenciar seu próprio estacionamento
-                       </p>
-                     </div>
-                   </div>
-                   <div className="flex items-center space-x-2">
-                     <input
-                       id="dono-estacionamento"
-                       type="checkbox"
-                       checked={donoEstacionamento}
-                       onChange={(e) => setDonoEstacionamento(e.target.checked)}
-                       className="rounded border-gray-300 text-spatioo-green focus:ring-spatioo-green"
-                     />
-                   </div>
-                 </div>
-                 {donoEstacionamento && (
-                   <div className="bg-spatioo-green/10 border border-spatioo-green/20 rounded-lg p-3">
-                     <p className="text-sm text-spatioo-green-dark">
-                       ✓ Você poderá gerenciar seu estacionamento através do menu lateral
-                     </p>
-                   </div>
-                 )}
-               </CardContent>
                <CardFooter>
-                <Button 
-                  className="w-full bg-spatioo-green hover:bg-spatioo-green-dark text-black font-medium"
-                  onClick={handleSaveProfile}
-                  disabled={saving}
-                >
-                  {saving ? 'Salvando...' : 'Salvar Alterações'}
-                </Button>
-              </CardFooter>
-            </Card>
+                 <Button 
+                   className="w-full bg-spatioo-green hover:bg-spatioo-green-dark text-black font-medium"
+                   onClick={handleSaveProfile}
+                   disabled={saving}
+                 >
+                   {saving ? 'Salvando...' : 'Salvar Alterações'}
+                 </Button>
+               </CardFooter>
+             </Card>
           </div>
         </TabsContent>
         
@@ -424,6 +386,36 @@ const Profile = () => {
               </CardContent>
             </Card>
             
+            {/* Configurações de Negócio */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Configurações de Negócio</CardTitle>
+                <CardDescription>Gerencie suas opções empresariais</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {!profile?.dono_estacionamento ? (
+                  <CreateEstacionamentoDialog onSuccess={() => window.location.reload()} />
+                ) : (
+                  <div className="flex items-center justify-between space-x-3">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-spatioo-green/20 rounded-lg">
+                        <Building2 className="h-5 w-5 text-spatioo-green" />
+                      </div>
+                      <div>
+                        <p className="font-medium">Estacionamento Cadastrado</p>
+                        <p className="text-sm text-muted-foreground">
+                          Você pode gerenciar seu estacionamento através do menu lateral
+                        </p>
+                      </div>
+                    </div>
+                    <div className="bg-spatioo-green/10 px-3 py-1 rounded-full">
+                      <span className="text-xs text-spatioo-green font-medium">✓ Ativo</span>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             {/* Segurança */}
             <Card>
               <CardHeader>
@@ -433,38 +425,48 @@ const Profile = () => {
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-3">
-                    <Shield className="h-5 w-5 text-muted-foreground" />
+                    <div className="p-2 bg-red-100 rounded-lg">
+                      <Shield className="h-5 w-5 text-red-600" />
+                    </div>
                     <div>
                       <p className="font-medium">Alterar senha</p>
-                      <p className="text-xs text-muted-foreground">Atualizar sua senha de acesso</p>
+                      <p className="text-sm text-muted-foreground">Mantenha sua conta segura</p>
                     </div>
                   </div>
-                  <ChangePasswordDialog 
-                    trigger={
-                      <Button variant="ghost" size="sm" className="h-9">
-                        <ChevronLeft className="h-4 w-4 rotate-180" />
-                      </Button>
-                    } 
-                  />
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <Bell className="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">Notificações</p>
-                      <p className="text-xs text-muted-foreground">Gerenciar alertas e mensagens</p>
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="sm" className="h-9">
-                    <ChevronLeft className="h-4 w-4 rotate-180" />
-                  </Button>
+                  <ChangePasswordDialog trigger={
+                    <Button variant="outline" size="sm">
+                      Alterar
+                    </Button>
+                  } />
                 </div>
               </CardContent>
             </Card>
             
+            {/* Notifications */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Notificações</CardTitle>
+                <CardDescription>Configure suas preferências de notificação</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <Bell className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Notificações push</p>
+                      <p className="text-sm text-muted-foreground">Receba atualizações sobre suas reservas</p>
+                    </div>
+                  </div>
+                  <input type="checkbox" defaultChecked className="rounded" />
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Sair da conta */}
             <Button 
-              variant="outline" 
+              variant="outline"
               className="w-full border-destructive text-destructive hover:bg-destructive/10"
               onClick={signOut}
             >

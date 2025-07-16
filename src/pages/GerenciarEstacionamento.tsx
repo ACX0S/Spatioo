@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Estacionamento, EstacionamentoInsert, EstacionamentoUpdate } from "@/types/estacionamento";
 import { Plus, Edit2, Trash2, Building2, Clock, DollarSign, Car } from "lucide-react";
+import EditEstacionamentoDialog from "@/components/EditEstacionamentoDialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -134,6 +135,7 @@ const GerenciarEstacionamento = () => {
     if (!estacionamento) return;
 
     try {
+      // Primeiro excluir o estacionamento
       const { error } = await supabase
         .from('estacionamento')
         .delete()
@@ -141,11 +143,19 @@ const GerenciarEstacionamento = () => {
 
       if (error) throw error;
 
+      // Depois atualizar o perfil para dono_estacionamento = false
+      await updateProfile({ dono_estacionamento: false });
+
       setEstacionamento(null);
       toast({
         title: "Sucesso",
         description: "Estacionamento excluído com sucesso!",
       });
+
+      // Redirecionar para o perfil após a exclusão
+      setTimeout(() => {
+        navigate("/profile");
+      }, 1500);
     } catch (error: any) {
       console.error('Error deleting estacionamento:', error);
       toast({
@@ -294,10 +304,10 @@ const GerenciarEstacionamento = () => {
                 <CardDescription>CNPJ: {estacionamento.cnpj}</CardDescription>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                  <Edit2 className="h-4 w-4 mr-2" />
-                  Editar
-                </Button>
+                <EditEstacionamentoDialog 
+                  estacionamento={estacionamento} 
+                  onSuccess={fetchEstacionamento}
+                />
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="destructive" size="sm">
@@ -309,7 +319,7 @@ const GerenciarEstacionamento = () => {
                     <AlertDialogHeader>
                       <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Tem certeza que deseja excluir este estacionamento? Esta ação não pode ser desfeita.
+                        Tem certeza que deseja excluir este estacionamento? Esta ação não pode ser desfeita e você precisará criar um novo para voltar a ser dono de estacionamento.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
