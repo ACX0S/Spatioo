@@ -61,6 +61,59 @@ export type Database = {
           },
         ]
       }
+      estacionamento: {
+        Row: {
+          cep: string
+          cnpj: string
+          created_at: string
+          endereco: string
+          fotos: string[] | null
+          horario_funcionamento: Json
+          id: string
+          nome: string
+          numero_vagas: number
+          preco: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cep: string
+          cnpj: string
+          created_at?: string
+          endereco: string
+          fotos?: string[] | null
+          horario_funcionamento: Json
+          id?: string
+          nome: string
+          numero_vagas: number
+          preco: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cep?: string
+          cnpj?: string
+          created_at?: string
+          endereco?: string
+          fotos?: string[] | null
+          horario_funcionamento?: Json
+          id?: string
+          nome?: string
+          numero_vagas?: number
+          preco?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "estacionamento_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       parking_spots: {
         Row: {
           address: string
@@ -114,6 +167,7 @@ export type Database = {
           avatar_url: string | null
           cep: string | null
           complement: string | null
+          dono_estacionamento: boolean | null
           id: string
           name: string | null
           neighborhood: string | null
@@ -126,6 +180,7 @@ export type Database = {
           avatar_url?: string | null
           cep?: string | null
           complement?: string | null
+          dono_estacionamento?: boolean | null
           id: string
           name?: string | null
           neighborhood?: string | null
@@ -138,6 +193,7 @@ export type Database = {
           avatar_url?: string | null
           cep?: string | null
           complement?: string | null
+          dono_estacionamento?: boolean | null
           id?: string
           name?: string | null
           neighborhood?: string | null

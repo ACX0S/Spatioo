@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout";
 import { AuthProvider } from "./contexts/AuthContext";
 import Profile from "./pages/Profile";
+import GerenciarEstacionamento from "./pages/GerenciarEstacionamento";
 import RequireAuth from "./components/RequireAuth";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => {
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="admin" element={<ParkingOwnerDashboard />} />
                   <Route path="profile" element={<Profile />} />
+                  <Route path="gerenciar-estacionamento" element={<GerenciarEstacionamento />} />
                   <Route path="*" element={<NotFound />} />
                 </Route>
               </Routes>

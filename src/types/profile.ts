@@ -10,4 +10,5 @@ export interface Profile {
   complement: string | null;
   neighborhood: string | null;
   cep: string | null;
+  dono_estacionamento: boolean | null;
 }

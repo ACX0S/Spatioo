@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, Mail, Phone, Camera, ChevronLeft, CreditCard, Shield, Bell, LogOut, MapPin, Home } from 'lucide-react';
+import { User, Mail, Phone, Camera, ChevronLeft, CreditCard, Shield, Bell, LogOut, MapPin, Home, Building2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -26,6 +26,7 @@ const Profile = () => {
   const [number, setNumber] = useState(profile?.number || '');
   const [complement, setComplement] = useState(profile?.complement || '');
   const [neighborhood, setNeighborhood] = useState(profile?.neighborhood || '');
+  const [donoEstacionamento, setDonoEstacionamento] = useState(profile?.dono_estacionamento || false);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -38,6 +39,7 @@ const Profile = () => {
       setNumber(profile.number || '');
       setComplement(profile.complement || '');
       setNeighborhood(profile.neighborhood || '');
+      setDonoEstacionamento(profile.dono_estacionamento || false);
     }
   }, [profile]);
 
@@ -111,7 +113,8 @@ const Profile = () => {
         street, 
         number, 
         complement, 
-        neighborhood 
+        neighborhood,
+        dono_estacionamento: donoEstacionamento
       });
       
       toast({
@@ -321,9 +324,48 @@ const Profile = () => {
                   {cep && cep.replace(/\D/g, '').length === 8 && (
                     <p className="text-xs text-muted-foreground">Campo preenchido automaticamente pelo CEP</p>
                   )}
-                </div>
-              </CardContent>
-              <CardFooter>
+                 </div>
+               </CardContent>
+             </Card>
+             
+             {/* Configurações de Negócio */}
+             <Card>
+               <CardHeader className="pb-4">
+                 <CardTitle>Configurações de Negócio</CardTitle>
+                 <CardDescription>Gerencie suas opções empresariais</CardDescription>
+               </CardHeader>
+               <CardContent className="space-y-4">
+                 <div className="flex items-center justify-between space-x-3">
+                   <div className="flex items-center space-x-3">
+                     <div className="p-2 bg-spatioo-green/20 rounded-lg">
+                       <Building2 className="h-5 w-5 text-spatioo-green" />
+                     </div>
+                     <div>
+                       <p className="font-medium">Sou dono de estacionamento</p>
+                       <p className="text-sm text-muted-foreground">
+                         Ative para gerenciar seu próprio estacionamento
+                       </p>
+                     </div>
+                   </div>
+                   <div className="flex items-center space-x-2">
+                     <input
+                       id="dono-estacionamento"
+                       type="checkbox"
+                       checked={donoEstacionamento}
+                       onChange={(e) => setDonoEstacionamento(e.target.checked)}
+                       className="rounded border-gray-300 text-spatioo-green focus:ring-spatioo-green"
+                     />
+                   </div>
+                 </div>
+                 {donoEstacionamento && (
+                   <div className="bg-spatioo-green/10 border border-spatioo-green/20 rounded-lg p-3">
+                     <p className="text-sm text-spatioo-green-dark">
+                       ✓ Você poderá gerenciar seu estacionamento através do menu lateral
+                     </p>
+                   </div>
+                 )}
+               </CardContent>
+               <CardFooter>
                 <Button 
                   className="w-full bg-spatioo-green hover:bg-spatioo-green-dark text-black font-medium"
                   onClick={handleSaveProfile}

@@ -15,7 +15,8 @@ import {
   Bell,
   HelpCircle,
   Compass,
-  LogOut
+  LogOut,
+  Building2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -44,6 +45,8 @@ const Layout = () => {
         return "Gerenciar vagas";
       case "/profile":
         return "Meu Perfil";
+      case "/gerenciar-estacionamento":
+        return "Gerenciar Estacionamento";
       default:
         if (pathname.includes("/parking/")) {
           return "Detalhes do Estacionamento";
@@ -186,6 +189,15 @@ const Layout = () => {
                       <Car className="h-5 w-5 text-spatioo-green" />
                       <span>Gerenciar vagas</span>
                     </Link>
+                    {profile?.dono_estacionamento && (
+                      <Link 
+                        to="/gerenciar-estacionamento" 
+                        className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-accent transition-colors"
+                      >
+                        <Building2 className="h-5 w-5 text-spatioo-green" />
+                        <span>Gerenciar Estacionamento</span>
+                      </Link>
+                    )}
                     <hr className="my-2 border-border" />
                     <Link 
                       to="/settings" 
