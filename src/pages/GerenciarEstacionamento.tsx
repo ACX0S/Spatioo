@@ -376,6 +376,14 @@ const GerenciarEstacionamento = () => {
                 <CardDescription>CNPJ: {estacionamento.cnpj}</CardDescription>
               </div>
               <div className="flex gap-2">
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => navigate(`/estacionamento-dashboard/${estacionamento.id}`)}
+                >
+                  <Building2 className="h-4 w-4 mr-2" />
+                  Gerenciar
+                </Button>
                 <EditEstacionamentoDialog 
                   estacionamento={estacionamento} 
                   onSuccess={fetchEstacionamento}
