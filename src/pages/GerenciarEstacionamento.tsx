@@ -11,8 +11,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Estacionamento, EstacionamentoInsert, EstacionamentoUpdate } from "@/types/estacionamento";
-import { Plus, Edit2, Trash2, Building2, Clock, DollarSign, Car } from "lucide-react";
+import { Plus, Edit2, Trash2, Building2, Clock, DollarSign, Car, Upload, X } from "lucide-react";
 import EditEstacionamentoDialog from "@/components/EditEstacionamentoDialog";
+import { uploadEstacionamentoPhoto, deleteEstacionamentoPhotos } from "@/services/storageService";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -41,6 +42,7 @@ const GerenciarEstacionamento = () => {
   const [estacionamento, setEstacionamento] = useState<Estacionamento | null>(null);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [formData, setFormData] = useState<EstacionamentoInsert>({
     nome: "",
     cnpj: "",
@@ -161,6 +163,76 @@ const GerenciarEstacionamento = () => {
       toast({
         title: "Erro",
         description: "Erro ao excluir estacionamento",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !estacionamento || !profile?.id) return;
+
+    setUploadingPhoto(true);
+    try {
+      const photoUrl = await uploadEstacionamentoPhoto(file, profile.id);
+      
+      const currentPhotos = estacionamento.fotos || [];
+      const updatedPhotos = [...currentPhotos, photoUrl];
+      
+      const { error } = await supabase
+        .from('estacionamento')
+        .update({ fotos: updatedPhotos })
+        .eq('id', estacionamento.id);
+
+      if (error) throw error;
+
+      setEstacionamento({ ...estacionamento, fotos: updatedPhotos });
+      
+      toast({
+        title: "Sucesso",
+        description: "Foto adicionada com sucesso!",
+      });
+    } catch (error: any) {
+      console.error('Error uploading photo:', error);
+      toast({
+        title: "Erro",
+        description: error.message || "Erro ao fazer upload da foto",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingPhoto(false);
+      // Reset input
+      event.target.value = '';
+    }
+  };
+
+  const handleRemovePhoto = async (photoUrl: string) => {
+    if (!estacionamento || !profile?.id) return;
+
+    try {
+      const updatedPhotos = (estacionamento.fotos || []).filter(url => url !== photoUrl);
+      
+      const { error } = await supabase
+        .from('estacionamento')
+        .update({ fotos: updatedPhotos })
+        .eq('id', estacionamento.id);
+
+      if (error) throw error;
+
+      // Delete from storage
+      await deleteEstacionamentoPhotos([photoUrl], profile.id);
+
+      setEstacionamento({ ...estacionamento, fotos: updatedPhotos });
+      
+      toast({
+        title: "Sucesso",
+        description: "Foto removida com sucesso!",
+      });
+    } catch (error: any) {
+      console.error('Error removing photo:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao remover foto",
         variant: "destructive",
       });
     }
@@ -374,6 +446,70 @@ const GerenciarEstacionamento = () => {
                   </Badge>
                 </div>
               </div>
+            </div>
+            
+            <Separator />
+            
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <Upload className="h-4 w-4" />
+                  Fotos do Estacionamento
+                </h3>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoUpload}
+                    disabled={uploadingPhoto}
+                    className="hidden"
+                    id="photo-upload"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => document.getElementById('photo-upload')?.click()}
+                    disabled={uploadingPhoto || (estacionamento.fotos?.length || 0) >= 5}
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    {uploadingPhoto ? "Enviando..." : "Adicionar Foto"}
+                  </Button>
+                </div>
+              </div>
+              
+              {estacionamento.fotos && estacionamento.fotos.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {estacionamento.fotos.map((photoUrl, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={photoUrl}
+                        alt={`Foto ${index + 1} do estacionamento`}
+                        className="w-full h-32 object-cover rounded-md border"
+                      />
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-2 right-2 h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => handleRemovePhoto(photoUrl)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Upload className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                  <p>Nenhuma foto adicionada ainda</p>
+                  <p className="text-sm">Adicione fotos para mostrar seu estacionamento</p>
+                </div>
+              )}
+              
+              {(estacionamento.fotos?.length || 0) >= 5 && (
+                <p className="text-sm text-muted-foreground text-center">
+                  Máximo de 5 fotos permitidas
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
