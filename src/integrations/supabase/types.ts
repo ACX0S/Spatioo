@@ -51,15 +51,7 @@ export type Database = {
           status?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "bookings_parking_spot_id_fkey"
-            columns: ["parking_spot_id"]
-            isOneToOne: false
-            referencedRelation: "parking_spots"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       estacionamento: {
         Row: {
@@ -113,54 +105,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      parking_spots: {
-        Row: {
-          address: string
-          available_spots: number
-          created_at: string | null
-          created_by: string | null
-          description: string | null
-          id: string
-          image_url: string | null
-          lat: number | null
-          lng: number | null
-          name: string
-          price_per_hour: number
-          rating: number | null
-          reviews_count: number | null
-        }
-        Insert: {
-          address: string
-          available_spots?: number
-          created_at?: string | null
-          created_by?: string | null
-          description?: string | null
-          id?: string
-          image_url?: string | null
-          lat?: number | null
-          lng?: number | null
-          name: string
-          price_per_hour: number
-          rating?: number | null
-          reviews_count?: number | null
-        }
-        Update: {
-          address?: string
-          available_spots?: number
-          created_at?: string | null
-          created_by?: string | null
-          description?: string | null
-          id?: string
-          image_url?: string | null
-          lat?: number | null
-          lng?: number | null
-          name?: string
-          price_per_hour?: number
-          rating?: number | null
-          reviews_count?: number | null
-        }
-        Relationships: []
       }
       profiles: {
         Row: {
