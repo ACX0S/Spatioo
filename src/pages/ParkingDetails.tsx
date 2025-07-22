@@ -41,10 +41,10 @@ const ParkingDetails = () => {
     <div className="container p-4 max-w-md mx-auto pb-20">
       {/* Image Header */}
       <div className="relative h-48 bg-muted rounded-lg mb-4 overflow-hidden">
-        {parkingSpot.image_url ? (
+        {parkingSpot.fotos && parkingSpot.fotos.length > 0 ? (
           <img 
-            src={parkingSpot.image_url} 
-            alt={parkingSpot.name} 
+            src={`https://ojnayvmppwpbdcsddpaw.supabase.co/storage/v1/object/public/estacionamento-photos/${parkingSpot.fotos[0]}`}
+            alt={parkingSpot.nome} 
             className="w-full h-full object-cover"
           />
         ) : (
@@ -65,24 +65,21 @@ const ParkingDetails = () => {
       
       {/* Basic Info */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-1">{parkingSpot.name}</h1>
+        <h1 className="text-2xl font-bold mb-1">{parkingSpot.nome}</h1>
         <div className="flex items-center text-muted-foreground mb-2">
           <MapPin className="h-4 w-4 mr-1 text-spatioo-green" />
-          <span className="text-sm">{parkingSpot.address}</span>
+          <span className="text-sm">{parkingSpot.endereco}</span>
         </div>
         
         <div className="flex justify-between items-center">
-          <div className="flex items-center gap-1">
-            <Star className="h-5 w-5 text-yellow-500" />
-            <span className="font-medium">{parkingSpot.rating?.toFixed(1) || '-'}</span>
-            <span className="text-muted-foreground text-sm">
-              ({parkingSpot.reviews_count || 0} avaliações)
-            </span>
-          </div>
-          
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-spatioo-green" />
-            <span className="text-sm font-medium">Aberto 24h</span>
+            <span className="text-sm font-medium">
+              {typeof parkingSpot.horario_funcionamento === 'object' && parkingSpot.horario_funcionamento && 
+              'abertura' in parkingSpot.horario_funcionamento && 'fechamento' in parkingSpot.horario_funcionamento ? 
+                `${parkingSpot.horario_funcionamento.abertura} - ${parkingSpot.horario_funcionamento.fechamento}` : 
+                'Horário não informado'}
+            </span>
           </div>
         </div>
       </div>
@@ -92,23 +89,24 @@ const ParkingDetails = () => {
         <div>
           <p className="text-sm text-muted-foreground">Preço por hora</p>
           <p className="text-2xl font-bold text-spatioo-green">
-            R$ {parkingSpot.price_per_hour.toFixed(2)}
+            R$ {Number(parkingSpot.preco).toFixed(2)}
           </p>
         </div>
         
         <div className="text-right">
-          <p className="text-sm text-muted-foreground">Vagas disponíveis</p>
-          <p className="text-xl font-bold">{parkingSpot.available_spots}</p>
+          <p className="text-sm text-muted-foreground">Total de vagas</p>
+          <p className="text-xl font-bold">{parkingSpot.numero_vagas}</p>
         </div>
       </div>
       
-      {/* Description */}
-      {parkingSpot.description && (
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-2">Sobre o estacionamento</h2>
-          <p className="text-muted-foreground">{parkingSpot.description}</p>
+      {/* CNPJ Info */}
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold mb-2">Informações do estabelecimento</h2>
+        <div className="p-3 bg-muted/30 rounded-lg">
+          <p className="text-sm text-muted-foreground">CNPJ: {parkingSpot.cnpj}</p>
+          <p className="text-sm text-muted-foreground">CEP: {parkingSpot.cep}</p>
         </div>
-      )}
+      </div>
       
       {/* Amenities */}
       <div className="mb-6">

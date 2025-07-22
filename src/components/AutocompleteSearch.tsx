@@ -3,12 +3,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, MapPin } from 'lucide-react';
-import { ParkingSpot } from '@/types/parking';
+import { Database } from '@/integrations/supabase/types';
 import { fetchAllParkingSpots } from '@/services/parkingService';
+
+type EstacionamentoRow = Database['public']['Tables']['estacionamento']['Row'];
 
 interface AutocompleteSearchProps {
   onSearch: (query: string) => void;
-  onParkingSelect?: (parking: ParkingSpot) => void;
+  onParkingSelect?: (parking: EstacionamentoRow) => void;
   placeholder?: string;
   className?: string;
 }
@@ -20,9 +22,9 @@ const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
   className = ""
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [suggestions, setSuggestions] = useState<ParkingSpot[]>([]);
+  const [suggestions, setSuggestions] = useState<EstacionamentoRow[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [allParkingSpots, setAllParkingSpots] = useState<ParkingSpot[]>([]);
+  const [allParkingSpots, setAllParkingSpots] = useState<EstacionamentoRow[]>([]);
   const [loading, setLoading] = useState(false);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
@@ -52,8 +54,8 @@ const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
 
     const query = searchQuery.toLowerCase();
     const filteredSuggestions = allParkingSpots.filter(spot => 
-      spot.name.toLowerCase().includes(query) || 
-      spot.address.toLowerCase().includes(query)
+      spot.nome.toLowerCase().includes(query) || 
+      spot.endereco.toLowerCase().includes(query)
     ).slice(0, 5); // Limit to 5 suggestions
 
     setSuggestions(filteredSuggestions);
@@ -79,13 +81,13 @@ const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
     setShowSuggestions(false);
   };
 
-  const handleSuggestionClick = (spot: ParkingSpot) => {
-    setSearchQuery(spot.name);
+  const handleSuggestionClick = (spot: EstacionamentoRow) => {
+    setSearchQuery(spot.nome);
     setShowSuggestions(false);
     if (onParkingSelect) {
       onParkingSelect(spot);
     } else {
-      onSearch(spot.name);
+      onSearch(spot.nome);
     }
   };
 
@@ -122,10 +124,10 @@ const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
               className="p-3 hover:bg-muted cursor-pointer border-b border-border last:border-0"
               onClick={() => handleSuggestionClick(spot)}
             >
-              <div className="font-medium">{spot.name}</div>
+              <div className="font-medium">{spot.nome}</div>
               <div className="text-sm text-muted-foreground flex items-center mt-1">
                 <MapPin className="h-3 w-3 mr-1" />
-                {spot.address}
+                {spot.endereco}
               </div>
             </div>
           ))}

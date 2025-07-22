@@ -7,7 +7,9 @@ import { Car, MapPin, Clock, Navigation, Star, Compass, TrendingUp, History } fr
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { ParkingSpot } from '@/types/parking';
+import { Database } from '@/integrations/supabase/types';
+
+type EstacionamentoRow = Database['public']['Tables']['estacionamento']['Row'];
 import { toast } from '@/components/ui/use-toast';
 import AutocompleteSearch from '@/components/AutocompleteSearch';
 
@@ -15,8 +17,8 @@ const Home = () => {
   const navigate = useNavigate();
   const { profile } = useAuth();
   const [userLocation, setUserLocation] = useState('Obtendo localização...');
-  const [nearbyParkingSpots, setNearbyParkingSpots] = useState<ParkingSpot[]>([]);
-  const [popularDestinations, setPopularDestinations] = useState<ParkingSpot[]>([]);
+  const [nearbyParkingSpots, setNearbyParkingSpots] = useState<EstacionamentoRow[]>([]);
+  const [popularDestinations, setPopularDestinations] = useState<EstacionamentoRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
@@ -41,9 +43,9 @@ const Home = () => {
         
         // Buscar locais próximos
         const { data: nearby, error: nearbyError } = await supabase
-          .from('parking_spots')
+          .from('estacionamento')
           .select('*')
-          .order('rating', { ascending: false })
+          .order('created_at', { ascending: false })
           .limit(3);
           
         if (nearbyError) throw nearbyError;
@@ -51,9 +53,9 @@ const Home = () => {
         
         // Buscar destinos populares
         const { data: popular, error: popularError } = await supabase
-          .from('parking_spots')
+          .from('estacionamento')
           .select('*')
-          .order('reviews_count', { ascending: false })
+          .order('created_at', { ascending: false })
           .limit(4);
           
         if (popularError) throw popularError;
@@ -97,7 +99,7 @@ const Home = () => {
   };
 
   // Handle parking spot selection
-  const handleParkingSelect = (spot: ParkingSpot) => {
+  const handleParkingSelect = (spot: EstacionamentoRow) => {
     navigate(`/parking/${spot.id}`);
   };
 
@@ -251,18 +253,18 @@ const Home = () => {
               >
                 <CardContent className="p-3 flex justify-between items-center">
                   <div>
-                    <CardTitle className="text-base mb-1">{spot.name}</CardTitle>
+                    <CardTitle className="text-base mb-1">{spot.nome}</CardTitle>
                     <div className="flex items-center text-xs text-muted-foreground">
                       <MapPin className="h-3 w-3 mr-1" />
-                      {spot.address}
+                      {spot.endereco}
                     </div>
                     <div className="flex items-center text-xs mt-1">
                       <Badge variant="secondary" className="rounded-full mr-2 px-2 py-0 h-5">
                         <Navigation className="h-3 w-3 mr-1" />
-                        {spot.available_spots} vagas
+                        {spot.numero_vagas} vagas
                       </Badge>
                       <Badge variant="outline" className="rounded-full px-2 py-0 h-5 font-medium border-spatioo-green/30 text-spatioo-green bg-spatioo-green/10">
-                        R$ {spot.price_per_hour.toFixed(2)}/h
+                        R$ {spot.preco}/h
                       </Badge>
                     </div>
                   </div>
@@ -311,25 +313,22 @@ const Home = () => {
               >
                 <CardContent className="p-3 space-y-2">
                   <div className="bg-muted rounded-lg h-16 w-full flex items-center justify-center">
-                    {destination.image_url ? (
+                    {destination.fotos && destination.fotos.length > 0 ? (
                       <img 
-                        src={destination.image_url} 
-                        alt={destination.name} 
-                        className="h-full w-full object-cover" 
+                        src={`${supabase.storage.from('estacionamento-photos').getPublicUrl(destination.fotos[0]).data.publicUrl}`}
+                        alt={destination.nome} 
+                        className="h-full w-full object-cover rounded-lg" 
                       />
                     ) : (
                       <Car className="h-8 w-8 text-muted-foreground" />
                     )}
                   </div>
-                  <CardTitle className="text-sm">{destination.name}</CardTitle>
+                  <CardTitle className="text-sm">{destination.nome}</CardTitle>
                   <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center">
-                      <Star className="h-3 w-3 text-yellow-500 mr-1" />
-                      <span>{destination.rating}</span>
-                    </div>
                     <Badge variant="outline" className="rounded-full px-2 py-0 h-5">
-                      {destination.available_spots} vagas
+                      {destination.numero_vagas} vagas
                     </Badge>
+                    <span className="text-muted-foreground">R$ {destination.preco}/h</span>
                   </div>
                 </CardContent>
               </Card>

@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { ParkingSpot } from '@/types/parking';
 import { useNavigate } from 'react-router-dom';
 import { format, add, set } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
@@ -12,9 +11,12 @@ import { Calendar as CalendarIcon, CreditCard } from 'lucide-react';
 import { createBooking } from '@/services/bookingService';
 import { toast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { Database } from '@/integrations/supabase/types';
+
+type EstacionamentoRow = Database['public']['Tables']['estacionamento']['Row'];
 
 interface BookingFormProps {
-  parkingSpot: ParkingSpot;
+  parkingSpot: EstacionamentoRow;
 }
 
 const TIME_OPTIONS = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
@@ -63,7 +65,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
         start_time: startTime,
         end_time: endTime(),
         spot_number: spotNumber,
-        price: parkingSpot.price_per_hour,
+        price: Number(parkingSpot.preco),
         status: 'upcoming'
       });
       
@@ -143,7 +145,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
             <div className="space-y-1 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Valor por hora:</span>
-                <span className="text-lg text-spatioo-green">R$ {parkingSpot.price_per_hour.toFixed(2)}</span>
+                <span className="text-lg text-spatioo-green">R$ {Number(parkingSpot.preco).toFixed(2)}</span>
               </div>
             </div>
           </div>
