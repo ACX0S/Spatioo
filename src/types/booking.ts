@@ -2,7 +2,7 @@
 export interface Booking {
   id: string;
   user_id: string;
-  parking_spot_id: string;
+  estacionamento_id: string;
   date: string;
   start_time: string;
   end_time: string;

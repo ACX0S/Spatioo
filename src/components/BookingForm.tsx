@@ -60,7 +60,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
       const spotNumber = `A${Math.floor(Math.random() * 9) + 1}`;
       
       await createBooking({
-        parking_spot_id: parkingSpot.id,
+        estacionamento_id: parkingSpot.id,
         date: format(date, 'yyyy-MM-dd'),
         start_time: startTime,
         end_time: endTime(),

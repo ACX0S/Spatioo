@@ -135,7 +135,7 @@ const Dashboard = () => {
                     <Button 
                       size="sm" 
                       className="bg-spatioo-green hover:bg-spatioo-green-dark text-black"
-                      onClick={() => navigate(`/parking/${booking.parking_spot_id}`)}
+                      onClick={() => navigate(`/parking/${booking.estacionamento_id}`)}
                     >
                       Ver detalhes
                     </Button>
@@ -227,7 +227,7 @@ const Dashboard = () => {
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => navigate(`/parking/${booking.parking_spot_id}`)}
+                      onClick={() => navigate(`/parking/${booking.estacionamento_id}`)}
                     >
                       Reservar novamente
                     </Button>

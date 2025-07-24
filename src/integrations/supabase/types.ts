@@ -19,8 +19,8 @@ export type Database = {
           created_at: string | null
           date: string
           end_time: string
+          estacionamento_id: string
           id: string
-          parking_spot_id: string
           price: number
           spot_number: string
           start_time: string
@@ -31,8 +31,8 @@ export type Database = {
           created_at?: string | null
           date: string
           end_time: string
+          estacionamento_id: string
           id?: string
-          parking_spot_id: string
           price: number
           spot_number: string
           start_time: string
@@ -43,15 +43,23 @@ export type Database = {
           created_at?: string | null
           date?: string
           end_time?: string
+          estacionamento_id?: string
           id?: string
-          parking_spot_id?: string
           price?: number
           spot_number?: string
           start_time?: string
           status?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_bookings_estacionamento"
+            columns: ["estacionamento_id"]
+            isOneToOne: false
+            referencedRelation: "estacionamento"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       estacionamento: {
         Row: {

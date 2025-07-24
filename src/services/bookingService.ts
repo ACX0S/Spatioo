@@ -18,7 +18,7 @@ export const fetchUserBookings = async (): Promise<Booking[]> => {
       .from('bookings')
       .select(`
         *,
-        parking_spots:parking_spot_id (name, address)
+        estacionamento:estacionamento_id (nome, endereco)
       `)
       .eq('user_id', user.id)
       .order('date', { ascending: true })
@@ -29,8 +29,8 @@ export const fetchUserBookings = async (): Promise<Booking[]> => {
     // Processar resultados para formato mais fácil de usar
     return (bookings || []).map(booking => ({
       ...booking,
-      parkingName: booking.parking_spots?.name,
-      parkingAddress: booking.parking_spots?.address,
+      parkingName: booking.estacionamento?.nome,
+      parkingAddress: booking.estacionamento?.endereco,
       // Ensure status is one of the allowed types with type assertion
       status: (booking.status || 'upcoming') as 'active' | 'upcoming' | 'completed' | 'cancelled'
     }));
@@ -58,7 +58,7 @@ export const createBooking = async (bookingData: Omit<Booking, 'id' | 'user_id' 
       })
       .select(`
         *,
-        parking_spots:parking_spot_id (name, address)
+        estacionamento:estacionamento_id (nome, endereco)
       `)
       .single();
     
@@ -70,8 +70,8 @@ export const createBooking = async (bookingData: Omit<Booking, 'id' | 'user_id' 
     
     return {
       ...data,
-      parkingName: data.parking_spots?.name,
-      parkingAddress: data.parking_spots?.address,
+      parkingName: data.estacionamento?.nome,
+      parkingAddress: data.estacionamento?.endereco,
       // Ensure status is one of the allowed types with type assertion
       status: (data.status || 'upcoming') as 'active' | 'upcoming' | 'completed' | 'cancelled'
     };
