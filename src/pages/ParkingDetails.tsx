@@ -3,6 +3,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { useParkingDetail } from '@/hooks/useParkingDetail';
 import { Car, MapPin, Star, Clock, ArrowLeft } from 'lucide-react';
 import BookingForm from '@/components/BookingForm';
@@ -39,16 +40,32 @@ const ParkingDetails = () => {
 
   return (
     <div className="container p-4 max-w-md mx-auto pb-20">
-      {/* Image Header */}
-      <div className="relative h-48 bg-muted rounded-lg mb-4 overflow-hidden">
+      {/* Image Carousel */}
+      <div className="relative h-48 mb-4">
         {parkingSpot.fotos && parkingSpot.fotos.length > 0 ? (
-          <img 
-            src={`https://ojnayvmppwpbdcsddpaw.supabase.co/storage/v1/object/public/estacionamento-photos/${parkingSpot.fotos[0]}`}
-            alt={parkingSpot.nome} 
-            className="w-full h-full object-cover"
-          />
+          <Carousel className="w-full h-full">
+            <CarouselContent>
+              {parkingSpot.fotos.map((foto, index) => (
+                <CarouselItem key={index}>
+                  <div className="relative h-48 bg-muted rounded-lg overflow-hidden">
+                    <img 
+                      src={`https://ojnayvmppwpbdcsddpaw.supabase.co/storage/v1/object/public/estacionamento-photos/${foto}`}
+                      alt={`${parkingSpot.nome} - Foto ${index + 1}`} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            {parkingSpot.fotos.length > 1 && (
+              <>
+                <CarouselPrevious className="absolute top-1/2 left-2 -translate-y-1/2" />
+                <CarouselNext className="absolute top-1/2 right-2 -translate-y-1/2" />
+              </>
+            )}
+          </Carousel>
         ) : (
-          <div className="h-full w-full flex items-center justify-center bg-gradient-to-r from-slate-800 to-slate-900">
+          <div className="h-48 w-full flex items-center justify-center bg-gradient-to-r from-slate-800 to-slate-900 rounded-lg">
             <Car className="h-16 w-16 text-slate-500" />
           </div>
         )}
@@ -56,7 +73,7 @@ const ParkingDetails = () => {
         <Button 
           variant="ghost" 
           size="icon" 
-          className="absolute top-2 left-2 rounded-full bg-background/80 backdrop-blur-sm"
+          className="absolute top-2 left-2 z-10 rounded-full bg-background/80 backdrop-blur-sm"
           onClick={() => navigate(-1)}
         >
           <ArrowLeft className="h-5 w-5" />

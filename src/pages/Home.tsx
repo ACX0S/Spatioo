@@ -312,10 +312,10 @@ const Home = () => {
                 onClick={() => navigate(`/parking/${destination.id}`)}
               >
                 <CardContent className="p-3 space-y-2">
-                  <div className="bg-muted rounded-lg h-16 w-full flex items-center justify-center">
+                  <div className="bg-muted rounded-lg h-16 w-full flex items-center justify-center overflow-hidden">
                     {destination.fotos && destination.fotos.length > 0 ? (
                       <img 
-                        src={`${supabase.storage.from('estacionamento-photos').getPublicUrl(destination.fotos[0]).data.publicUrl}`}
+                        src={`https://ojnayvmppwpbdcsddpaw.supabase.co/storage/v1/object/public/estacionamento-photos/${destination.fotos[0]}`}
                         alt={destination.nome} 
                         className="h-full w-full object-cover rounded-lg" 
                       />
