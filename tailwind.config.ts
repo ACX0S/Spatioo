@@ -64,10 +64,10 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				spatioo: {
-					green: '#00e879',
+					green: '#01E979',
 					'green-light': '#63fca7',
 					'green-dark': '#00c868',
-					black: '#111111',
+					black: '#000000',
 					'gray-dark': '#333333',
 					'gray-medium': '#666666',
 					'gray-light': '#f4f4f4',
