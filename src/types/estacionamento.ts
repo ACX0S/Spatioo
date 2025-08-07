@@ -14,6 +14,8 @@ export interface Estacionamento {
   user_id: string;
   created_at: string;
   updated_at: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface EstacionamentoInsert {
@@ -29,6 +31,8 @@ export interface EstacionamentoInsert {
   };
   preco: number;
   user_id: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface EstacionamentoUpdate {
@@ -43,4 +47,6 @@ export interface EstacionamentoUpdate {
     fechamento: string;
   };
   preco?: number;
+  latitude?: number;
+  longitude?: number;
 }

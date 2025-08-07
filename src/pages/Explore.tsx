@@ -35,11 +35,11 @@ const Explore = () => {
           console.error('Error getting user location:', error);
           toast({
             title: "Localização não disponível",
-            description: "Não foi possível acessar sua localização. Mostrando todos os estacionamentos.",
+            description: "Não foi possível acessar sua localização. As distâncias não serão exibidas.",
             variant: "destructive"
           });
-          // Default to São Caetano do Sul if can't get user location
-          setUserLocation([-46.5697, -23.6227]);
+          // Don't set a default location if we can't get user's real location
+          setUserLocation(null);
         }
       );
     }
@@ -82,16 +82,30 @@ const Explore = () => {
   
   // Sort parking spots by distance when user location or parking spots change
   useEffect(() => {
-    if (!userLocation || parkingSpots.length === 0) return;
+    if (parkingSpots.length === 0) return;
     
     const spotsWithDistance = parkingSpots.map(spot => {
-      // For now, add a placeholder distance since coordinates aren't available
-      return { ...spot, distance: Math.random() * 10 }; // Random distance for demo
+      if (userLocation && spot.latitude && spot.longitude) {
+        // Calculate real distance using coordinates
+        const distance = calculateDistance(
+          userLocation[1], // latitude
+          userLocation[0], // longitude
+          spot.latitude,
+          spot.longitude
+        );
+        return { ...spot, distance };
+      } else {
+        // No distance calculation possible
+        return { ...spot, distance: undefined };
+      }
     });
     
-    // Sort by distance (closest first)
+    // Sort by distance (closest first), spots without distance go to the end
     const sorted = [...spotsWithDistance].sort((a, b) => {
-      return (a.distance || Number.MAX_VALUE) - (b.distance || Number.MAX_VALUE);
+      if (a.distance === undefined && b.distance === undefined) return 0;
+      if (a.distance === undefined) return 1;
+      if (b.distance === undefined) return -1;
+      return a.distance - b.distance;
     });
     
     setSortedParkingSpots(sorted);
@@ -169,7 +183,11 @@ const Explore = () => {
                       <span>{spot.endereco}</span>
                     </div>
                     <div className="mt-2 flex items-center gap-2">
-                      <span className="text-sm">{spot.distance?.toFixed(1)} km</span>
+                      {spot.distance !== undefined ? (
+                        <span className="text-sm">{spot.distance.toFixed(1)} km</span>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">Distância não disponível</span>
+                      )}
                     </div>
                   </div>
                   <div className="text-right">

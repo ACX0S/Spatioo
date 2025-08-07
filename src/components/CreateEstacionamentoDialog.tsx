@@ -16,6 +16,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Building2 } from "lucide-react";
+import { useCep } from "@/hooks/useCep";
+import { useGeocoding } from "@/hooks/useGeocoding";
 
 interface CreateEstacionamentoDialogProps {
   onSuccess?: () => void;
@@ -26,6 +28,8 @@ const CreateEstacionamentoDialog = ({ onSuccess }: CreateEstacionamentoDialogPro
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { fetchCep, formatCep } = useCep();
+  const { geocodeCep } = useGeocoding();
   const [formData, setFormData] = useState<EstacionamentoInsert>({
     nome: "",
     cnpj: "",
@@ -41,6 +45,37 @@ const CreateEstacionamentoDialog = ({ onSuccess }: CreateEstacionamentoDialogPro
     user_id: profile?.id || ""
   });
 
+  const handleCepChange = async (newCep: string) => {
+    const formatted = formatCep(newCep);
+    setFormData({ ...formData, cep: formatted });
+
+    // Auto-fill address when CEP is complete
+    if (formatted.replace(/\D/g, '').length === 8) {
+      try {
+        const cepData = await fetchCep(formatted);
+        if (cepData) {
+          const fullAddress = `${cepData.logradouro}, ${cepData.bairro}, ${cepData.localidade}, ${cepData.uf}`;
+          setFormData(prev => ({ 
+            ...prev, 
+            endereco: fullAddress
+          }));
+
+          // Geocode the address to get coordinates
+          const coordinates = await geocodeCep(formatted);
+          if (coordinates) {
+            setFormData(prev => ({
+              ...prev,
+              latitude: coordinates.latitude,
+              longitude: coordinates.longitude
+            }));
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao buscar CEP:', error);
+      }
+    }
+  };
+
   const handleCreateEstacionamento = async () => {
     try {
       setLoading(true);
@@ -55,10 +90,23 @@ const CreateEstacionamentoDialog = ({ onSuccess }: CreateEstacionamentoDialogPro
         return;
       }
 
-      // Primeiro criar o estacionamento
+      // If coordinates are not available, try to geocode the address one more time
+      let finalFormData = { ...formData };
+      if (!finalFormData.latitude || !finalFormData.longitude) {
+        const coordinates = await geocodeCep(formData.cep);
+        if (coordinates) {
+          finalFormData = {
+            ...finalFormData,
+            latitude: coordinates.latitude,
+            longitude: coordinates.longitude
+          };
+        }
+      }
+
+      // Criar o estacionamento
       const { data, error } = await supabase
         .from('estacionamento')
-        .insert(formData)
+        .insert(finalFormData)
         .select()
         .single();
 
@@ -153,7 +201,7 @@ const CreateEstacionamentoDialog = ({ onSuccess }: CreateEstacionamentoDialogPro
             <Input
               id="cep"
               value={formData.cep}
-              onChange={(e) => setFormData({ ...formData, cep: e.target.value })}
+              onChange={(e) => handleCepChange(e.target.value)}
               placeholder="00000-000"
             />
           </div>

@@ -15,6 +15,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Edit2 } from "lucide-react";
+import { useCep } from "@/hooks/useCep";
+import { useGeocoding } from "@/hooks/useGeocoding";
 
 interface EditEstacionamentoDialogProps {
   estacionamento: Estacionamento;
@@ -25,6 +27,8 @@ const EditEstacionamentoDialog = ({ estacionamento, onSuccess }: EditEstacioname
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { fetchCep, formatCep } = useCep();
+  const { geocodeCep } = useGeocoding();
   const [formData, setFormData] = useState<EstacionamentoUpdate>({
     nome: estacionamento.nome,
     cnpj: estacionamento.cnpj,
@@ -34,6 +38,8 @@ const EditEstacionamentoDialog = ({ estacionamento, onSuccess }: EditEstacioname
     fotos: estacionamento.fotos || [],
     horario_funcionamento: estacionamento.horario_funcionamento,
     preco: estacionamento.preco,
+    latitude: estacionamento.latitude,
+    longitude: estacionamento.longitude,
   });
 
   useEffect(() => {
@@ -46,8 +52,41 @@ const EditEstacionamentoDialog = ({ estacionamento, onSuccess }: EditEstacioname
       fotos: estacionamento.fotos || [],
       horario_funcionamento: estacionamento.horario_funcionamento,
       preco: estacionamento.preco,
+      latitude: estacionamento.latitude,
+      longitude: estacionamento.longitude,
     });
   }, [estacionamento]);
+
+  const handleCepChange = async (newCep: string) => {
+    const formatted = formatCep(newCep);
+    setFormData({ ...formData, cep: formatted });
+
+    // Auto-fill address when CEP is complete
+    if (formatted.replace(/\D/g, '').length === 8) {
+      try {
+        const cepData = await fetchCep(formatted);
+        if (cepData) {
+          const fullAddress = `${cepData.logradouro}, ${cepData.bairro}, ${cepData.localidade}, ${cepData.uf}`;
+          setFormData(prev => ({ 
+            ...prev, 
+            endereco: fullAddress
+          }));
+
+          // Geocode the address to get coordinates
+          const coordinates = await geocodeCep(formatted);
+          if (coordinates) {
+            setFormData(prev => ({
+              ...prev,
+              latitude: coordinates.latitude,
+              longitude: coordinates.longitude
+            }));
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao buscar CEP:', error);
+      }
+    }
+  };
 
   const handleUpdateEstacionamento = async () => {
     try {
@@ -63,9 +102,22 @@ const EditEstacionamentoDialog = ({ estacionamento, onSuccess }: EditEstacioname
         return;
       }
 
+      // If coordinates are not available, try to geocode the address
+      let finalFormData = { ...formData };
+      if (!finalFormData.latitude || !finalFormData.longitude) {
+        const coordinates = await geocodeCep(formData.cep || '');
+        if (coordinates) {
+          finalFormData = {
+            ...finalFormData,
+            latitude: coordinates.latitude,
+            longitude: coordinates.longitude
+          };
+        }
+      }
+
       const { error } = await supabase
         .from('estacionamento')
-        .update(formData)
+        .update(finalFormData)
         .eq('id', estacionamento.id);
 
       if (error) throw error;
@@ -128,7 +180,7 @@ const EditEstacionamentoDialog = ({ estacionamento, onSuccess }: EditEstacioname
             <Input
               id="cep"
               value={formData.cep}
-              onChange={(e) => setFormData({ ...formData, cep: e.target.value })}
+              onChange={(e) => handleCepChange(e.target.value)}
               placeholder="00000-000"
             />
           </div>
