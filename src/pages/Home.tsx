@@ -22,11 +22,45 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
-  // Simular obtendo localização do usuário
+  // Obter localização real do usuário
   useEffect(() => {
-    setTimeout(() => {
-      setUserLocation('São Caetano do Sul, SP');
-    }, 1500);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+            // Fazer geocodificação reversa para obter o endereço
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=pt-BR`
+            );
+            const data = await response.json();
+            
+            if (data.address) {
+              const city = data.address.city || data.address.town || data.address.village || '';
+              const state = data.address.state || '';
+              const location = city && state ? `${city}, ${state}` : 'Localização obtida';
+              setUserLocation(location);
+            } else {
+              setUserLocation('Localização obtida');
+            }
+          } catch (error) {
+            console.error('Erro na geocodificação reversa:', error);
+            setUserLocation('Localização obtida');
+          }
+        },
+        (error) => {
+          console.error('Erro ao obter localização:', error);
+          setUserLocation('Localização não disponível');
+          toast({
+            title: "Localização não disponível",
+            description: "Não foi possível acessar sua localização. Verifique as permissões do navegador.",
+            variant: "destructive"
+          });
+        }
+      );
+    } else {
+      setUserLocation('Geolocalização não suportada');
+    }
     
     // Carregar buscas recentes do localStorage
     const savedSearches = localStorage.getItem('recentSearches');
