@@ -105,7 +105,7 @@ const Login = () => {
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
           <div className="w-16 h-16 mb-4">
-            <img src="/Images/spatioo-logo.png" alt="Spatioo Logo" className="w-full h-full object-contain" />
+            <img src="/Images/LOGO-REDUZIDA-vclaro.png" alt="Spatioo Logo" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-2xl font-bold mb-1">Bem-vindo ao Spatioo</h1>
           <p className="text-muted-foreground text-center">
