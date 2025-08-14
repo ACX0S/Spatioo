@@ -132,7 +132,9 @@ const Layout = () => {
               <SheetContent className="bg-background border-border">
                 <div className="flex flex-col h-full">
                   <div className="flex items-center gap-3 mb-8">
-                    <Car className="h-8 w-8 text-spatioo-green" />
+                    <div className="w-8 h-8">
+                      <img src="/Images/LOGO-REDUZIDA-vclaro.png" alt="Spatioo Logo" className="w-full h-full object-contain" />
+                    </div>
                     <span className="font-semibold text-xl">Spatioo</span>
                   </div>
                   

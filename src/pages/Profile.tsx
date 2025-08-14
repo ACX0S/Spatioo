@@ -105,21 +105,27 @@ const Profile = () => {
   const handleSaveProfile = async () => {
     try {
       setSaving(true);
-      await updateProfile({ 
+      
+      const profileData = { 
         name, 
-        phone, 
-        cep, 
-        street, 
-        number, 
-        complement, 
-        neighborhood
-      });
+        phone: phone.trim() || null, // Se vazio, enviar null ao invés de string vazia
+        cep: cep.trim() || null, 
+        street: street.trim() || null, 
+        number: number.trim() || null, 
+        complement: complement.trim() || null, 
+        neighborhood: neighborhood.trim() || null
+      };
+      
+      console.log('Saving profile data:', profileData);
+      
+      await updateProfile(profileData);
       
       toast({
         title: "Perfil atualizado",
         description: "Suas informações foram atualizadas com sucesso."
       });
     } catch (error: any) {
+      console.error('Error saving profile:', error);
       toast({
         title: "Erro ao salvar",
         description: error.message,
