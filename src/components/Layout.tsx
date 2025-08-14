@@ -218,19 +218,6 @@ const Layout = () => {
                   </div>
                   
                   <div className="mt-auto">
-                    <div className="bg-card rounded-lg p-4 border border-border">
-                      <h3 className="font-medium mb-2">Precisa de ajuda?</h3>
-                      <p className="text-sm text-muted-foreground mb-3">
-                        Nossa equipe está pronta para te ajudar com qualquer dúvida.
-                      </p>
-                      <Button 
-                        variant="outline" 
-                        className="w-full justify-start gap-2 rounded-md"
-                      >
-                        <HelpCircle className="h-4 w-4" />
-                        Central de ajuda
-                      </Button>
-                    </div>
                   </div>
                 </div>
               </SheetContent>
