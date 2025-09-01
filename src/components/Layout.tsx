@@ -16,7 +16,8 @@ import {
   HelpCircle,
   Compass,
   LogOut,
-  Building2
+  Building2,
+  Plus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -244,7 +245,7 @@ const Layout = () => {
       
       {/* Bottom Navigation Bar */}
       <nav className="sticky bottom-0 z-40 bg-background/95 backdrop-blur-md border-t border-border h-16 w-full">
-        <div className="h-full grid grid-cols-4">
+        <div className="h-full grid grid-cols-5">
           <Link 
             to="/home" 
             className={cn(
@@ -276,6 +277,17 @@ const Layout = () => {
           >
             <Calendar className="h-5 w-5" />
             <span className="text-xs mt-1">Reservas</span>
+          </Link>
+          
+          <Link 
+            to="/ofertar" 
+            className={cn(
+              "flex flex-col items-center justify-center",
+              isActive("/ofertar") ? "text-spatioo-green" : "text-muted-foreground"
+            )}
+          >
+            <Plus className="h-5 w-5" />
+            <span className="text-xs mt-1">Ofertar</span>
           </Link>
           
           <Link 
