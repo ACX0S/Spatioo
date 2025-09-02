@@ -1,24 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Car, MapPin, Clock, Navigation, Star, Compass, TrendingUp, History } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
-import { fetchNearbyParkingSpots, fetchPopularParkingSpots, PublicParkingData } from '@/services/parkingService';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/use-toast';
+import { useParkingData } from '@/hooks/useParkingData';
+import { PublicParkingData } from '@/services/parkingService';
+import { toast } from '@/hooks/use-toast';
 import AutocompleteSearch from '@/components/AutocompleteSearch';
+import ParkingGrid from '@/components/ParkingGrid';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 const Home = () => {
   const navigate = useNavigate();
   const { profile } = useAuth();
   const [userLocation, setUserLocation] = useState('Obtendo localização...');
-  const [nearbyParkingSpots, setNearbyParkingSpots] = useState<PublicParkingData[]>([]);
-  const [popularDestinations, setPopularDestinations] = useState<PublicParkingData[]>([]);
-  const [loading, setLoading] = useState(true);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+
+  // Use optimized hooks for data fetching
+  const { 
+    data: nearbyParkingSpots, 
+    loading: nearbyLoading,
+    error: nearbyError,
+    refetch: refetchNearby
+  } = useParkingData({ type: 'nearby', limit: 3 });
+
+  const { 
+    data: popularDestinations, 
+    loading: popularLoading,
+    error: popularError,
+    refetch: refetchPopular
+  } = useParkingData({ type: 'popular', limit: 4 });
+
+  const loading = nearbyLoading || popularLoading;
 
   // Obter localização real do usuário
   useEffect(() => {
@@ -26,200 +41,134 @@ const Home = () => {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           try {
-            const { latitude, longitude } = position.coords;
-            // Fazer geocodificação reversa para obter o endereço
             const response = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=pt-BR`
+              `https://api.opencagedata.com/geocode/v1/json?q=${position.coords.latitude}+${position.coords.longitude}&key=74c89b3be64946ac96d777d08b878d43`
             );
             const data = await response.json();
             
-            if (data.address) {
-              const city = data.address.city || data.address.town || data.address.village || '';
-              const state = data.address.state || '';
-              const location = city && state ? `${city}, ${state}` : 'Localização obtida';
-              setUserLocation(location);
-            } else {
-              setUserLocation('Localização obtida');
+            if (data.results && data.results.length > 0) {
+              const location = data.results[0];
+              const locationString = `${location.components.neighbourhood || location.components.suburb || location.components.city}, ${location.components.state}`;
+              setUserLocation(locationString);
             }
           } catch (error) {
-            console.error('Erro na geocodificação reversa:', error);
-            setUserLocation('Localização obtida');
+            console.error('Erro ao obter localização:', error);
+            setUserLocation('Localização não disponível');
           }
         },
         (error) => {
-          console.error('Erro ao obter localização:', error);
+          console.error('Erro de geolocalização:', error);
           setUserLocation('Localização não disponível');
-          toast({
-            title: "Localização não disponível",
-            description: "Não foi possível acessar sua localização. Verifique as permissões do navegador.",
-            variant: "destructive"
-          });
         }
       );
     } else {
       setUserLocation('Geolocalização não suportada');
     }
-    
-    // Carregar buscas recentes do localStorage
-    const savedSearches = localStorage.getItem('recentSearches');
-    if (savedSearches) {
-      setRecentSearches(JSON.parse(savedSearches));
-    }
   }, []);
 
-  // Carregar estacionamentos do Supabase
+  // Carregar recentes do localStorage
   useEffect(() => {
-    const fetchParkingSpots = async () => {
-      try {
-        setLoading(true);
-        
-        // Buscar locais próximos
-        const { data: nearby, error: nearbyError } = await supabase
-          .from('estacionamento')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(3);
-          
-        if (nearbyError) throw nearbyError;
-        setNearbyParkingSpots(nearby || []);
-        
-        // Buscar destinos populares
-        const { data: popular, error: popularError } = await supabase
-          .from('estacionamento')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(4);
-          
-        if (popularError) throw popularError;
-        setPopularDestinations(popular || []);
-        
-      } catch (error: any) {
-        console.error('Erro ao carregar estacionamentos:', error.message);
-        toast({
-          title: "Erro ao carregar dados",
-          description: "Não foi possível buscar os estacionamentos.",
-          variant: "destructive"
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchParkingSpots();
+    const recent = localStorage.getItem('recentSearches');
+    if (recent) {
+      setRecentSearches(JSON.parse(recent));
+    }
   }, []);
 
-  // Handle search submission
-  const handleSearch = (query: string) => {
+  // Memoized callbacks for better performance
+  const saveRecentSearch = useCallback((search: string) => {
+    const updated = [search, ...recentSearches.filter(s => s !== search)].slice(0, 5);
+    setRecentSearches(updated);
+    localStorage.setItem('recentSearches', JSON.stringify(updated));
+  }, [recentSearches]);
+
+  const handleSearch = useCallback((query: string) => {
     if (query.trim()) {
-      try {
-        // Salvar busca no histórico recente
-        const updatedSearches = [query, ...recentSearches.filter(s => s !== query)].slice(0, 4);
-        setRecentSearches(updatedSearches);
-        localStorage.setItem('recentSearches', JSON.stringify(updatedSearches));
-        
-        // Realizar a busca e navegar para os resultados
-        navigate('/explore', { state: { search: query } });
-      } catch (error) {
-        console.error('Erro ao realizar busca:', error);
-        toast({
-          title: "Erro",
-          description: "Não foi possível completar a busca.",
-          variant: "destructive"
-        });
-      }
+      saveRecentSearch(query);
+      navigate('/explore', { state: { search: query } });
     }
-  };
+  }, [navigate, saveRecentSearch]);
 
-  // Handle parking spot selection
-  const handleParkingSelect = (spot: PublicParkingData) => {
+  const handleLocationSearch = useCallback(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          toast({
+            title: "Localização obtida",
+            description: "Buscando estacionamentos próximos..."
+          });
+          navigate('/explore', { 
+            state: { 
+              userLocation: [latitude, longitude] 
+            } 
+          });
+        },
+        (error) => {
+          toast({
+            title: "Erro de localização",
+            description: "Não foi possível obter sua localização atual.",
+            variant: "destructive"
+          });
+        }
+      );
+    } else {
+      toast({
+        title: "Erro",
+        description: "Geolocalização não é suportada neste dispositivo.",
+        variant: "destructive"
+      });
+    }
+  }, [navigate]);
+
+  const handleParkingSelect = useCallback((spot: PublicParkingData) => {
     navigate(`/parking/${spot.id}`);
-  };
+  }, [navigate]);
 
-  // Handle suggestion click
-  const handleSuggestionClick = (location: string) => {
+  const handleSuggestionClick = useCallback((location: string) => {
     navigate('/explore', { state: { search: location } });
-  };
+  }, [navigate]);
 
   return (
-    <div className="container p-4 max-w-md mx-auto">
-      {/* Location and Welcome section */}
-      <div className="mb-6">
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <div className="flex items-center gap-2 text-muted-foreground mb-1">
-            <MapPin className="h-4 w-4 text-spatioo-green" />
-            <span className="text-sm">{userLocation}</span>
-          </div>
-          <h1 className="text-2xl font-bold">Olá, {profile?.name || 'Visitante'}!</h1>
-          <p className="text-muted-foreground">Encontre as melhores vagas perto de você</p>
-        </motion.div>
-      </div>
-
-      {/* Search bar */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
+    <div className="container mx-auto p-4 space-y-6">
+      {/* Header with greeting */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.1 }}
-        className="mb-6"
+        transition={{ duration: 0.5 }}
+        className="text-center space-y-2"
       >
-        <AutocompleteSearch 
-          onSearch={handleSearch} 
-          onParkingSelect={handleParkingSelect}
-          placeholder="Para onde você vai?"
-        />
+        <h1 className="text-2xl font-bold">
+          Olá{profile?.name ? `, ${profile.name}` : ''}! 👋
+        </h1>
+        <p className="text-muted-foreground">
+          <MapPin className="inline w-4 h-4 mr-1" />
+          {userLocation}
+        </p>
       </motion.div>
 
-      {/* Quick Actions */}
+      {/* Search Section */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.2 }}
-        className="mb-8"
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="space-y-4"
       >
-        <div className="grid grid-cols-4 gap-2">
+        <AutocompleteSearch
+          onSearch={handleSearch}
+          onParkingSelect={handleParkingSelect}
+          placeholder="Para onde você vai?"
+          className="w-full"
+        />
+
+        <div className="flex gap-2 justify-center">
           <Button 
             variant="outline" 
-            onClick={() => navigate('/explore')}
-            className="flex flex-col items-center justify-center h-20 space-y-1 rounded-xl hover:bg-primary/10 hover:border-primary/20 transition-colors"
+            size="sm" 
+            onClick={handleLocationSearch}
+            className="text-xs"
           >
-            <Compass className="h-6 w-6 text-primary" />
-            <span className="text-xs font-medium">Explorar</span>
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            onClick={() => navigate('/dashboard')}
-            className="flex flex-col items-center justify-center h-20 space-y-1 rounded-xl hover:bg-primary/10 hover:border-primary/20 transition-colors"
-          >
-            <Clock className="h-6 w-6 text-primary" />
-            <span className="text-xs font-medium">Reservas</span>
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            className="flex flex-col items-center justify-center h-20 space-y-1 rounded-xl hover:bg-primary/10 hover:border-primary/20 transition-colors"
-            onClick={() => {
-              if (nearbyParkingSpots.length > 0) {
-                navigate(`/parking/${nearbyParkingSpots[0].id}`);
-              } else {
-                navigate('/explore');
-              }
-            }}
-          >
-            <Navigation className="h-6 w-6 text-primary" />
-            <span className="text-xs font-medium">Próximo</span>
-          </Button>
-          
-          <Button 
-            variant="outline"
-            onClick={() => navigate('/profile')} 
-            className="flex flex-col items-center justify-center h-20 space-y-1 rounded-xl hover:bg-primary/10 hover:border-primary/20 transition-colors"
-          >
-            <History className="h-6 w-6 text-primary" />
-            <span className="text-xs font-medium">Perfil</span>
+            <Navigation className="w-3 h-3 mr-1" />
+            Usar localização atual
           </Button>
         </div>
       </motion.div>
@@ -227,21 +176,22 @@ const Home = () => {
       {/* Recent Searches */}
       {recentSearches.length > 0 && (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.3 }}
-          className="mb-6"
+          transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <h2 className="text-lg font-semibold mb-3">Buscas recentes</h2>
-          <div className="flex flex-wrap gap-2">
-            {recentSearches.map((search, index) => (
+          <div className="flex items-center gap-2 mb-3">
+            <History className="w-4 h-4 text-muted-foreground" />
+            <h2 className="text-sm font-medium">Buscas Recentes</h2>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            {recentSearches.slice(0, 3).map((search, index) => (
               <Badge 
-                key={index} 
+                key={index}
                 variant="outline" 
-                className="cursor-pointer px-3 py-1 rounded-full hover:bg-secondary"
+                className="cursor-pointer hover:bg-muted/50 text-xs"
                 onClick={() => handleSuggestionClick(search)}
               >
-                <History className="h-3 w-3 mr-1" />
                 {search}
               </Badge>
             ))}
@@ -249,125 +199,70 @@ const Home = () => {
         </motion.div>
       )}
 
-      {/* Suggested Nearby Locations */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.4 }}
-        className="mb-6"
-      >
-        <div className="flex justify-between items-center mb-3">
-          <h2 className="text-lg font-semibold">Próximos a você</h2>
-          <Button 
-            variant="link" 
-            className="h-auto p-0 text-spatioo-green"
-            onClick={() => navigate('/explore')}
-          >
-            Ver todos
-          </Button>
-        </div>
-        
-        <div className="space-y-3">
-          {loading ? (
-            <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-spatioo-green"></div>
-            </div>
-          ) : nearbyParkingSpots.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Nenhum estacionamento encontrado
-            </div>
-          ) : (
-            nearbyParkingSpots.map((spot) => (
-              <Card 
-                key={spot.id} 
-                className="overflow-hidden cursor-pointer hover:bg-muted/40 transition-colors"
-                onClick={() => navigate(`/parking/${spot.id}`)}
-              >
-                <CardContent className="p-3 flex justify-between items-center">
-                  <div>
-                    <CardTitle className="text-base mb-1">{spot.nome}</CardTitle>
-                    <div className="flex items-center text-xs text-muted-foreground">
-                      <MapPin className="h-3 w-3 mr-1" />
-                      {spot.endereco}
-                    </div>
-                    <div className="flex items-center text-xs mt-1">
-                      <Badge variant="secondary" className="rounded-full mr-2 px-2 py-0 h-5">
-                        <Navigation className="h-3 w-3 mr-1" />
-                        {spot.numero_vagas} vagas
-                      </Badge>
-                      <Badge variant="outline" className="rounded-full px-2 py-0 h-5 font-medium border-spatioo-green/30 text-spatioo-green bg-spatioo-green/10">
-                        R$ {spot.preco}/h
-                      </Badge>
-                    </div>
-                  </div>
-                  <div className="bg-spatioo-green/10 h-10 w-10 rounded-full flex items-center justify-center">
-                    <Car className="h-5 w-5 text-spatioo-green" />
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
-      </motion.div>
+      {/* Loading state */}
+      {loading && <LoadingSpinner text="Carregando estacionamentos..." />}
 
-      {/* Popular Destinations */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.5 }}
-      >
-        <div className="flex justify-between items-center mb-3">
-          <h2 className="text-lg font-semibold">Destinos populares</h2>
-          <Button 
-            variant="link" 
-            className="h-auto p-0 text-spatioo-green"
-            onClick={() => navigate('/explore')}
-          >
-            Ver todos
+      {/* Nearby Parking Section */}
+      {!loading && nearbyParkingSpots.length > 0 && (
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <Compass className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-semibold">Próximos a você</h2>
+          </div>
+          
+          <ParkingGrid
+            data={nearbyParkingSpots}
+            onParkingSelect={handleParkingSelect}
+            onRetry={refetchNearby}
+            emptyMessage="Nenhum estacionamento próximo encontrado."
+            className="mb-6"
+          />
+        </motion.section>
+      )}
+
+      {/* Popular Destinations Section */}
+      {!loading && popularDestinations.length > 0 && (
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <TrendingUp className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-semibold">Destinos Populares</h2>
+          </div>
+          
+          <ParkingGrid
+            data={popularDestinations}
+            onParkingSelect={handleParkingSelect}
+            onRetry={refetchPopular}
+            emptyMessage="Nenhum destino popular encontrado."
+          />
+        </motion.section>
+      )}
+
+      {/* Empty state when no data */}
+      {!loading && nearbyParkingSpots.length === 0 && popularDestinations.length === 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="text-center py-12"
+        >
+          <Car className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Nenhum estacionamento encontrado</h3>
+          <p className="text-muted-foreground mb-4">
+            Não encontramos estacionamentos na sua região ainda.
+          </p>
+          <Button onClick={() => navigate('/explore')}>
+            Explorar Todos os Estacionamentos
           </Button>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          {loading ? (
-            <div className="col-span-2 flex justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-spatioo-green"></div>
-            </div>
-          ) : popularDestinations.length === 0 ? (
-            <div className="col-span-2 text-center py-8 text-muted-foreground">
-              Nenhum destino popular encontrado
-            </div>
-          ) : (
-            popularDestinations.map((destination) => (
-              <Card 
-                key={destination.id} 
-                className="overflow-hidden cursor-pointer hover:bg-muted/40 transition-colors"
-                onClick={() => navigate(`/parking/${destination.id}`)}
-              >
-                <CardContent className="p-3 space-y-2">
-                  <div className="bg-muted rounded-lg h-16 w-full flex items-center justify-center overflow-hidden">
-                    {destination.fotos && destination.fotos.length > 0 ? (
-                      <img 
-                        src={`https://ojnayvmppwpbdcsddpaw.supabase.co/storage/v1/object/public/estacionamento-photos/${destination.fotos[0]}`}
-                        alt={destination.nome} 
-                        className="h-full w-full object-cover rounded-lg" 
-                      />
-                    ) : (
-                      <Car className="h-8 w-8 text-muted-foreground" />
-                    )}
-                  </div>
-                  <CardTitle className="text-sm">{destination.nome}</CardTitle>
-                  <div className="flex items-center justify-between text-xs">
-                    <Badge variant="outline" className="rounded-full px-2 py-0 h-5">
-                      {destination.numero_vagas} vagas
-                    </Badge>
-                    <span className="text-muted-foreground">R$ {destination.preco}/h</span>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 };

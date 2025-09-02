@@ -1,0 +1,105 @@
+import React, { memo } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Car, MapPin, Clock, Star } from 'lucide-react';
+import { PublicParkingData } from '@/services/parkingService';
+
+interface ParkingCardProps {
+  parkingSpot: PublicParkingData;
+  onSelect?: (spot: PublicParkingData) => void;
+  showDistance?: boolean;
+  distance?: number;
+  className?: string;
+}
+
+const ParkingCard = memo(({ 
+  parkingSpot, 
+  onSelect, 
+  showDistance = false, 
+  distance, 
+  className = "" 
+}: ParkingCardProps) => {
+  const handleClick = () => {
+    onSelect?.(parkingSpot);
+  };
+
+  const formatHorario = (horario: any) => {
+    if (typeof horario === 'object' && horario.abertura && horario.fechamento) {
+      return `${horario.abertura} - ${horario.fechamento}`;
+    }
+    return 'Horário não informado';
+  };
+
+  return (
+    <Card 
+      className={`cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-[1.02] ${className}`}
+      onClick={handleClick}
+    >
+      <CardContent className="p-4">
+        {/* Image with lazy loading */}
+        {parkingSpot.fotos && parkingSpot.fotos.length > 0 && (
+          <div className="w-full h-32 bg-gray-200 rounded-lg mb-3 overflow-hidden">
+            <img
+              src={parkingSpot.fotos[0]}
+              alt={`Foto de ${parkingSpot.nome}`}
+              className="w-full h-full object-cover"
+              loading="lazy"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <div className="flex items-start justify-between">
+            <h3 className="font-semibold text-sm leading-tight">{parkingSpot.nome}</h3>
+            <Badge variant="secondary" className="ml-2 text-xs">
+              R$ {parkingSpot.preco}/h
+            </Badge>
+          </div>
+
+          <div className="flex items-center text-xs text-muted-foreground">
+            <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
+            <span className="truncate">{parkingSpot.endereco}</span>
+          </div>
+
+          <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center text-muted-foreground">
+              <Car className="w-3 h-3 mr-1" />
+              <span>{parkingSpot.numero_vagas} vagas</span>
+            </div>
+
+            <div className="flex items-center text-muted-foreground">
+              <Clock className="w-3 h-3 mr-1" />
+              <span>{formatHorario(parkingSpot.horario_funcionamento)}</span>
+            </div>
+          </div>
+
+          {showDistance && distance !== undefined && (
+            <div className="flex items-center text-xs text-primary">
+              <Star className="w-3 h-3 mr-1" />
+              <span>{distance.toFixed(1)} km de distância</span>
+            </div>
+          )}
+
+          <Button 
+            size="sm" 
+            className="w-full mt-3 text-xs h-8"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClick();
+            }}
+          >
+            Ver Detalhes
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+});
+
+ParkingCard.displayName = 'ParkingCard';
+
+export default ParkingCard;
