@@ -11,12 +11,10 @@ import { Calendar as CalendarIcon, CreditCard } from 'lucide-react';
 import { createBooking } from '@/services/bookingService';
 import { toast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { Database } from '@/integrations/supabase/types';
-
-type EstacionamentoRow = Database['public']['Tables']['estacionamento']['Row'];
+import { PublicParkingData } from '@/services/parkingService';
 
 interface BookingFormProps {
-  parkingSpot: EstacionamentoRow;
+  parkingSpot: PublicParkingData;
 }
 
 const TIME_OPTIONS = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];

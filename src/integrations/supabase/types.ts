@@ -59,20 +59,6 @@ export type Database = {
             referencedRelation: "estacionamento"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "fk_bookings_estacionamento"
-            columns: ["estacionamento_id"]
-            isOneToOne: false
-            referencedRelation: "estacionamento_booking"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_bookings_estacionamento"
-            columns: ["estacionamento_id"]
-            isOneToOne: false
-            referencedRelation: "estacionamento_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       estacionamento: {
@@ -178,87 +164,13 @@ export type Database = {
       }
     }
     Views: {
-      estacionamento_booking: {
-        Row: {
-          created_at: string | null
-          endereco: string | null
-          fotos: string[] | null
-          horario_funcionamento: Json | null
-          id: string | null
-          latitude: number | null
-          longitude: number | null
-          nome: string | null
-          numero_vagas: number | null
-          preco: number | null
-        }
-        Insert: {
-          created_at?: string | null
-          endereco?: string | null
-          fotos?: string[] | null
-          horario_funcionamento?: Json | null
-          id?: string | null
-          latitude?: number | null
-          longitude?: number | null
-          nome?: string | null
-          numero_vagas?: number | null
-          preco?: number | null
-        }
-        Update: {
-          created_at?: string | null
-          endereco?: string | null
-          fotos?: string[] | null
-          horario_funcionamento?: Json | null
-          id?: string | null
-          latitude?: number | null
-          longitude?: number | null
-          nome?: string | null
-          numero_vagas?: number | null
-          preco?: number | null
-        }
-        Relationships: []
-      }
-      estacionamento_public: {
-        Row: {
-          area: string | null
-          created_at: string | null
-          fotos: string[] | null
-          horario_funcionamento: Json | null
-          id: string | null
-          latitude_approx: number | null
-          longitude_approx: number | null
-          nome: string | null
-          numero_vagas: number | null
-          preco: number | null
-        }
-        Insert: {
-          area?: never
-          created_at?: string | null
-          fotos?: string[] | null
-          horario_funcionamento?: Json | null
-          id?: string | null
-          latitude_approx?: never
-          longitude_approx?: never
-          nome?: string | null
-          numero_vagas?: number | null
-          preco?: number | null
-        }
-        Update: {
-          area?: never
-          created_at?: string | null
-          fotos?: string[] | null
-          horario_funcionamento?: Json | null
-          id?: string | null
-          latitude_approx?: never
-          longitude_approx?: never
-          nome?: string | null
-          numero_vagas?: number | null
-          preco?: number | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      user_owns_estacionamento: {
+        Args: { estacionamento_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

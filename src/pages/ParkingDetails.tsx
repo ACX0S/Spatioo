@@ -121,7 +121,7 @@ const ParkingDetails = () => {
         <h2 className="text-lg font-semibold mb-2">Informações do estabelecimento</h2>
         <div className="p-3 bg-muted/30 rounded-lg">
           <p className="text-sm text-muted-foreground">Endereço: {parkingSpot.endereco}</p>
-          <p className="text-sm text-muted-foreground">CEP: {parkingSpot.cep}</p>
+          {/* CEP não disponível para dados públicos por segurança */}
         </div>
       </div>
       

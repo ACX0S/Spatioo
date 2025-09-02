@@ -3,14 +3,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, MapPin } from 'lucide-react';
-import { Database } from '@/integrations/supabase/types';
-import { fetchAllParkingSpots } from '@/services/parkingService';
-
-type EstacionamentoRow = Database['public']['Tables']['estacionamento']['Row'];
+import { fetchAllParkingSpots, PublicParkingData } from '@/services/parkingService';
 
 interface AutocompleteSearchProps {
   onSearch: (query: string) => void;
-  onParkingSelect?: (parking: EstacionamentoRow) => void;
+  onParkingSelect?: (parking: PublicParkingData) => void;
   placeholder?: string;
   className?: string;
 }
@@ -22,9 +19,9 @@ const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
   className = ""
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [suggestions, setSuggestions] = useState<EstacionamentoRow[]>([]);
+  const [suggestions, setSuggestions] = useState<PublicParkingData[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [allParkingSpots, setAllParkingSpots] = useState<EstacionamentoRow[]>([]);
+  const [allParkingSpots, setAllParkingSpots] = useState<PublicParkingData[]>([]);
   const [loading, setLoading] = useState(false);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
@@ -81,7 +78,7 @@ const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
     setShowSuggestions(false);
   };
 
-  const handleSuggestionClick = (spot: EstacionamentoRow) => {
+  const handleSuggestionClick = (spot: PublicParkingData) => {
     setSearchQuery(spot.nome);
     setShowSuggestions(false);
     if (onParkingSelect) {

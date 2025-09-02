@@ -6,10 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Car, MapPin, Clock, Navigation, Star, Compass, TrendingUp, History } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
+import { fetchNearbyParkingSpots, fetchPopularParkingSpots, PublicParkingData } from '@/services/parkingService';
 import { supabase } from '@/integrations/supabase/client';
-import { Database } from '@/integrations/supabase/types';
-
-type EstacionamentoRow = Database['public']['Tables']['estacionamento']['Row'];
 import { toast } from '@/components/ui/use-toast';
 import AutocompleteSearch from '@/components/AutocompleteSearch';
 
@@ -17,8 +15,8 @@ const Home = () => {
   const navigate = useNavigate();
   const { profile } = useAuth();
   const [userLocation, setUserLocation] = useState('Obtendo localização...');
-  const [nearbyParkingSpots, setNearbyParkingSpots] = useState<EstacionamentoRow[]>([]);
-  const [popularDestinations, setPopularDestinations] = useState<EstacionamentoRow[]>([]);
+  const [nearbyParkingSpots, setNearbyParkingSpots] = useState<PublicParkingData[]>([]);
+  const [popularDestinations, setPopularDestinations] = useState<PublicParkingData[]>([]);
   const [loading, setLoading] = useState(true);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
@@ -133,7 +131,7 @@ const Home = () => {
   };
 
   // Handle parking spot selection
-  const handleParkingSelect = (spot: EstacionamentoRow) => {
+  const handleParkingSelect = (spot: PublicParkingData) => {
     navigate(`/parking/${spot.id}`);
   };
 

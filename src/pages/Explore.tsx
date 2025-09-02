@@ -6,20 +6,17 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MapPin, Star, Navigation } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
-import { fetchAllParkingSpots } from '@/services/parkingService';
-import { Database } from '@/integrations/supabase/types';
-
-type EstacionamentoRow = Database['public']['Tables']['estacionamento']['Row'];
+import { fetchAllParkingSpots, searchParkingSpots, PublicParkingData } from '@/services/parkingService';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import '@/styles/map.css';
 import AutocompleteSearch from '@/components/AutocompleteSearch';
 
 const Explore = () => {
   const location = useLocation();
-  const [parkingSpots, setParkingSpots] = useState<EstacionamentoRow[]>([]);
+  const [parkingSpots, setParkingSpots] = useState<PublicParkingData[]>([]);
   const [loading, setLoading] = useState(true);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
-  const [sortedParkingSpots, setSortedParkingSpots] = useState<(EstacionamentoRow & { distance?: number })[]>([]);
+  const [sortedParkingSpots, setSortedParkingSpots] = useState<(PublicParkingData & { distance?: number })[]>([]);
   const initialSearch = location.state?.search || '';
   const [searchTerm, setSearchTerm] = useState(initialSearch);
   
@@ -117,7 +114,7 @@ const Explore = () => {
   };
   
   // Handle direct navigation to spot details
-  const handleParkingSelect = (spot: EstacionamentoRow) => {
+  const handleParkingSelect = (spot: PublicParkingData) => {
     window.location.href = `/parking/${spot.id}`;
   };
   
