@@ -1,28 +1,15 @@
-
 import { useState, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { 
-  Car, 
   Map, 
-  User, 
   Calendar, 
-  Settings, 
-  Menu, 
-  X, 
   ChevronLeft, 
-  Search, 
-  Bell,
-  HelpCircle,
   Compass,
-  LogOut,
-  Building2,
   Plus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -30,7 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const Layout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { profile, signOut } = useAuth();
+  const { profile } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [pageTitle, setPageTitle] = useState("Spatioo");
 
@@ -77,9 +64,6 @@ const Layout = () => {
     if (path === "/dashboard" && location.pathname === "/dashboard") {
       return true;
     }
-    if (path === "/profile" && location.pathname === "/profile") {
-      return true;
-    }
     return false;
   };
 
@@ -118,111 +102,21 @@ const Layout = () => {
           </div>
           
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <Bell className="h-5 w-5" />
-            </Button>
-            
             <ThemeToggle />
             
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent className="bg-background border-border">
-                <div className="flex flex-col h-full">
-                  <div className="flex items-center gap-3 mb-8">
-                    <div className="w-8 h-8">
-                      <img src="/Images/LOGO-REDUZIDA-vclaro.png" alt="Spatioo Logo" className="w-full h-full object-contain" />
-                    </div>
-                    <span className="font-semibold text-xl">Spatioo</span>
-                  </div>
-                  
-                  <div className="border-b border-border pb-4 mb-4">
-                    <div className="flex items-center gap-3 mb-4">
-                      <Avatar>
-                        <AvatarImage src={profile?.avatar_url || ''} />
-                        <AvatarFallback className="bg-spatioo-green/20 text-spatioo-green">
-                          {getInitials(profile?.name)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h3 className="font-medium">{profile?.name || 'Usuário'}</h3>
-                        <p className="text-xs text-muted-foreground">{profile?.phone || 'Perfil não atualizado'}</p>
-                      </div>
-                    </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full justify-start gap-2"
-                      onClick={() => navigate('/profile')}
-                    >
-                      <User className="h-4 w-4" />
-                      Gerenciar Perfil
-                    </Button>
-                  </div>
-                  
-                  <div className="flex flex-col gap-1">
-                    <Link 
-                      to="/home" 
-                      className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-accent transition-colors"
-                    >
-                      <Map className="h-5 w-5 text-spatioo-green" />
-                      <span>Home</span>
-                    </Link>
-                    <Link 
-                      to="/explore" 
-                      className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-accent transition-colors"
-                    >
-                      <Compass className="h-5 w-5 text-spatioo-green" />
-                      <span>Explorar</span>
-                    </Link>
-                    <Link 
-                      to="/dashboard" 
-                      className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-accent transition-colors"
-                    >
-                      <Calendar className="h-5 w-5 text-spatioo-green" />
-                      <span>Meus agendamentos</span>
-                    </Link>
-                    <Link 
-                      to="/admin" 
-                      className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-accent transition-colors"
-                    >
-                      <Car className="h-5 w-5 text-spatioo-green" />
-                      <span>Gerenciar vagas</span>
-                    </Link>
-                    {profile?.dono_estacionamento && (
-                      <Link 
-                        to="/gerenciar-estacionamento" 
-                        className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-accent transition-colors"
-                      >
-                        <Building2 className="h-5 w-5 text-spatioo-green" />
-                        <span>Gerenciar Estacionamento</span>
-                      </Link>
-                    )}
-                    <hr className="my-2 border-border" />
-                    <Link 
-                      to="/settings" 
-                      className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-accent transition-colors"
-                    >
-                      <Settings className="h-5 w-5" />
-                      <span>Configurações</span>
-                    </Link>
-                    <button 
-                      onClick={signOut}
-                      className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-destructive/10 text-destructive transition-colors text-left"
-                    >
-                      <LogOut className="h-5 w-5" />
-                      <span>Sair da conta</span>
-                    </button>
-                  </div>
-                  
-                  <div className="mt-auto">
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="rounded-full"
+              onClick={() => navigate('/profile')}
+            >
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={profile?.avatar_url || ''} />
+                <AvatarFallback className="bg-spatioo-green/20 text-spatioo-green text-xs">
+                  {getInitials(profile?.name)}
+                </AvatarFallback>
+              </Avatar>
+            </Button>
           </div>
         </div>
       </header>
@@ -245,7 +139,7 @@ const Layout = () => {
       
       {/* Bottom Navigation Bar */}
       <nav className="sticky bottom-0 z-40 bg-background/95 backdrop-blur-md border-t border-border h-16 w-full">
-        <div className="h-full grid grid-cols-5">
+        <div className="h-full grid grid-cols-4">
           <Link 
             to="/home" 
             className={cn(
@@ -288,17 +182,6 @@ const Layout = () => {
           >
             <Plus className="h-5 w-5" />
             <span className="text-xs mt-1">Ofertar</span>
-          </Link>
-          
-          <Link 
-            to="/profile" 
-            className={cn(
-              "flex flex-col items-center justify-center",
-              isActive("/profile") ? "text-spatioo-green" : "text-muted-foreground"
-            )}
-          >
-            <User className="h-5 w-5" />
-            <span className="text-xs mt-1">Perfil</span>
           </Link>
         </div>
       </nav>
