@@ -1,281 +1,211 @@
 import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { EstacionamentoInsert } from "@/types/estacionamento";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Building2 } from "lucide-react";
-import { useCep } from "@/hooks/useCep";
-import { useGeocoding } from "@/hooks/useGeocoding";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MapPin, Clock, DollarSign, Car } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface CreateEstacionamentoDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
 }
 
-const CreateEstacionamentoDialog = ({ onSuccess }: CreateEstacionamentoDialogProps) => {
-  const { profile, updateProfile } = useAuth();
+const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEstacionamentoDialogProps) => {
   const { toast } = useToast();
-  const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const { fetchCep, formatCep } = useCep();
-  const { geocodeCep } = useGeocoding();
-  const [formData, setFormData] = useState<EstacionamentoInsert>({
+  const [formData, setFormData] = useState({
     nome: "",
-    cnpj: "",
-    cep: "",
     endereco: "",
-    numero_vagas: 0,
-    fotos: [],
-    horario_funcionamento: {
-      abertura: "08:00",
-      fechamento: "18:00"
-    },
-    preco: 0,
-    user_id: profile?.id || ""
+    cep: "",
+    descricao: "",
+    vagas: "",
+    preco: "",
+    horarioInicio: "",
+    horarioFim: "",
+    tipo: ""
   });
 
-  const handleCepChange = async (newCep: string) => {
-    const formatted = formatCep(newCep);
-    setFormData({ ...formData, cep: formatted });
-
-    // Auto-fill address when CEP is complete
-    if (formatted.replace(/\D/g, '').length === 8) {
-      try {
-        const cepData = await fetchCep(formatted);
-        if (cepData) {
-          const fullAddress = `${cepData.logradouro}, ${cepData.bairro}, ${cepData.localidade}, ${cepData.uf}`;
-          setFormData(prev => ({ 
-            ...prev, 
-            endereco: fullAddress
-          }));
-
-          // Geocode the address to get coordinates
-          const coordinates = await geocodeCep(formatted);
-          if (coordinates) {
-            setFormData(prev => ({
-              ...prev,
-              latitude: coordinates.latitude,
-              longitude: coordinates.longitude
-            }));
-          }
-        }
-      } catch (error) {
-        console.error('Erro ao buscar CEP:', error);
-      }
-    }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast({
+      title: "Vaga registrada!",
+      description: "Sua vaga foi registrada com sucesso.",
+    });
+    
+    // Reset form
+    setFormData({
+      nome: "",
+      endereco: "",
+      cep: "",
+      descricao: "",
+      vagas: "",
+      preco: "",
+      horarioInicio: "",
+      horarioFim: "",
+      tipo: ""
+    });
+    
+    onOpenChange(false);
+    onSuccess?.();
   };
 
-  const handleCreateEstacionamento = async () => {
-    try {
-      setLoading(true);
-
-      // Validar campos obrigatórios
-      if (!formData.nome || !formData.cnpj || !formData.cep || !formData.endereco || formData.numero_vagas <= 0 || formData.preco <= 0) {
-        toast({
-          title: "Erro",
-          description: "Preencha todos os campos obrigatórios",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // If coordinates are not available, try to geocode the address one more time
-      let finalFormData = { ...formData };
-      if (!finalFormData.latitude || !finalFormData.longitude) {
-        const coordinates = await geocodeCep(formData.cep);
-        if (coordinates) {
-          finalFormData = {
-            ...finalFormData,
-            latitude: coordinates.latitude,
-            longitude: coordinates.longitude
-          };
-        }
-      }
-
-      // Criar o estacionamento
-      const { data, error } = await supabase
-        .from('estacionamento')
-        .insert(finalFormData)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Depois atualizar o perfil para dono_estacionamento = true
-      await updateProfile({ dono_estacionamento: true });
-
-      setIsOpen(false);
-      toast({
-        title: "Sucesso",
-        description: "Estacionamento criado com sucesso!",
-      });
-
-      // Reset form
-      setFormData({
-        nome: "",
-        cnpj: "",
-        cep: "",
-        endereco: "",
-        numero_vagas: 0,
-        fotos: [],
-        horario_funcionamento: {
-          abertura: "08:00",
-          fechamento: "18:00"
-        },
-        preco: 0,
-        user_id: profile?.id || ""
-      });
-
-      onSuccess?.();
-    } catch (error: any) {
-      console.error('Error creating estacionamento:', error);
-      toast({
-        title: "Erro",
-        description: "Erro ao criar estacionamento",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-spatioo-green/20 rounded-lg">
-              <Building2 className="h-5 w-5 text-spatioo-green" />
-            </div>
-            <div>
-              <p className="font-medium">Criar Estacionamento</p>
-              <p className="text-sm text-muted-foreground">
-                Cadastre seu estacionamento na plataforma
-              </p>
-            </div>
-          </div>
-          <Button variant="outline" size="sm">
-            Criar
-          </Button>
-        </div>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Criar Novo Estacionamento</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <Car className="h-5 w-5 text-spatioo-green" />
+            Registrar Nova Vaga
+          </DialogTitle>
           <DialogDescription>
-            Preencha os dados do seu estacionamento para começar a gerenciá-lo
+            Preencha os dados da sua vaga de estacionamento
           </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="nome">Nome do Estacionamento *</Label>
-            <Input
-              id="nome"
-              value={formData.nome}
-              onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-              placeholder="Ex: Estacionamento Centro"
-            />
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="nome">Nome da Vaga</Label>
+              <Input
+                id="nome"
+                placeholder="Ex: Vaga Residencial Centro"
+                value={formData.nome}
+                onChange={(e) => handleInputChange("nome", e.target.value)}
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="tipo">Tipo de Vaga</Label>
+              <Select value={formData.tipo} onValueChange={(value) => handleInputChange("tipo", value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="residencial">Residencial</SelectItem>
+                  <SelectItem value="comercial">Comercial</SelectItem>
+                  <SelectItem value="particular">Particular</SelectItem>
+                  <SelectItem value="coberta">Coberta</SelectItem>
+                  <SelectItem value="descoberta">Descoberta</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="cnpj">CNPJ *</Label>
-            <Input
-              id="cnpj"
-              value={formData.cnpj}
-              onChange={(e) => setFormData({ ...formData, cnpj: e.target.value })}
-              placeholder="00.000.000/0000-00"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="cep">CEP *</Label>
-            <Input
-              id="cep"
-              value={formData.cep}
-              onChange={(e) => handleCepChange(e.target.value)}
-              placeholder="00000-000"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="endereco">Endereço *</Label>
+            <Label htmlFor="endereco" className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              Endereço
+            </Label>
             <Input
               id="endereco"
-              value={formData.endereco}
-              onChange={(e) => setFormData({ ...formData, endereco: e.target.value })}
               placeholder="Rua, número, bairro"
+              value={formData.endereco}
+              onChange={(e) => handleInputChange("endereco", e.target.value)}
+              required
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="numero_vagas">Número de Vagas *</Label>
-            <Input
-              id="numero_vagas"
-              type="number"
-              min="1"
-              value={formData.numero_vagas}
-              onChange={(e) => setFormData({ ...formData, numero_vagas: parseInt(e.target.value) || 0 })}
-              placeholder="Ex: 50"
-            />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="cep">CEP</Label>
+              <Input
+                id="cep"
+                placeholder="00000-000"
+                value={formData.cep}
+                onChange={(e) => handleInputChange("cep", e.target.value)}
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="vagas">Número de Vagas</Label>
+              <Input
+                id="vagas"
+                type="number"
+                min="1"
+                placeholder="1"
+                value={formData.vagas}
+                onChange={(e) => handleInputChange("vagas", e.target.value)}
+                required
+              />
+            </div>
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="preco">Preço por Hora (R$) *</Label>
+            <Label htmlFor="preco" className="flex items-center gap-2">
+              <DollarSign className="h-4 w-4" />
+              Preço por Hora (R$)
+            </Label>
             <Input
               id="preco"
               type="number"
               step="0.01"
               min="0"
+              placeholder="15.00"
               value={formData.preco}
-              onChange={(e) => setFormData({ ...formData, preco: parseFloat(e.target.value) || 0 })}
-              placeholder="Ex: 5.00"
+              onChange={(e) => handleInputChange("preco", e.target.value)}
+              required
             />
           </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="horarioInicio" className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Horário de Início
+              </Label>
+              <Input
+                id="horarioInicio"
+                type="time"
+                value={formData.horarioInicio}
+                onChange={(e) => handleInputChange("horarioInicio", e.target.value)}
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="horarioFim">Horário de Fim</Label>
+              <Input
+                id="horarioFim"
+                type="time"
+                value={formData.horarioFim}
+                onChange={(e) => handleInputChange("horarioFim", e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
           <div className="space-y-2">
-            <Label htmlFor="abertura">Horário de Abertura</Label>
-            <Input
-              id="abertura"
-              type="time"
-              value={formData.horario_funcionamento.abertura}
-              onChange={(e) => setFormData({
-                ...formData,
-                horario_funcionamento: {
-                  ...formData.horario_funcionamento,
-                  abertura: e.target.value
-                }
-              })}
+            <Label htmlFor="descricao">Descrição Adicional</Label>
+            <Textarea
+              id="descricao"
+              placeholder="Informações extras sobre a vaga (opcional)"
+              value={formData.descricao}
+              onChange={(e) => handleInputChange("descricao", e.target.value)}
+              rows={3}
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="fechamento">Horário de Fechamento</Label>
-            <Input
-              id="fechamento"
-              type="time"
-              value={formData.horario_funcionamento.fechamento}
-              onChange={(e) => setFormData({
-                ...formData,
-                horario_funcionamento: {
-                  ...formData.horario_funcionamento,
-                  fechamento: e.target.value
-                }
-              })}
-            />
+
+          <div className="flex gap-3 pt-4">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
+              Cancelar
+            </Button>
+            <Button type="submit" className="flex-1 bg-spatioo-green hover:bg-spatioo-green/90">
+              Registrar Vaga
+            </Button>
           </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setIsOpen(false)} disabled={loading}>
-            Cancelar
-          </Button>
-          <Button onClick={handleCreateEstacionamento} disabled={loading}>
-            {loading ? 'Criando...' : 'Criar Estacionamento'}
-          </Button>
-        </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

@@ -29,6 +29,7 @@ const Profile = () => {
   const [neighborhood, setNeighborhood] = useState(profile?.neighborhood || '');
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [createEstacionamentoDialogOpen, setCreateEstacionamentoDialogOpen] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -400,7 +401,20 @@ const Profile = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 {!profile?.dono_estacionamento ? (
-                  <CreateEstacionamentoDialog onSuccess={() => window.location.reload()} />
+                  <div>
+                    <Button 
+                      onClick={() => setCreateEstacionamentoDialogOpen(true)}
+                      className="w-full bg-spatioo-green hover:bg-spatioo-green/90"
+                    >
+                      <Building2 className="h-4 w-4 mr-2" />
+                      Cadastrar Estacionamento
+                    </Button>
+                    <CreateEstacionamentoDialog 
+                      open={createEstacionamentoDialogOpen}
+                      onOpenChange={setCreateEstacionamentoDialogOpen}
+                      onSuccess={() => window.location.reload()} 
+                    />
+                  </div>
                 ) : (
                   <div className="flex items-center justify-between space-x-3">
                     <div className="flex items-center space-x-3">

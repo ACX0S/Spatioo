@@ -28,13 +28,15 @@ const Layout = () => {
       case "/explore":
         return "Explorar";
       case "/dashboard":
-        return "Meus agendamentos";
+        return "Painel";
       case "/admin":
         return "Gerenciar vagas";
       case "/profile":
         return "Meu Perfil";
       case "/gerenciar-estacionamento":
         return "Gerenciar Estacionamento";
+      case "/ofertar":
+        return "Ofertar";
       default:
         if (pathname.includes("/parking/")) {
           return "Detalhes do Estacionamento";
@@ -62,6 +64,9 @@ const Layout = () => {
       return true;
     }
     if (path === "/dashboard" && location.pathname === "/dashboard") {
+      return true;
+    }
+    if (path === "/ofertar" && location.pathname === "/ofertar") {
       return true;
     }
     return false;
@@ -163,17 +168,6 @@ const Layout = () => {
           </Link>
           
           <Link 
-            to="/dashboard" 
-            className={cn(
-              "flex flex-col items-center justify-center",
-              isActive("/dashboard") ? "text-spatioo-green" : "text-muted-foreground"
-            )}
-          >
-            <Calendar className="h-5 w-5" />
-            <span className="text-xs mt-1">Reservas</span>
-          </Link>
-          
-          <Link 
             to="/ofertar" 
             className={cn(
               "flex flex-col items-center justify-center",
@@ -182,6 +176,17 @@ const Layout = () => {
           >
             <Plus className="h-5 w-5" />
             <span className="text-xs mt-1">Ofertar</span>
+          </Link>
+          
+          <Link 
+            to="/dashboard" 
+            className={cn(
+              "flex flex-col items-center justify-center",
+              isActive("/dashboard") ? "text-spatioo-green" : "text-muted-foreground"
+            )}
+          >
+            <Calendar className="h-5 w-5" />
+            <span className="text-xs mt-1">Painel</span>
           </Link>
         </div>
       </nav>
