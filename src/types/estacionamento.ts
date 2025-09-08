@@ -16,6 +16,7 @@ export interface Estacionamento {
   updated_at: string;
   latitude?: number;
   longitude?: number;
+  descricao?: string;
 }
 
 export interface EstacionamentoInsert {

@@ -66,6 +66,7 @@ export type Database = {
           cep: string
           cnpj: string
           created_at: string
+          descricao: string | null
           endereco: string
           fotos: string[] | null
           horario_funcionamento: Json
@@ -82,6 +83,7 @@ export type Database = {
           cep: string
           cnpj: string
           created_at?: string
+          descricao?: string | null
           endereco: string
           fotos?: string[] | null
           horario_funcionamento: Json
@@ -98,6 +100,7 @@ export type Database = {
           cep?: string
           cnpj?: string
           created_at?: string
+          descricao?: string | null
           endereco?: string
           fotos?: string[] | null
           horario_funcionamento?: Json

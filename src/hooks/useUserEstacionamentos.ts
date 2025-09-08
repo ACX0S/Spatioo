@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Database } from '@/integrations/supabase/types';
 import { toast } from '@/hooks/use-toast';
+import { Estacionamento } from '@/types/estacionamento';
 
 type EstacionamentoData = Database['public']['Tables']['estacionamento']['Row'];
 

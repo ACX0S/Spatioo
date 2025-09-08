@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { MapPin, Clock, DollarSign, Car } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useCep } from "@/hooks/useCep";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import TimePickerDialog from "@/components/TimePickerDialog";
 
 interface CreateEstacionamentoDialogProps {
@@ -35,28 +37,87 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
     tipo: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { user } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Vaga registrada!",
-      description: "Sua vaga foi registrada com sucesso.",
-    });
     
-    // Reset form
-    setFormData({
-      nome: "",
-      endereco: "",
-      cep: "",
-      descricao: "",
-      vagas: "",
-      preco: "",
-      horarioInicio: "",
-      horarioFim: "",
-      tipo: ""
-    });
-    
-    onOpenChange(false);
-    onSuccess?.();
+    if (!user) {
+      toast({
+        title: "Erro",
+        description: "Você precisa estar logado para registrar uma vaga.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate required fields
+    if (!formData.nome || !formData.endereco || !formData.cep || !formData.vagas || 
+        !formData.preco || !formData.horarioInicio || !formData.horarioFim || !formData.tipo) {
+      toast({
+        title: "Erro",
+        description: "Por favor, preencha todos os campos obrigatórios.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase
+        .from('estacionamento')
+        .insert({
+          nome: formData.nome,
+          endereco: formData.endereco,
+          cep: formData.cep,
+          descricao: formData.descricao || null,
+          numero_vagas: parseInt(formData.vagas),
+          preco: parseFloat(formData.preco),
+          horario_funcionamento: {
+            abertura: formData.horarioInicio,
+            fechamento: formData.horarioFim
+          },
+          user_id: user.id,
+          cnpj: formData.tipo === 'estacionamento' ? '00.000.000/0001-00' : '' // Placeholder CNPJ
+        });
+
+      if (error) {
+        console.error('Error creating estacionamento:', error);
+        throw error;
+      }
+
+      toast({
+        title: "Vaga registrada!",
+        description: "Sua vaga foi registrada com sucesso.",
+      });
+      
+      // Reset form
+      setFormData({
+        nome: "",
+        endereco: "",
+        cep: "",
+        descricao: "",
+        vagas: "",
+        preco: "",
+        horarioInicio: "",
+        horarioFim: "",
+        tipo: ""
+      });
+      
+      onOpenChange(false);
+      onSuccess?.();
+    } catch (error: any) {
+      console.error('Error submitting form:', error);
+      toast({
+        title: "Erro",
+        description: error.message || "Erro ao registrar a vaga. Tente novamente.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -247,8 +308,12 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
               Cancelar
             </Button>
-            <Button type="submit" className="flex-1 bg-spatioo-green hover:bg-spatioo-green/90">
-              Registrar Vaga
+            <Button 
+              type="submit" 
+              className="flex-1 bg-spatioo-green hover:bg-spatioo-green/90"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Registrando..." : "Registrar Vaga"}
             </Button>
           </div>
         </form>
