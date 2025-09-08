@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MapPin, Clock, DollarSign, Car } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useCep } from "@/hooks/useCep";
+import TimePickerDialog from "@/components/TimePickerDialog";
 
 interface CreateEstacionamentoDialogProps {
   open: boolean;
@@ -16,6 +18,11 @@ interface CreateEstacionamentoDialogProps {
 
 const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEstacionamentoDialogProps) => {
   const { toast } = useToast();
+  const { fetchCep, formatCep, loading: cepLoading, error: cepError } = useCep();
+  const [timePickerOpen, setTimePickerOpen] = useState(false);
+  const [timePickerType, setTimePickerType] = useState<'inicio' | 'fim'>('inicio');
+  const [cepData, setCepData] = useState<any>(null);
+  
   const [formData, setFormData] = useState({
     nome: "",
     endereco: "",
@@ -59,6 +66,37 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
     }));
   };
 
+  const handleCepChange = async (value: string) => {
+    const formattedCep = formatCep(value);
+    handleInputChange("cep", formattedCep);
+    
+    if (formattedCep.length === 9) {
+      const cepData = await fetchCep(formattedCep);
+      if (cepData) {
+        setCepData(cepData);
+        handleInputChange("endereco", `${cepData.logradouro}, ${cepData.bairro}`);
+      }
+    }
+  };
+
+  const handleVagasChange = (value: string) => {
+    const numericValue = value.replace(/\D/g, '');
+    handleInputChange("vagas", numericValue);
+  };
+
+  const openTimePicker = (type: 'inicio' | 'fim') => {
+    setTimePickerType(type);
+    setTimePickerOpen(true);
+  };
+
+  const handleTimeSelect = (time: string) => {
+    if (timePickerType === 'inicio') {
+      handleInputChange("horarioInicio", time);
+    } else {
+      handleInputChange("horarioFim", time);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -93,10 +131,7 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="residencial">Residencial</SelectItem>
-                  <SelectItem value="comercial">Comercial</SelectItem>
-                  <SelectItem value="particular">Particular</SelectItem>
-                  <SelectItem value="coberta">Coberta</SelectItem>
-                  <SelectItem value="descoberta">Descoberta</SelectItem>
+                  <SelectItem value="estacionamento">Estacionamento</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -123,20 +158,27 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
                 id="cep"
                 placeholder="00000-000"
                 value={formData.cep}
-                onChange={(e) => handleInputChange("cep", e.target.value)}
+                onChange={(e) => handleCepChange(e.target.value)}
                 required
+                disabled={cepLoading}
               />
+              {cepError && (
+                <p className="text-sm text-destructive">{cepError}</p>
+              )}
+              {cepData && (
+                <p className="text-sm text-muted-foreground">
+                  {cepData.localidade} - {cepData.uf}
+                </p>
+              )}
             </div>
             
             <div className="space-y-2">
               <Label htmlFor="vagas">Número de Vagas</Label>
               <Input
                 id="vagas"
-                type="number"
-                min="1"
                 placeholder="1"
                 value={formData.vagas}
-                onChange={(e) => handleInputChange("vagas", e.target.value)}
+                onChange={(e) => handleVagasChange(e.target.value)}
                 required
               />
             </div>
@@ -161,28 +203,32 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="horarioInicio" className="flex items-center gap-2">
+              <Label className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
                 Horário de Início
               </Label>
-              <Input
-                id="horarioInicio"
-                type="time"
-                value={formData.horarioInicio}
-                onChange={(e) => handleInputChange("horarioInicio", e.target.value)}
-                required
-              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => openTimePicker('inicio')}
+                className="w-full justify-start text-left font-normal"
+              >
+                <Clock className="mr-2 h-4 w-4" />
+                {formData.horarioInicio || "Selecionar horário"}
+              </Button>
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="horarioFim">Horário de Fim</Label>
-              <Input
-                id="horarioFim"
-                type="time"
-                value={formData.horarioFim}
-                onChange={(e) => handleInputChange("horarioFim", e.target.value)}
-                required
-              />
+              <Label>Horário de Fim</Label>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => openTimePicker('fim')}
+                className="w-full justify-start text-left font-normal"
+              >
+                <Clock className="mr-2 h-4 w-4" />
+                {formData.horarioFim || "Selecionar horário"}
+              </Button>
             </div>
           </div>
 
@@ -207,6 +253,14 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
           </div>
         </form>
       </DialogContent>
+      
+      <TimePickerDialog
+        open={timePickerOpen}
+        onOpenChange={setTimePickerOpen}
+        value={timePickerType === 'inicio' ? formData.horarioInicio : formData.horarioFim}
+        onTimeSelect={handleTimeSelect}
+        title={timePickerType === 'inicio' ? 'Horário de Início' : 'Horário de Fim'}
+      />
     </Dialog>
   );
 };
