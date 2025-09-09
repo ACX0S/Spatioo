@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Explore from "./pages/Explore";
 import ParkingDetails from "./pages/ParkingDetails";
 import Dashboard from "./pages/Dashboard";
+import UserPanel from "./pages/UserPanel";
 import ParkingOwnerDashboard from "./pages/ParkingOwnerDashboard";
 import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout";
@@ -39,7 +40,8 @@ const App = () => {
                   <Route path="home" element={<Home />} />
                   <Route path="explore" element={<Explore />} />
                   <Route path="parking/:id" element={<ParkingDetails />} />
-                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="dashboard" element={<UserPanel />} />
+                  <Route path="dashboard/reservas" element={<Dashboard />} />
                   <Route path="admin" element={<ParkingOwnerDashboard />} />
                   <Route path="profile" element={<Profile />} />
                   <Route path="gerenciar-estacionamento" element={<GerenciarEstacionamento />} />
