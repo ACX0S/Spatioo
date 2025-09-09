@@ -63,6 +63,7 @@ export type Database = {
       }
       estacionamento: {
         Row: {
+          ativo: boolean
           cep: string
           cnpj: string
           created_at: string
@@ -80,6 +81,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          ativo?: boolean
           cep: string
           cnpj: string
           created_at?: string
@@ -97,6 +99,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          ativo?: boolean
           cep?: string
           cnpj?: string
           created_at?: string
@@ -122,6 +125,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notifications: {
+        Row: {
+          booking_id: string | null
+          created_at: string
+          estacionamento_id: string | null
+          id: string
+          message: string
+          read: boolean
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string
+          estacionamento_id?: string | null
+          id?: string
+          message: string
+          read?: boolean
+          title: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string
+          estacionamento_id?: string | null
+          id?: string
+          message?: string
+          read?: boolean
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
