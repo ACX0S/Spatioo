@@ -4,16 +4,21 @@ import { Edit3, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Database } from '@/integrations/supabase/types';
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import EditEstacionamentoDialog from "./EditEstacionamentoDialog";
 
 type EstacionamentoData = Database['public']['Tables']['estacionamento']['Row'];
 
 interface UserParkingCardProps {
   estacionamento: EstacionamentoData;
   onEdit?: (id: string) => void;
+  onUpdate?: () => void;
 }
 
-export const UserParkingCard = ({ estacionamento, onEdit }: UserParkingCardProps) => {
-  const [isActive, setIsActive] = useState(true);
+export const UserParkingCard = ({ estacionamento, onEdit, onUpdate }: UserParkingCardProps) => {
+  const [isActive, setIsActive] = useState(estacionamento.ativo || false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -30,6 +35,37 @@ export const UserParkingCard = ({ estacionamento, onEdit }: UserParkingCardProps
       }
     }
     return "24h";
+  };
+
+  const handleActiveToggle = async (checked: boolean) => {
+    setIsUpdating(true);
+    try {
+      const { error } = await supabase
+        .from('estacionamento')
+        .update({ ativo: checked })
+        .eq('id', estacionamento.id);
+
+      if (error) throw error;
+
+      setIsActive(checked);
+      onUpdate?.();
+      
+      toast({
+        title: checked ? "Vaga ativada" : "Vaga desativada",
+        description: checked 
+          ? "Sua vaga está agora visível para outros usuários." 
+          : "Sua vaga não aparecerá mais para outros usuários.",
+      });
+    } catch (error: any) {
+      console.error('Error updating estacionamento status:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar o status da vaga.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   return (
@@ -61,18 +97,15 @@ export const UserParkingCard = ({ estacionamento, onEdit }: UserParkingCardProps
           </div>
           
           <div className="flex flex-col items-end gap-2 ml-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onEdit?.(estacionamento.id)}
-              className="h-8 w-8"
-            >
-              <Edit3 className="h-4 w-4" />
-            </Button>
+            <EditEstacionamentoDialog 
+              estacionamento={estacionamento}
+              onSuccess={onUpdate}
+            />
             
             <Switch
               checked={isActive}
-              onCheckedChange={setIsActive}
+              onCheckedChange={handleActiveToggle}
+              disabled={isUpdating}
               className="data-[state=checked]:bg-spatioo-green"
             />
           </div>

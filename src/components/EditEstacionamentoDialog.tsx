@@ -19,7 +19,7 @@ import { useCep } from "@/hooks/useCep";
 import { useGeocoding } from "@/hooks/useGeocoding";
 
 interface EditEstacionamentoDialogProps {
-  estacionamento: Estacionamento;
+  estacionamento: any; // Use any to handle the Database type compatibility
   onSuccess?: () => void;
 }
 

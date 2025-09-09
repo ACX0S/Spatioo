@@ -59,6 +59,7 @@ const Ofertar = () => {
               key={estacionamento.id} 
               estacionamento={estacionamento}
               onEdit={handleEdit}
+              onUpdate={refetch}
             />
           ))}
         </div>

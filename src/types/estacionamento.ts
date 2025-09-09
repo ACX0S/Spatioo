@@ -17,6 +17,7 @@ export interface Estacionamento {
   latitude?: number;
   longitude?: number;
   descricao?: string;
+  ativo?: boolean;
 }
 
 export interface EstacionamentoInsert {
@@ -50,4 +51,5 @@ export interface EstacionamentoUpdate {
   preco?: number;
   latitude?: number;
   longitude?: number;
+  ativo?: boolean;
 }
