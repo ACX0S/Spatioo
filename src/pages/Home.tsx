@@ -159,18 +159,6 @@ const Home = () => {
           placeholder="Para onde você vai?"
           className="w-full"
         />
-
-        <div className="flex gap-2 justify-center">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleLocationSearch}
-            className="text-xs"
-          >
-            <Navigation className="w-3 h-3 mr-1" />
-            Usar localização atual
-          </Button>
-        </div>
       </motion.div>
 
       {/* Recent Searches */}

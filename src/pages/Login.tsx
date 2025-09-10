@@ -107,7 +107,7 @@ const Login = () => {
           <div className="w-16 h-16 mb-4">
             <img src="/Images/LOGO-REDUZIDA-vclaro.png" alt="Spatioo Logo" className="w-full h-full object-contain" />
           </div>
-          <h1 className="text-2xl font-bold mb-1">Bem-vindo ao Spatioo</h1>
+          <h1 className="text-2xl font-bold mb-1">Bem-vindo à Spatioo</h1>
           <p className="text-muted-foreground text-center">
             Encontre e reserve vagas de estacionamento com facilidade
           </p>
