@@ -39,6 +39,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import EditEstacionamentoDialog from "@/components/EditEstacionamentoDialog";
+import { useVagasStats } from "@/hooks/useVagasStats";
+import { useVagas } from "@/hooks/useVagas";
+import { useEstacionamentoBookings } from "@/hooks/useEstacionamentoBookings";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Trash2, Settings, Plus, Filter } from "lucide-react";
+import { format } from "date-fns";
 
 type SidebarOption = 'dashboard' | 'editar' | 'fotos' | 'vagas';
 
@@ -51,6 +57,14 @@ const EstacionamentoDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState<SidebarOption>('dashboard');
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterStartDate, setFilterStartDate] = useState<string>('');
+  const [filterEndDate, setFilterEndDate] = useState<string>('');
+  
+  // Hooks for real data
+  const { stats, refetch: refetchStats } = useVagasStats(estacionamento?.id);
+  const { vagas, updateVagaStatus, deleteVaga, refetch: refetchVagas } = useVagas(estacionamento?.id);
+  const { bookings, filterBookings } = useEstacionamentoBookings(estacionamento?.id);
 
   const sidebarItems = [
     { id: 'dashboard', title: 'Dashboard', icon: LayoutDashboard },
@@ -203,8 +217,8 @@ const EstacionamentoDashboard = () => {
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">0</div>
-                  <p className="text-xs text-muted-foreground">de {estacionamento.numero_vagas} vagas</p>
+                  <div className="text-2xl font-bold">{stats?.vagas_ocupadas || 0}</div>
+                  <p className="text-xs text-muted-foreground">de {stats?.total_vagas || estacionamento.numero_vagas} vagas</p>
                 </CardContent>
               </Card>
               
@@ -345,58 +359,198 @@ const EstacionamentoDashboard = () => {
         );
 
       case 'vagas':
+        const filteredBookings = filterBookings(filterStatus, filterStartDate, filterEndDate);
+        
         return (
           <div className="space-y-6">
+            {/* Estatísticas das Vagas */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total</CardTitle>
+                  <Car className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats?.total_vagas || 0}</div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Disponíveis</CardTitle>
+                  <div className="h-4 w-4 bg-green-500 rounded-full" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">{stats?.vagas_disponiveis || 0}</div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Ocupadas</CardTitle>
+                  <div className="h-4 w-4 bg-red-500 rounded-full" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-red-600">{stats?.vagas_ocupadas || 0}</div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Reservadas</CardTitle>
+                  <div className="h-4 w-4 bg-yellow-500 rounded-full" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-yellow-600">{stats?.vagas_reservadas || 0}</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Gerenciamento de Vagas */}
             <Card>
               <CardHeader>
-                <CardTitle>Gerenciamento de Vagas</CardTitle>
-                <CardDescription>
-                  Monitore e gerencie as vagas do seu estacionamento
-                </CardDescription>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <CardTitle>Vagas Individuais</CardTitle>
+                    <CardDescription>
+                      Gerencie cada vaga individualmente
+                    </CardDescription>
+                  </div>
+                  <Button 
+                    onClick={() => refetchVagas()}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Atualizar
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <h3 className="font-medium">Vagas Disponíveis</h3>
-                        <p className="text-2xl font-bold text-green-600">{estacionamento.numero_vagas}</p>
-                      </div>
-                      <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
-                        <Car className="h-6 w-6 text-green-600" />
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <h3 className="font-medium">Vagas Ocupadas</h3>
-                        <p className="text-2xl font-bold text-red-600">0</p>
-                      </div>
-                      <div className="h-12 w-12 bg-red-100 rounded-full flex items-center justify-center">
-                        <Users className="h-6 w-6 text-red-600" />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <h3 className="font-medium">Status das Vagas</h3>
-                    <div className="space-y-2">
-                      {Array.from({ length: Math.min(estacionamento.numero_vagas, 10) }, (_, i) => (
-                        <div key={i} className="flex items-center justify-between p-2 border rounded">
-                          <span>Vaga {i + 1}</span>
-                          <Badge variant="outline" className="text-green-600 border-green-600">
-                            Disponível
+                {vagas.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {vagas.map((vaga) => (
+                      <div key={vaga.id} className="border rounded-lg p-4 space-y-3">
+                        <div className="flex justify-between items-center">
+                          <h4 className="font-medium">{vaga.numero_vaga}</h4>
+                          <Badge 
+                            variant={vaga.status === 'disponivel' ? 'default' : 
+                                   vaga.status === 'ocupada' ? 'destructive' : 
+                                   vaga.status === 'reservada' ? 'secondary' : 'outline'}
+                          >
+                            {vaga.status === 'disponivel' ? 'Disponível' :
+                             vaga.status === 'ocupada' ? 'Ocupada' :
+                             vaga.status === 'reservada' ? 'Reservada' : 'Manutenção'}
                           </Badge>
                         </div>
-                      ))}
-                      {estacionamento.numero_vagas > 10 && (
-                        <p className="text-sm text-muted-foreground text-center pt-2">
-                          ... e mais {estacionamento.numero_vagas - 10} vagas disponíveis
-                        </p>
-                      )}
-                    </div>
+                        
+                        <div className="text-sm text-muted-foreground">
+                          Tipo: {vaga.tipo_vaga === 'comum' ? 'Comum' : 
+                                vaga.tipo_vaga === 'eletrico' ? 'Elétrico' :
+                                vaga.tipo_vaga === 'deficiente' ? 'PCD' : 'Moto'}
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          <Select value={vaga.status} onValueChange={(value) => updateVagaStatus(vaga.id, value)}>
+                            <SelectTrigger className="flex-1">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="disponivel">Disponível</SelectItem>
+                              <SelectItem value="ocupada">Ocupada</SelectItem>
+                              <SelectItem value="reservada">Reservada</SelectItem>
+                              <SelectItem value="manutencao">Manutenção</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => deleteVaga(vaga.id)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Car className="h-12 w-12 mx-auto mb-4" />
+                    <p>Nenhuma vaga encontrada</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Reservas */}
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <CardTitle>Reservas</CardTitle>
+                    <CardDescription>
+                      Histórico de reservas do estacionamento
+                    </CardDescription>
+                  </div>
+                  <div className="flex gap-2">
+                    <Select value={filterStatus} onValueChange={setFilterStatus}>
+                      <SelectTrigger className="w-40">
+                        <SelectValue placeholder="Filtrar status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos</SelectItem>
+                        <SelectItem value="upcoming">Agendado</SelectItem>
+                        <SelectItem value="confirmed">Confirmado</SelectItem>
+                        <SelectItem value="cancelled">Cancelado</SelectItem>
+                        <SelectItem value="completed">Concluído</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
+              </CardHeader>
+              <CardContent>
+                {bookings.length > 0 ? (
+                  <div className="space-y-4">
+                    {filteredBookings.map((booking) => (
+                      <div key={booking.id} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-start">
+                          <div className="space-y-1">
+                            <p className="font-medium">
+                              Cliente
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              Vaga: {booking.spot_number}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {format(new Date(booking.date), 'dd/MM/yyyy')} • {booking.start_time} - {booking.end_time}
+                            </p>
+                          </div>
+                          <div className="text-right space-y-1">
+                            <Badge 
+                              variant={booking.status === 'upcoming' ? 'default' : 
+                                     booking.status === 'confirmed' ? 'secondary' : 
+                                     booking.status === 'cancelled' ? 'destructive' : 'outline'}
+                            >
+                              {booking.status === 'upcoming' ? 'Agendado' :
+                               booking.status === 'confirmed' ? 'Confirmado' :
+                               booking.status === 'cancelled' ? 'Cancelado' : 'Concluído'}
+                            </Badge>
+                            <p className="text-sm font-medium">
+                              R$ {booking.price.toFixed(2)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Calendar className="h-12 w-12 mx-auto mb-4" />
+                    <p>Nenhuma reserva encontrada</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

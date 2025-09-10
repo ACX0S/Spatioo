@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Edit3, MapPin } from "lucide-react";
+import { Edit3, MapPin, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Database } from '@/integrations/supabase/types';
 import { useState } from "react";
@@ -68,6 +68,47 @@ export const UserParkingCard = ({ estacionamento, onEdit, onUpdate }: UserParkin
     }
   };
 
+  const handleDeleteEstacionamento = async () => {
+    if (!confirm('Tem certeza que deseja deletar este estacionamento? Esta ação não pode ser desfeita.')) {
+      return;
+    }
+
+    setIsUpdating(true);
+    try {
+      // First delete all related vagas
+      const { error: vagasError } = await supabase
+        .from('vagas')
+        .delete()
+        .eq('estacionamento_id', estacionamento.id);
+
+      if (vagasError) throw vagasError;
+
+      // Then delete the estacionamento
+      const { error } = await supabase
+        .from('estacionamento')
+        .delete()
+        .eq('id', estacionamento.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Sucesso",
+        description: "Estacionamento deletado com sucesso!",
+      });
+
+      onUpdate?.();
+    } catch (error: any) {
+      console.error('Error deleting estacionamento:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao deletar estacionamento",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   return (
     <Card className="mb-3">
       <CardContent className="p-4">
@@ -97,10 +138,22 @@ export const UserParkingCard = ({ estacionamento, onEdit, onUpdate }: UserParkin
           </div>
           
           <div className="flex flex-col items-end gap-2 ml-4">
-            <EditEstacionamentoDialog 
-              estacionamento={estacionamento}
-              onSuccess={onUpdate}
-            />
+            <div className="flex gap-2">
+              <EditEstacionamentoDialog 
+                estacionamento={estacionamento}
+                onSuccess={onUpdate}
+              />
+              
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleDeleteEstacionamento}
+                disabled={isUpdating}
+                className="text-red-600 hover:text-red-700"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
             
             <Switch
               checked={isActive}

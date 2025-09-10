@@ -266,6 +266,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_vagas_stats: {
+        Args: { estacionamento_id_param: string }
+        Returns: {
+          total_vagas: number
+          vagas_disponiveis: number
+          vagas_manutencao: number
+          vagas_ocupadas: number
+          vagas_reservadas: number
+        }[]
+      }
       user_owns_estacionamento: {
         Args: { estacionamento_id: string }
         Returns: boolean
