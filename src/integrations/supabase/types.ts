@@ -207,6 +207,60 @@ export type Database = {
         }
         Relationships: []
       }
+      vagas: {
+        Row: {
+          booking_id: string | null
+          created_at: string
+          estacionamento_id: string
+          id: string
+          numero_vaga: string
+          pagamento_realizado: boolean
+          status: string
+          tipo_vaga: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string
+          estacionamento_id: string
+          id?: string
+          numero_vaga: string
+          pagamento_realizado?: boolean
+          status?: string
+          tipo_vaga?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string
+          estacionamento_id?: string
+          id?: string
+          numero_vaga?: string
+          pagamento_realizado?: boolean
+          status?: string
+          tipo_vaga?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_vagas_booking"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_vagas_estacionamento"
+            columns: ["estacionamento_id"]
+            isOneToOne: false
+            referencedRelation: "estacionamento"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
