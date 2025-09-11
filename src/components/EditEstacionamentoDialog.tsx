@@ -158,45 +158,45 @@ const EditEstacionamentoDialog = ({ estacionamento, onSuccess }: EditEstacioname
         </DialogHeader>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="nome">Nome do Estacionamento *</Label>
+            <Label htmlFor="edit-nome">Nome do Estacionamento *</Label>
             <Input
-              id="nome"
+              id="edit-nome"
               value={formData.nome}
               onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
               placeholder="Ex: Estacionamento Centro"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="cnpj">CNPJ *</Label>
+            <Label htmlFor="edit-cnpj">CNPJ *</Label>
             <Input
-              id="cnpj"
+              id="edit-cnpj"
               value={formData.cnpj}
               onChange={(e) => setFormData({ ...formData, cnpj: e.target.value })}
               placeholder="00.000.000/0000-00"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="cep">CEP *</Label>
+            <Label htmlFor="edit-cep">CEP *</Label>
             <Input
-              id="cep"
+              id="edit-cep"
               value={formData.cep}
               onChange={(e) => handleCepChange(e.target.value)}
               placeholder="00000-000"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="endereco">Endereço *</Label>
+            <Label htmlFor="edit-endereco">Endereço *</Label>
             <Input
-              id="endereco"
+              id="edit-endereco"
               value={formData.endereco}
               onChange={(e) => setFormData({ ...formData, endereco: e.target.value })}
               placeholder="Rua, número, bairro"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="numero_vagas">Número de Vagas *</Label>
+            <Label htmlFor="edit-numero_vagas">Número de Vagas *</Label>
             <Input
-              id="numero_vagas"
+              id="edit-numero_vagas"
               type="number"
               min="1"
               value={formData.numero_vagas}
@@ -205,9 +205,9 @@ const EditEstacionamentoDialog = ({ estacionamento, onSuccess }: EditEstacioname
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="preco">Preço por Hora (R$) *</Label>
+            <Label htmlFor="edit-preco">Preço por Hora (R$) *</Label>
             <Input
-              id="preco"
+              id="edit-preco"
               type="number"
               step="0.01"
               min="0"
@@ -217,9 +217,9 @@ const EditEstacionamentoDialog = ({ estacionamento, onSuccess }: EditEstacioname
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="abertura">Horário de Abertura</Label>
+            <Label htmlFor="edit-abertura">Horário de Abertura</Label>
             <Input
-              id="abertura"
+              id="edit-abertura"
               type="time"
               value={formData.horario_funcionamento?.abertura || "08:00"}
               onChange={(e) => setFormData({
@@ -232,9 +232,9 @@ const EditEstacionamentoDialog = ({ estacionamento, onSuccess }: EditEstacioname
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="fechamento">Horário de Fechamento</Label>
+            <Label htmlFor="edit-fechamento">Horário de Fechamento</Label>
             <Input
-              id="fechamento"
+              id="edit-fechamento"
               type="time"
               value={formData.horario_funcionamento?.fechamento || "18:00"}
               onChange={(e) => setFormData({

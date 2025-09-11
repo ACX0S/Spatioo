@@ -174,9 +174,9 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="nome">Nome da Vaga</Label>
+              <Label htmlFor="create-nome">Nome da Vaga</Label>
               <Input
-                id="nome"
+                id="create-nome"
                 placeholder="Ex: Vaga Residencial Centro"
                 value={formData.nome}
                 onChange={(e) => handleInputChange("nome", e.target.value)}
@@ -185,7 +185,7 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="tipo">Tipo de Vaga</Label>
+              <Label htmlFor="create-tipo">Tipo de Vaga</Label>
               <Select value={formData.tipo} onValueChange={(value) => handleInputChange("tipo", value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione o tipo" />
@@ -199,12 +199,12 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="endereco" className="flex items-center gap-2">
+            <Label htmlFor="create-endereco" className="flex items-center gap-2">
               <MapPin className="h-4 w-4" />
               Endereço
             </Label>
             <Input
-              id="endereco"
+              id="create-endereco"
               placeholder="Rua, número, bairro"
               value={formData.endereco}
               onChange={(e) => handleInputChange("endereco", e.target.value)}
@@ -214,9 +214,9 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="cep">CEP</Label>
+              <Label htmlFor="create-cep">CEP</Label>
               <Input
-                id="cep"
+                id="create-cep"
                 placeholder="00000-000"
                 value={formData.cep}
                 onChange={(e) => handleCepChange(e.target.value)}
@@ -234,9 +234,9 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="vagas">Número de Vagas</Label>
+              <Label htmlFor="create-vagas">Número de Vagas</Label>
               <Input
-                id="vagas"
+                id="create-vagas"
                 placeholder="1"
                 value={formData.vagas}
                 onChange={(e) => handleVagasChange(e.target.value)}
@@ -246,12 +246,12 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="preco" className="flex items-center gap-2">
+            <Label htmlFor="create-preco" className="flex items-center gap-2">
               <DollarSign className="h-4 w-4" />
               Preço por Hora (R$)
             </Label>
             <Input
-              id="preco"
+              id="create-preco"
               type="number"
               step="0.01"
               min="0"
@@ -294,9 +294,9 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="descricao">Descrição Adicional</Label>
+            <Label htmlFor="create-descricao">Descrição Adicional</Label>
             <Textarea
-              id="descricao"
+              id="create-descricao"
               placeholder="Informações extras sobre a vaga (opcional)"
               value={formData.descricao}
               onChange={(e) => handleInputChange("descricao", e.target.value)}
