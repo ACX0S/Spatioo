@@ -163,7 +163,22 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "notifications_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_estacionamento_id_fkey"
+            columns: ["estacionamento_id"]
+            isOneToOne: false
+            referencedRelation: "estacionamento"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

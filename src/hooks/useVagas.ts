@@ -24,12 +24,18 @@ export const useVagas = (estacionamentoId: string | undefined) => {
       const { data, error } = await supabase
         .from('vagas')
         .select('*')
-        .eq('estacionamento_id', estacionamentoId)
-        .order('numero_vaga');
+        .eq('estacionamento_id', estacionamentoId);
 
       if (error) throw error;
 
-      setVagas(data || []);
+      const sorted = (data || []).slice().sort((a, b) => {
+        const getNum = (s: string) => {
+          const m = s.match(/\d+/);
+          return m ? parseInt(m[0], 10) : 0;
+        };
+        return getNum(a.numero_vaga) - getNum(b.numero_vaga);
+      });
+      setVagas(sorted);
     } catch (err: any) {
       console.error('Error fetching vagas:', err);
       setError(err.message || 'Erro ao carregar vagas');
