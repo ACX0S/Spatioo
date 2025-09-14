@@ -82,20 +82,6 @@ const Login = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-40 w-full bg-background">
-        <div className="container px-4 h-16 flex items-center">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="rounded-full" 
-            onClick={() => navigate(-1)}
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
-        </div>
-      </header>
-      
       <motion.div 
         className="flex-1 container max-w-md mx-auto p-4 flex flex-col"
         initial={{ opacity: 0, y: 10 }}
