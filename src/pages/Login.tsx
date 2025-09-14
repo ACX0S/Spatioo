@@ -51,6 +51,10 @@ const Login = () => {
       setIsSubmitting(false);
     }
   };
+  function setAgreeTerms(value: boolean) {
+    // Lógica para atualizar o estado de acordo com o checkbox
+    console.log('Checkbox value:', value);
+  }
   
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,6 +83,7 @@ const Login = () => {
       setIsSubmitting(false);
     }
   };
+  
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -284,9 +289,10 @@ const Login = () => {
                   type="checkbox"
                   id="terms"
                   className="mr-2 mt-1"
+                  onChange={(e) => setAgreeTerms(e.target.checked)}
                 />
                 <label htmlFor="terms" className="text-xs text-muted-foreground">
-                  Concordo com os <a href="#" className="text-spatioo-green">Termos de Uso</a> e <a href="#" className="text-spatioo-green">Política de Privacidade</a> do Spatioo.
+                  Concordo com os <a href="#" className="text-spatioo-green">Termos de Uso</a> e <a href="#" className="text-spatioo-green">Política de Privacidade</a> da Spatioo.
                 </label>
               </div>
               
