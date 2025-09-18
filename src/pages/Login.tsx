@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Car, Lock, Mail, User, ChevronLeft, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { Lock, Mail, User, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/use-toast';
@@ -39,7 +39,8 @@ const Login = () => {
       toast({
         title: "Campos obrigatórios",
         description: "Preencha o email e senha para entrar",
-        variant: "destructive"
+        variant: "destructive",
+        duration: 2000
       });
       return;
     }
@@ -51,14 +52,9 @@ const Login = () => {
       setIsSubmitting(false);
     }
   };
-  function setAgreeTerms(value: boolean) {
-    // Lógica para atualizar o estado de acordo com o checkbox
-    console.log('Checkbox value:', value);
-  }
-  
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name || !email || !password || !confirmPassword || !phone) {
       toast({
         title: "Campos obrigatórios",
         description: "Preencha todos os campos obrigatórios",
@@ -71,7 +67,8 @@ const Login = () => {
       toast({
         title: "Senhas não coincidem",
         description: "A senha e confirmação de senha devem ser iguais",
-        variant: "destructive"
+        variant: "destructive",
+        duration: 2000
       });
       return;
     }
@@ -83,7 +80,14 @@ const Login = () => {
       setIsSubmitting(false);
     }
   };
-  
+    function setAgreeTerms(value: boolean) {
+    value ? toast({
+        title: "Termos de uso aceitos",
+        variant: "default",
+        duration: 1000
+        
+      }) : null
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
