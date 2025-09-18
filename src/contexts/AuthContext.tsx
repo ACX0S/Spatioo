@@ -160,6 +160,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: "Erro ao fazer login",
         description: error.message,
         variant: "destructive",
+        duration : 2000
+
       });
       throw error;
     }
@@ -205,6 +207,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: "Erro ao criar conta",
         description: error.message,
         variant: "destructive",
+        duration : 3000
       });
       throw error;
     }
