@@ -150,6 +150,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       toast({
         title: "Login realizado com sucesso",
         description: "Bem-vindo de volta!",
+        duration : 2000
       });
       
       navigate('/home');
