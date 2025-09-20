@@ -321,7 +321,6 @@ const Profile = () => {
                   <Input
                     type="text"
                     placeholder="Nome do bairro"
-                    className={cep && cep.replace(/\D/g, '').length === 8 ? "bg-gray-50" : ""}
                     value={neighborhood}
                     onChange={(e) => setNeighborhood(e.target.value)}
                     readOnly={cep && cep.replace(/\D/g, '').length === 8}
