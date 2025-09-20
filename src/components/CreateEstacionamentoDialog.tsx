@@ -20,7 +20,14 @@ interface CreateEstacionamentoDialogProps {
 
 const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEstacionamentoDialogProps) => {
   const { toast } = useToast();
-  const { fetchCep, formatCep, loading: cepLoading, error: cepError } = useCep();
+  const { 
+    fetchCep, 
+    formatCep, 
+    validateCepFormat, 
+    formatAddress,
+    loading: cepLoading, 
+    error: cepError 
+  } = useCep();
   const [timePickerOpen, setTimePickerOpen] = useState(false);
   const [timePickerType, setTimePickerType] = useState<'inicio' | 'fim'>('inicio');
   const [cepData, setCepData] = useState<any>(null);
@@ -132,10 +139,28 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
     handleInputChange("cep", formattedCep);
     
     if (formattedCep.length === 9) {
+      // Validar o formato do CEP antes de fazer a requisição
+      const validation = validateCepFormat(formattedCep);
+      if (!validation.isValid) {
+        toast({
+          title: "CEP Inválido",
+          description: validation.message,
+          variant: "destructive"
+        });
+        return;
+      }
+      
       const cepData = await fetchCep(formattedCep);
       if (cepData) {
         setCepData(cepData);
-        handleInputChange("endereco", `${cepData.logradouro}, ${cepData.bairro}`);
+        // Usar a função formatAddress para formatar o endereço completo
+        handleInputChange("endereco", formatAddress(cepData));
+      } else if (cepError) {
+        toast({
+          title: "Erro",
+          description: cepError,
+          variant: "destructive"
+        });
       }
     }
   };
