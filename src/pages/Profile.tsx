@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, Mail, Phone, Camera, ChevronLeft, CreditCard, Shield, Bell, LogOut, MapPin, Home, Building2 } from 'lucide-react';
+import { User, Mail, Phone, Camera, ChevronLeft, CreditCard, Shield, Bell, LogOut, MapPin, Home, Building2, Check } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -139,7 +139,7 @@ const Profile = () => {
 
   return (
     <div className="container p-4 max-w-md mx-auto">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <Button 
           variant="ghost" 
           size="icon" 
@@ -153,7 +153,7 @@ const Profile = () => {
       </div>
       
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid grid-cols-2 mb-6">
+        <TabsList className="grid grid-cols-2 mb-4">
           <TabsTrigger value="profile">Dados Pessoais</TabsTrigger>
           <TabsTrigger value="account">Conta</TabsTrigger>
         </TabsList>
@@ -196,7 +196,7 @@ const Profile = () => {
                 </div>
                 
                 {/* Email */}
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <label className="text-sm font-medium">Email</label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -335,7 +335,7 @@ const Profile = () => {
              <Card>
                <CardFooter>
                  <Button 
-                   className="w-full bg-spatioo-green hover:bg-spatioo-green-dark text-black font-medium"
+                   className="w-full mt-6 bg-spatioo-green hover:bg-spatioo-green-dark text-black font-medium"
                    onClick={handleSaveProfile}
                    disabled={saving}
                  >
@@ -379,7 +379,7 @@ const Profile = () => {
                 <CardDescription>Resumo da sua atividade</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="grid grid-cols-2 gap-4 mb-4 ">
                   <div className="bg-muted/40 p-3 rounded-lg">
                     <p className="text-xs text-muted-foreground">Reservas ativas</p>
                     <p className="text-2xl font-bold">{activeBookings.length}</p>
@@ -419,16 +419,16 @@ const Profile = () => {
                     <div className="flex items-center space-x-3">
                       <div className="p-2 bg-spatioo-green/20 rounded-lg">
                         <Building2 className="h-5 w-5 text-spatioo-green" />
-                      </div>
+                      </div>  
                       <div>
                         <p className="font-medium">Estacionamento Cadastrado</p>
                         <p className="text-sm text-muted-foreground">
-                          Você pode gerenciar seu estacionamento através do menu lateral
+                          Você pode gerenciar seu estacionamento através do menu lateral.
                         </p>
                       </div>
                     </div>
                     <div className="bg-spatioo-green/10 px-3 py-1 rounded-full">
-                      <span className="text-xs text-spatioo-green font-medium">✓ Ativo</span>
+                      <span className="text-spatioo-green"><Check/></span>
                     </div>
                   </div>
                 )}
