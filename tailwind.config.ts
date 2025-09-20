@@ -67,11 +67,11 @@ export default {
 					green: '#01E979',
 					'green-light': '#63fca7',
 					'green-dark': '#00c868',
-					black: '#000000',
+					black: '#151715',
 					'gray-dark': '#333333',
 					'gray-medium': '#666666',
 					'gray-light': '#f4f4f4',
-					white: '#ffffff',
+					white: '#E6E6E6',
 				}
 			},
 			borderRadius: {
