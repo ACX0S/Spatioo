@@ -77,6 +77,7 @@ export type Database = {
           nome: string
           numero_vagas: number
           preco: number
+          tipo: string | null
           updated_at: string
           user_id: string
         }
@@ -95,6 +96,7 @@ export type Database = {
           nome: string
           numero_vagas: number
           preco: number
+          tipo?: string | null
           updated_at?: string
           user_id: string
         }
@@ -113,6 +115,7 @@ export type Database = {
           nome?: string
           numero_vagas?: number
           preco?: number
+          tipo?: string | null
           updated_at?: string
           user_id?: string
         }
