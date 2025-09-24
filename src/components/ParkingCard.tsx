@@ -53,16 +53,23 @@ const ParkingCard = memo(({
         )}
 
         <div className="space-y-2">
-          <div className="flex items-start justify-between">
-            <h3 className="font-semibold text-sm leading-tight">{parkingSpot.nome}</h3>
-            <Badge variant="secondary" className="ml-2 text-xs">
+          <div className="flex items-start justify-between gap-2">
+            <h3 
+              className="font-semibold text-sm leading-tight truncate flex-1 min-w-0" 
+              title={parkingSpot.nome}
+            >
+              {parkingSpot.nome}
+            </h3>
+            <Badge variant="secondary" className="text-xs flex-shrink-0">
               R$ {parkingSpot.preco}/h
             </Badge>
           </div>
 
           <div className="flex items-center text-xs text-muted-foreground">
             <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
-            <span className="truncate">{parkingSpot.endereco}</span>
+            <span className="truncate" title={parkingSpot.endereco}>
+              {parkingSpot.endereco}
+            </span>
           </div>
 
           <div className="flex items-center justify-between text-xs">
@@ -71,9 +78,11 @@ const ParkingCard = memo(({
               <span>{parkingSpot.numero_vagas} vagas</span>
             </div>
 
-            <div className="flex items-center text-muted-foreground">
-              <Clock className="w-3 h-3 mr-1" />
-              <span>{formatHorario(parkingSpot.horario_funcionamento)}</span>
+            <div className="flex items-center text-muted-foreground min-w-0">
+              <Clock className="w-3 h-3 mr-1 flex-shrink-0" />
+              <span className="truncate" title={formatHorario(parkingSpot.horario_funcionamento)}>
+                {formatHorario(parkingSpot.horario_funcionamento)}
+              </span>
             </div>
           </div>
 

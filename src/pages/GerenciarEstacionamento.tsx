@@ -78,7 +78,7 @@ const GerenciarEstacionamento = () => {
         throw error;
       }
 
-      setEstacionamento(data as Estacionamento);
+      setEstacionamento(data as any);
     } catch (error: any) {
       console.error('Error fetching estacionamento:', error);
       toast({
@@ -101,7 +101,7 @@ const GerenciarEstacionamento = () => {
 
       if (error) throw error;
 
-      setEstacionamento(data as Estacionamento);
+      setEstacionamento(data as any);
       setIsDialogOpen(false);
       toast({
         title: "Sucesso",

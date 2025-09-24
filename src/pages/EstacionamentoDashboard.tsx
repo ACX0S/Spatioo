@@ -94,7 +94,7 @@ const EstacionamentoDashboard = () => {
 
       if (error) throw error;
 
-      setEstacionamento(data as Estacionamento);
+      setEstacionamento(data as any);
     } catch (error: any) {
       console.error('Error fetching estacionamento:', error);
       toast({

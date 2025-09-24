@@ -36,6 +36,7 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
   const [formData, setFormData] = useState({
     nome: "",
     endereco: "",
+    numero: "",
     cep: "",
     descricao: "",
     vagas: "",
@@ -44,6 +45,8 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
     tipo: "",
     cnpj: ""
   });
+  
+  const [enderecoDisabled, setEnderecoDisabled] = useState(false);
   
   const [pricing, setPricing] = useState<PricingRow[]>([]);
   const [pricingError, setPricingError] = useState("");
@@ -64,9 +67,11 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
     }
 
     // Validate required fields
-    const requiredFields = [formData.nome, formData.endereco, formData.cep, formData.vagas, formData.horarioInicio, formData.horarioFim, formData.tipo];
+    const requiredFields = [formData.endereco, formData.numero, formData.cep, formData.vagas, formData.horarioInicio, formData.horarioFim, formData.tipo];
+    
+    // Add nome field only for "estacionamento" tipo
     if (formData.tipo === 'estacionamento') {
-      requiredFields.push(formData.cnpj);
+      requiredFields.push(formData.nome, formData.cnpj);
     }
     
     if (requiredFields.some(field => !field)) {
@@ -108,11 +113,16 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
 
     try {
       // First, create the estacionamento record
+      // Generate nome for residencial based on address
+      const nomeToSave = formData.tipo === 'residencial' 
+        ? cepData ? `${cepData.logradouro}, ${formData.numero} - ${cepData.bairro}` : `${formData.endereco}, ${formData.numero}`
+        : formData.nome;
+
       const { data: estacionamentoData, error: estacionamentoError } = await supabase
         .from('estacionamento')
         .insert({
-          nome: formData.nome,
-          endereco: formData.endereco,
+          nome: nomeToSave,
+          endereco: `${formData.endereco}, ${formData.numero}`,
           cep: formData.cep,
           descricao: formData.descricao || null,
           numero_vagas: parseInt(formData.vagas),
@@ -160,6 +170,7 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
       setFormData({
         nome: "",
         endereco: "",
+        numero: "",
         cep: "",
         descricao: "",
         vagas: "",
@@ -168,6 +179,8 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
         tipo: "",
         cnpj: ""
       });
+      setCepData(null);
+      setEnderecoDisabled(false);
       setPricing([]);
       setPricingError("");
       
@@ -211,8 +224,9 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
       const cepData = await fetchCep(formattedCep);
       if (cepData) {
         setCepData(cepData);
-        // Usar a função formatAddress para formatar o endereço completo
-        handleInputChange("endereco", formatAddress(cepData));
+        // Formatar o endereço sem o número
+        handleInputChange("endereco", `${cepData.logradouro}, ${cepData.bairro}, ${cepData.localidade} - ${cepData.uf}`);
+        setEnderecoDisabled(true);
       } else if (cepError) {
         toast({
           title: "Erro",
@@ -220,6 +234,9 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
           variant: "destructive"
         });
       }
+    } else {
+      setEnderecoDisabled(false);
+      setCepData(null);
     }
   };
 
@@ -255,30 +272,50 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="create-tipo">Tipo de Vaga</Label>
+            <Select value={formData.tipo} onValueChange={(value) => handleInputChange("tipo", value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="residencial">Residencial</SelectItem>
+                <SelectItem value="estacionamento">Estacionamento</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {formData.tipo === 'estacionamento' && (
             <div className="space-y-2">
-              <Label htmlFor="create-nome">Nome da Vaga</Label>
+              <Label htmlFor="create-nome">Nome do Estacionamento</Label>
               <Input
                 id="create-nome"
-                placeholder="Ex: Vaga Residencial Centro"
+                placeholder="Ex: Estacionamento Centro"
                 value={formData.nome}
                 onChange={(e) => handleInputChange("nome", e.target.value)}
                 required
               />
             </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="create-tipo">Tipo de Vaga</Label>
-              <Select value={formData.tipo} onValueChange={(value) => handleInputChange("tipo", value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione o tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="residencial">Residencial</SelectItem>
-                  <SelectItem value="estacionamento">Estacionamento</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          )}
+
+          <div className="space-y-2">
+            <Label htmlFor="create-cep">CEP</Label>
+            <Input
+              id="create-cep"
+              placeholder="00000-000"
+              value={formData.cep}
+              onChange={(e) => handleCepChange(e.target.value)}
+              required
+              disabled={cepLoading}
+            />
+            {cepError && (
+              <p className="text-sm text-destructive">{cepError}</p>
+            )}
+            {cepData && (
+              <p className="text-sm text-muted-foreground">
+                {cepData.localidade} - {cepData.uf}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -288,32 +325,25 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
             </Label>
             <Input
               id="create-endereco"
-              placeholder="Rua, número, bairro"
+              placeholder="Será preenchido automaticamente pelo CEP"
               value={formData.endereco}
               onChange={(e) => handleInputChange("endereco", e.target.value)}
               required
+              disabled={enderecoDisabled}
+              className={enderecoDisabled ? "bg-muted" : ""}
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="create-cep">CEP</Label>
+              <Label htmlFor="create-numero">Número</Label>
               <Input
-                id="create-cep"
-                placeholder="00000-000"
-                value={formData.cep}
-                onChange={(e) => handleCepChange(e.target.value)}
+                id="create-numero"
+                placeholder="123"
+                value={formData.numero}
+                onChange={(e) => handleInputChange("numero", e.target.value)}
                 required
-                disabled={cepLoading}
               />
-              {cepError && (
-                <p className="text-sm text-destructive">{cepError}</p>
-              )}
-              {cepData && (
-                <p className="text-sm text-muted-foreground">
-                  {cepData.localidade} - {cepData.uf}
-                </p>
-              )}
             </div>
             
             <div className="space-y-2">

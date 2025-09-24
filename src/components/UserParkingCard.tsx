@@ -113,11 +113,15 @@ export const UserParkingCard = ({ estacionamento, onEdit, onUpdate }: UserParkin
     <Card className="mb-3">
       <CardContent className="p-4">
         <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <h3 className="font-semibold text-foreground mb-1">{estacionamento.nome}</h3>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-foreground mb-1 truncate" title={estacionamento.nome}>
+              {estacionamento.nome}
+            </h3>
             <div className="flex items-center text-sm text-muted-foreground mb-2">
-              <MapPin className="h-3 w-3 mr-1" />
-              <span className="truncate">{estacionamento.endereco}</span>
+              <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+              <span className="truncate" title={estacionamento.endereco}>
+                {estacionamento.endereco}
+              </span>
             </div>
             
             <div className="grid grid-cols-2 gap-4 text-sm">
