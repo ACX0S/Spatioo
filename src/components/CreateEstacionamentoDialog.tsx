@@ -11,6 +11,7 @@ import { useCep } from "@/hooks/useCep";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import TimePickerDialog from "@/components/TimePickerDialog";
+import PricingTable, { PricingRow } from "@/components/PricingTable";
 
 interface CreateEstacionamentoDialogProps {
   open: boolean;
@@ -38,11 +39,14 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
     cep: "",
     descricao: "",
     vagas: "",
-    preco: "",
     horarioInicio: "",
     horarioFim: "",
-    tipo: ""
+    tipo: "",
+    cnpj: ""
   });
+  
+  const [pricing, setPricing] = useState<PricingRow[]>([]);
+  const [pricingError, setPricingError] = useState("");
 
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,8 +64,12 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
     }
 
     // Validate required fields
-    if (!formData.nome || !formData.endereco || !formData.cep || !formData.vagas || 
-        !formData.preco || !formData.horarioInicio || !formData.horarioFim || !formData.tipo) {
+    const requiredFields = [formData.nome, formData.endereco, formData.cep, formData.vagas, formData.horarioInicio, formData.horarioFim, formData.tipo];
+    if (formData.tipo === 'estacionamento') {
+      requiredFields.push(formData.cnpj);
+    }
+    
+    if (requiredFields.some(field => !field)) {
       toast({
         title: "Erro",
         description: "Por favor, preencha todos os campos obrigatórios.",
@@ -70,10 +78,37 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
       return;
     }
 
+    // Validate pricing table
+    if (pricing.length === 0) {
+      setPricingError("Adicione pelo menos uma configuração de preço.");
+      return;
+    }
+
+    const invalidPricing = pricing.some(row => {
+      const horas = parseFloat(row.horas);
+      const preco = parseFloat(row.preco);
+      return !row.horas || !row.preco || horas <= 0 || preco <= 0;
+    });
+
+    if (invalidPricing) {
+      setPricingError("Todos os campos de horas e preços devem ser preenchidos com valores positivos.");
+      return;
+    }
+
+    // Check for duplicate hours
+    const horasSet = new Set(pricing.map(row => row.horas));
+    if (horasSet.size !== pricing.length) {
+      setPricingError("Não é possível ter configurações duplicadas para a mesma quantidade de horas.");
+      return;
+    }
+
+    setPricingError("");
+
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase
+      // First, create the estacionamento record
+      const { data: estacionamentoData, error: estacionamentoError } = await supabase
         .from('estacionamento')
         .insert({
           nome: formData.nome,
@@ -81,18 +116,39 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
           cep: formData.cep,
           descricao: formData.descricao || null,
           numero_vagas: parseInt(formData.vagas),
-          preco: parseFloat(formData.preco),
+          preco: 0, // Will be replaced by pricing table
           horario_funcionamento: {
             abertura: formData.horarioInicio,
             fechamento: formData.horarioFim
           },
           user_id: user.id,
-          cnpj: formData.tipo === 'estacionamento' ? '00.000.000/0001-00' : '' // Placeholder CNPJ
-        });
+          cnpj: formData.tipo === 'estacionamento' ? formData.cnpj : '',
+          tipo: formData.tipo
+        })
+        .select()
+        .single();
 
-      if (error) {
-        console.error('Error creating estacionamento:', error);
-        throw error;
+      if (estacionamentoError) {
+        console.error('Error creating estacionamento:', estacionamentoError);
+        throw estacionamentoError;
+      }
+
+      // Then, create the pricing records using supabase client directly
+      if (pricing.length > 0) {
+        for (const row of pricing) {
+          const { error: pricingError } = await supabase
+            .from('estacionamento_precos' as any)
+            .insert({
+              estacionamento_id: estacionamentoData.id,
+              horas: parseInt(row.horas),
+              preco: parseFloat(row.preco)
+            });
+
+          if (pricingError) {
+            console.error('Error creating pricing row:', pricingError);
+            // Continue with other rows - estacionamento was created successfully
+          }
+        }
       }
 
       toast({
@@ -107,11 +163,13 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
         cep: "",
         descricao: "",
         vagas: "",
-        preco: "",
         horarioInicio: "",
         horarioFim: "",
-        tipo: ""
+        tipo: "",
+        cnpj: ""
       });
+      setPricing([]);
+      setPricingError("");
       
       onOpenChange(false);
       onSuccess?.();
@@ -270,22 +328,24 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="create-preco" className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4" />
-              Preço por Hora (R$)
-            </Label>
-            <Input
-              id="create-preco"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="15.00"
-              value={formData.preco}
-              onChange={(e) => handleInputChange("preco", e.target.value)}
-              required
-            />
-          </div>
+          {formData.tipo === 'estacionamento' && (
+            <div className="space-y-2">
+              <Label htmlFor="create-cnpj">CNPJ</Label>
+              <Input
+                id="create-cnpj"
+                placeholder="00.000.000/0001-00"
+                value={formData.cnpj}
+                onChange={(e) => handleInputChange("cnpj", e.target.value)}
+                required
+              />
+            </div>
+          )}
+
+          <PricingTable 
+            pricing={pricing}
+            onChange={setPricing}
+            error={pricingError}
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
