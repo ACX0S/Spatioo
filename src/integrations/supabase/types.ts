@@ -129,6 +129,41 @@ export type Database = {
           },
         ]
       }
+      estacionamento_precos: {
+        Row: {
+          created_at: string
+          estacionamento_id: string
+          horas: number
+          id: string
+          preco: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          estacionamento_id: string
+          horas: number
+          id?: string
+          preco: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          estacionamento_id?: string
+          horas?: number
+          id?: string
+          preco?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "estacionamento_precos_estacionamento_id_fkey"
+            columns: ["estacionamento_id"]
+            isOneToOne: false
+            referencedRelation: "estacionamento"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           booking_id: string | null

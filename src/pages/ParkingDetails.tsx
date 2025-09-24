@@ -7,6 +7,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { useParkingDetail } from '@/hooks/useParkingDetail';
 import { Car, MapPin, Star, Clock, ArrowLeft } from 'lucide-react';
 import BookingForm from '@/components/BookingForm';
+import PricingTable from '@/components/PricingDisplay';
 
 const ParkingDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -101,16 +102,11 @@ const ParkingDetails = () => {
         </div>
       </div>
       
-      {/* Price and Availability */}
+      {/* Pricing Table */}
+      <PricingTable parkingSpotId={parkingSpot.id} />
+      
       <div className="flex justify-between items-center p-4 bg-muted/30 rounded-lg mb-6">
-        <div>
-          <p className="text-sm text-muted-foreground">Preço por hora</p>
-          <p className="text-2xl font-bold text-spatioo-green">
-            R$ {Number(parkingSpot.preco).toFixed(2)}
-          </p>
-        </div>
-        
-        <div className="text-right">
+        <div className="text-right w-full">
           <p className="text-sm text-muted-foreground">Total de vagas</p>
           <p className="text-xl font-bold">{parkingSpot.numero_vagas}</p>
         </div>

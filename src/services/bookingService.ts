@@ -81,6 +81,88 @@ export const createBooking = async (bookingData: Omit<Booking, 'id' | 'user_id' 
   }
 };
 
+// Criar uma reserva imediata (tempo real)
+export const createImmediateBooking = async (bookingData: {
+  estacionamento_id: string;
+  duration_hours: number;
+  price: number;
+}): Promise<Booking> => {
+  try {
+    // Get the current user
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error('Usuário não autenticado');
+    }
+
+    const now = new Date();
+    const startTime = now.toTimeString().slice(0, 5); // HH:MM format
+    const endDate = new Date(now.getTime() + (bookingData.duration_hours * 60 * 60 * 1000));
+    const endTime = endDate.toTimeString().slice(0, 5);
+    
+    // Find an available spot
+    const { data: availableSpots, error: spotsError } = await supabase
+      .from('vagas')
+      .select('numero_vaga')
+      .eq('estacionamento_id', bookingData.estacionamento_id)
+      .eq('status', 'disponivel')
+      .limit(1);
+
+    if (spotsError) throw spotsError;
+    
+    if (!availableSpots || availableSpots.length === 0) {
+      throw new Error('Não há vagas disponíveis no momento');
+    }
+
+    const spotNumber = availableSpots[0].numero_vaga;
+
+    const { data, error } = await supabase
+      .from('bookings')
+      .insert({
+        user_id: user.id,
+        estacionamento_id: bookingData.estacionamento_id,
+        date: now.toISOString().split('T')[0], // YYYY-MM-DD format
+        start_time: startTime,
+        end_time: endTime,
+        spot_number: spotNumber,
+        price: bookingData.price,
+        status: 'active' // Immediately active
+      })
+      .select(`
+        *,
+        estacionamento:estacionamento_id (nome, endereco)
+      `)
+      .single();
+    
+    if (error) throw error;
+    
+    if (!data) {
+      throw new Error('Erro ao criar reserva');
+    }
+
+    // Update the spot status to reserved
+    await supabase
+      .from('vagas')
+      .update({ 
+        status: 'reservada',
+        user_id: user.id,
+        booking_id: data.id
+      })
+      .eq('estacionamento_id', bookingData.estacionamento_id)
+      .eq('numero_vaga', spotNumber);
+    
+    return {
+      ...data,
+      parkingName: data.estacionamento?.nome,
+      parkingAddress: data.estacionamento?.endereco,
+      status: 'active' as const
+    };
+  } catch (error: any) {
+    console.error('Erro ao criar reserva imediata:', error.message);
+    throw new Error('Falha ao criar sua reserva: ' + error.message);
+  }
+};
+
 // Cancelar uma reserva
 export const cancelBooking = async (bookingId: string): Promise<void> => {
   try {
