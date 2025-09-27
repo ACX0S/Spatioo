@@ -4,6 +4,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from '@/components/ui/button';
 import { AlertCircle } from 'lucide-react';
 
+/**
+ * @interface CancelBookingDialogProps
+ * @description Propriedades para o componente CancelBookingDialog.
+ * @param bookingId - O ID da reserva a ser cancelada.
+ * @param open - Estado opcional para controlar a abertura do diálogo externamente.
+ * @param onOpenChange - Função opcional para notificar sobre a mudança no estado de abertura.
+ * @param onConfirm - Função chamada quando o usuário confirma o cancelamento.
+ * @param trigger - Elemento React que aciona a abertura do diálogo.
+ */
 interface CancelBookingDialogProps {
   bookingId: string;
   open?: boolean;
@@ -12,6 +21,10 @@ interface CancelBookingDialogProps {
   trigger?: React.ReactNode;
 }
 
+/**
+ * @component CancelBookingDialog
+ * @description Um diálogo de confirmação para cancelar uma reserva.
+ */
 const CancelBookingDialog = ({ 
   bookingId, 
   open, 
@@ -19,21 +32,32 @@ const CancelBookingDialog = ({
   onConfirm,
   trigger
 }: CancelBookingDialogProps) => {
+  // Estado para controlar o feedback de carregamento durante o cancelamento.
   const [isLoading, setIsLoading] = useState(false);
+  // Estado para controlar a visibilidade do diálogo.
   const [dialogOpen, setDialogOpen] = useState(open || false);
 
+  /**
+   * @function handleOpenChange
+   * @description Gerencia a abertura e o fechamento do diálogo.
+   * @param value - O novo estado de visibilidade.
+   */
   const handleOpenChange = (value: boolean) => {
     setDialogOpen(value);
     onOpenChange?.(value);
   };
 
+  /**
+   * @function handleCancel
+   * @description Executa a lógica de cancelamento quando o usuário confirma a ação.
+   */
   const handleCancel = async () => {
     try {
       setIsLoading(true);
-      await onConfirm(bookingId);
-      handleOpenChange(false);
+      await onConfirm(bookingId); // Chama a função de confirmação passada como prop.
+      handleOpenChange(false); // Fecha o diálogo após o sucesso.
     } catch (error) {
-      console.error("Error canceling booking:", error);
+      console.error("Erro ao cancelar reserva:", error);
     } finally {
       setIsLoading(false);
     }
@@ -60,6 +84,7 @@ const CancelBookingDialog = ({
         </div>
         
         <DialogFooter className="sm:justify-between">
+          {/* Botão para fechar o diálogo sem cancelar */}
           <Button
             variant="outline"
             onClick={() => handleOpenChange(false)}
@@ -68,6 +93,7 @@ const CancelBookingDialog = ({
           >
             Voltar
           </Button>
+          {/* Botão para confirmar o cancelamento */}
           <Button
             variant="destructive"
             onClick={handleCancel}

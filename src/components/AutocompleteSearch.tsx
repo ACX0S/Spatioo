@@ -5,6 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Search, MapPin } from 'lucide-react';
 import { fetchAllParkingSpots, PublicParkingData } from '@/services/parkingService';
 
+/**
+ * @interface AutocompleteSearchProps
+ * @description Propriedades para o componente AutocompleteSearch.
+ * @param onSearch - Função chamada quando uma busca é submetida.
+ * @param onParkingSelect - Função opcional chamada quando um estacionamento específico é selecionado da lista de sugestões.
+ * @param placeholder - Texto de placeholder para o campo de busca.
+ * @param className - Classes CSS adicionais para o container do componente.
+ */
 interface AutocompleteSearchProps {
   onSearch: (query: string) => void;
   onParkingSelect?: (parking: PublicParkingData) => void;
@@ -12,20 +20,31 @@ interface AutocompleteSearchProps {
   className?: string;
 }
 
+/**
+ * @component AutocompleteSearch
+ * @description Um componente de barra de busca com funcionalidade de autocompletar.
+ * Ele busca e exibe sugestões de estacionamentos conforme o usuário digita.
+ */
 const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
   onSearch,
   onParkingSelect,
   placeholder = "Para onde você vai?",
   className = ""
 }) => {
+  // Estado para armazenar o valor da busca.
   const [searchQuery, setSearchQuery] = useState('');
+  // Estado para armazenar as sugestões filtradas.
   const [suggestions, setSuggestions] = useState<PublicParkingData[]>([]);
+  // Estado para controlar a visibilidade do dropdown de sugestões.
   const [showSuggestions, setShowSuggestions] = useState(false);
+  // Estado para armazenar todos os estacionamentos disponíveis para busca.
   const [allParkingSpots, setAllParkingSpots] = useState<PublicParkingData[]>([]);
+  // Estado para indicar se os dados estão sendo carregados.
   const [loading, setLoading] = useState(false);
+  // Ref para o container de sugestões, usado para detectar cliques fora dele.
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
-  // Load all parking spots for autocomplete
+  // Efeito para carregar todos os estacionamentos na montagem do componente.
   useEffect(() => {
     const loadParkingSpots = async () => {
       try {
@@ -33,7 +52,7 @@ const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
         const spots = await fetchAllParkingSpots();
         setAllParkingSpots(spots);
       } catch (error) {
-        console.error('Error loading parking spots for autocomplete:', error);
+        console.error('Erro ao carregar estacionamentos para autocompletar:', error);
       } finally {
         setLoading(false);
       }
@@ -42,7 +61,7 @@ const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
     loadParkingSpots();
   }, []);
 
-  // Filter suggestions based on search query
+  // Efeito para filtrar as sugestões com base na query de busca.
   useEffect(() => {
     if (searchQuery.trim().length === 0) {
       setSuggestions([]);
@@ -50,15 +69,16 @@ const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
     }
 
     const query = searchQuery.toLowerCase();
+    // Filtra os estacionamentos cujo nome ou endereço correspondem à busca.
     const filteredSuggestions = allParkingSpots.filter(spot => 
       spot.nome.toLowerCase().includes(query) || 
       spot.endereco.toLowerCase().includes(query)
-    ).slice(0, 5); // Limit to 5 suggestions
+    ).slice(0, 5); // Limita a 5 sugestões.
 
     setSuggestions(filteredSuggestions);
   }, [searchQuery, allParkingSpots]);
 
-  // Handle click outside to close suggestions
+  // Efeito para fechar o dropdown de sugestões ao clicar fora dele.
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node)) {
@@ -72,15 +92,18 @@ const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
     };
   }, []);
 
+  // Função para lidar com a submissão do formulário de busca.
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSearch(searchQuery);
     setShowSuggestions(false);
   };
 
+  // Função para lidar com o clique em uma sugestão.
   const handleSuggestionClick = (spot: PublicParkingData) => {
     setSearchQuery(spot.nome);
     setShowSuggestions(false);
+    // Se onParkingSelect for fornecido, chama-o; senão, usa onSearch.
     if (onParkingSelect) {
       onParkingSelect(spot);
     } else {
@@ -112,7 +135,7 @@ const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
         </Button>
       </form>
 
-      {/* Suggestions dropdown */}
+      {/* Dropdown de sugestões */}
       {showSuggestions && suggestions.length > 0 && (
         <div className="absolute z-10 mt-1 w-full bg-card rounded-lg shadow-lg border border-border overflow-hidden">
           {suggestions.map((spot) => (
@@ -131,7 +154,7 @@ const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
         </div>
       )}
 
-      {/* No results message */}
+      {/* Mensagem de nenhum resultado encontrado */}
       {showSuggestions && searchQuery.trim().length > 0 && suggestions.length === 0 && !loading && (
         <div className="absolute z-10 mt-1 w-full bg-card rounded-lg shadow-lg border border-border p-3 text-center text-muted-foreground">
           Nenhum local encontrado com "{searchQuery}"
@@ -140,5 +163,3 @@ const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
     </div>
   );
 };
-
-export default AutocompleteSearch;

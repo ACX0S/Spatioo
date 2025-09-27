@@ -1,3 +1,8 @@
+/* Define o estilo para o elemento com o ID 'root'.
+   - max-width: 1280px; Define a largura máxima do elemento.
+   - margin: 0 auto; Centraliza o elemento horizontalmente.
+   - padding: 2rem; Adiciona preenchimento interno.
+   - text-align: center; Alinha o texto ao centro. */
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -5,19 +10,33 @@
   text-align: center;
 }
 
+/* Define o estilo para os elementos com a classe 'logo'.
+   - height: 6em; Define a altura do logo.
+   - padding: 1.5em; Adiciona preenchimento interno.
+   - will-change: filter; Otimiza a animação do filtro.
+   - transition: filter 300ms; Adiciona uma transição suave para o filtro. */
 .logo {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
   transition: filter 300ms;
 }
+
+/* Define o estilo para o logo quando o mouse está sobre ele.
+   - filter: drop-shadow(0 0 2em #646cffaa); Adiciona um efeito de sombra. */
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
+/* Define o estilo para o logo com a classe 'react' quando o mouse está sobre ele.
+   - filter: drop-shadow(0 0 2em #61dafbaa); Adiciona um efeito de sombra específico para o logo do React. */
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
+/* Define a animação 'logo-spin'.
+   - from { transform: rotate(0deg); }; Estado inicial da rotação.
+   - to { transform: rotate(360deg); }; Estado final da rotação. */
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);
@@ -27,16 +46,22 @@
   }
 }
 
+/* Aplica a animação 'logo-spin' se o usuário não tiver preferência por movimento reduzido.
+   - a:nth-of-type(2) .logo { animation: logo-spin infinite 20s linear; }; Aplica a animação ao segundo logo dentro de um link. */
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {
     animation: logo-spin infinite 20s linear;
   }
 }
 
+/* Define o estilo para os elementos com a classe 'card'.
+   - padding: 2em; Adiciona preenchimento interno. */
 .card {
   padding: 2em;
 }
 
+/* Define o estilo para os elementos com a classe 'read-the-docs'.
+   - color: #888; Define a cor do texto. */
 .read-the-docs {
   color: #888;
 }

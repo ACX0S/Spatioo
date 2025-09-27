@@ -10,21 +10,51 @@ import { formatCurrency } from '@/lib/utils';
 import { Calendar, Clock, MapPin } from 'lucide-react';
 import CancelBookingDialog from './CancelBookingDialog';
 
+/**
+ * @interface BookingCardProps
+ * @description Propriedades para o componente BookingCard.
+ * @param booking - O objeto de reserva contendo todos os detalhes.
+ * @param onCancelBooking - Função para lidar com o cancelamento de uma reserva.
+ */
 interface BookingCardProps {
   booking: Booking;
   onCancelBooking: (id: string) => Promise<void>;
 }
 
+/**
+ * @component BookingCard
+ * @description Exibe um card com os detalhes de uma reserva, incluindo status, data, hora e preço.
+ * Permite o cancelamento de reservas futuras ou ativas.
+ */
 const BookingCard: React.FC<BookingCardProps> = ({ booking, onCancelBooking }) => {
+  
+  /**
+   * @function formatDate
+   * @description Formata uma string de data para o formato 'dd de MMM'.
+   * @param dateString - A data em formato de string.
+   * @returns A data formatada.
+   */
   const formatDate = (dateString: string) => {
     return format(new Date(dateString), "dd 'de' MMM", { locale: ptBR });
   };
 
+  /**
+   * @function formatTime
+   * @description Formata uma string de tempo para o formato 'HH:mm'.
+   * @param timeString - A hora em formato de string.
+   * @returns A hora formatada.
+   */
   const formatTime = (timeString: string) => {
     const [hours, minutes] = timeString.split(':');
     return `${hours}:${minutes}`;
   };
 
+  /**
+   * @function getStatusColor
+   * @description Retorna a cor de fundo com base no status da reserva.
+   * @param status - O status da reserva ('active', 'upcoming', 'completed', 'cancelled').
+   * @returns Uma string de classe CSS para a cor de fundo.
+   */
   const getStatusColor = (status: string) => {
     switch(status) {
       case 'active': return 'bg-green-500';
@@ -35,6 +65,12 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, onCancelBooking }) =
     }
   };
 
+  /**
+   * @function getStatusText
+   * @description Retorna o texto traduzido para o status da reserva.
+   * @param status - O status da reserva.
+   * @returns O texto do status em português.
+   */
   const getStatusText = (status: string) => {
     switch(status) {
       case 'active': return 'Ativa';
@@ -49,6 +85,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, onCancelBooking }) =
     <Card className="w-full">
       <CardContent className="p-4">
         <div className="flex justify-between items-start mb-3">
+          {/* Seção de informações do estacionamento e status da reserva */}
           <div className="flex-1">
             <h3 className="font-medium truncate">{booking.parkingName}</h3>
             <p className="text-sm text-muted-foreground truncate">{booking.parkingAddress}</p>
@@ -58,6 +95,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, onCancelBooking }) =
           </Badge>
         </div>
         
+        {/* Seção de detalhes da reserva (data, hora, vaga) */}
         <div className="space-y-2 mb-4">
           <div className="flex items-center gap-2 text-sm">
             <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -75,10 +113,12 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, onCancelBooking }) =
           </div>
         </div>
         
+        {/* Seção de preço e ações (cancelar) */}
         <div className="flex justify-between items-center">
           <p className="font-medium">{formatCurrency(booking.price)}</p>
           
           <div className="flex gap-2">
+            {/* O botão de cancelar só é exibido para reservas futuras ou ativas */}
             {(booking.status === 'upcoming' || booking.status === 'active') && (
               <CancelBookingDialog
                 bookingId={booking.id}

@@ -13,26 +13,45 @@ import { supabase } from "@/integrations/supabase/client";
 import TimePickerDialog from "@/components/TimePickerDialog";
 import PricingTable, { PricingRow } from "@/components/PricingTable";
 
+/**
+ * @interface CreateEstacionamentoDialogProps
+ * @description Propriedades para o componente CreateEstacionamentoDialog.
+ * @param open - Controla a visibilidade do diálogo.
+ * @param onOpenChange - Função para atualizar o estado de visibilidade.
+ * @param onSuccess - Callback opcional executado após o sucesso do registro.
+ */
 interface CreateEstacionamentoDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
 }
 
+/**
+ * @component CreateEstacionamentoDialog
+ * @description Um diálogo com um formulário completo para registrar um novo estacionamento (residencial ou comercial).
+ * 
+ * Este componente é responsável por gerenciar o formulário de registro de estacionamento, 
+ * incluindo a validação de campos, a busca de CEP e a inserção de dados no banco de dados.
+ */
 const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEstacionamentoDialogProps) => {
+  // Hook para exibir notificações ao usuário.
   const { toast } = useToast();
+  
+  // Hook para buscar informações de CEP.
   const { 
     fetchCep, 
     formatCep, 
     validateCepFormat, 
-    formatAddress,
     loading: cepLoading, 
     error: cepError 
   } = useCep();
+  
+  // Estados para controle de componentes internos e dados do formulário.
   const [timePickerOpen, setTimePickerOpen] = useState(false);
   const [timePickerType, setTimePickerType] = useState<'inicio' | 'fim'>('inicio');
   const [cepData, setCepData] = useState<any>(null);
   
+  // Estado para armazenar os dados do formulário.
   const [formData, setFormData] = useState({
     nome: "",
     endereco: "",
@@ -46,78 +65,67 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
     cnpj: ""
   });
   
+  // Estado para controlar a edição do campo de endereço.
   const [enderecoDisabled, setEnderecoDisabled] = useState(false);
   
+  // Estado para a tabela de preços.
   const [pricing, setPricing] = useState<PricingRow[]>([]);
   const [pricingError, setPricingError] = useState("");
 
-  const { user } = useAuth();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // Hook de autenticação para obter o usuário logado.
+  const { user } = useAuth(); 
+  
+  // Estado para controlar o status de submissão.
+  const [isSubmitting, setIsSubmitting] = useState(false); 
 
+  /**
+   * @function handleSubmit
+   * @description Lida com a submissão do formulário, valida os dados e envia para o Supabase.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!user) {
-      toast({
-        title: "Erro",
-        description: "Você precisa estar logado para registrar uma vaga.",
-        variant: "destructive"
-      });
+      toast({ title: "Erro", description: "Você precisa estar logado para registrar uma vaga.", variant: "destructive" });
       return;
     }
 
-    // Validate required fields
+    // Validação de campos obrigatórios.
     const requiredFields = [formData.endereco, formData.numero, formData.cep, formData.vagas, formData.horarioInicio, formData.horarioFim, formData.tipo];
-    
-    // Add nome field only for "estacionamento" tipo
     if (formData.tipo === 'estacionamento') {
       requiredFields.push(formData.nome, formData.cnpj);
     }
-    
     if (requiredFields.some(field => !field)) {
-      toast({
-        title: "Erro",
-        description: "Por favor, preencha todos os campos obrigatórios.",
-        variant: "destructive"
-      });
+      toast({ title: "Erro", description: "Por favor, preencha todos os campos obrigatórios.", variant: "destructive" });
       return;
     }
 
-    // Validate pricing table
+    // Validação da tabela de preços.
     if (pricing.length === 0) {
       setPricingError("Adicione pelo menos uma configuração de preço.");
       return;
     }
-
-    const invalidPricing = pricing.some(row => {
-      const horas = parseFloat(row.horas);
-      const preco = parseFloat(row.preco);
-      return !row.horas || !row.preco || horas <= 0 || preco <= 0;
-    });
-
+    const invalidPricing = pricing.some(row => !row.horas || !row.preco || parseFloat(row.horas) <= 0 || parseFloat(row.preco) <= 0);
     if (invalidPricing) {
       setPricingError("Todos os campos de horas e preços devem ser preenchidos com valores positivos.");
       return;
     }
-
-    // Check for duplicate hours
     const horasSet = new Set(pricing.map(row => row.horas));
     if (horasSet.size !== pricing.length) {
       setPricingError("Não é possível ter configurações duplicadas para a mesma quantidade de horas.");
       return;
     }
-
     setPricingError("");
 
     setIsSubmitting(true);
 
     try {
-      // First, create the estacionamento record
-      // Generate nome for residencial based on address
+      // Gera o nome do estacionamento com base no tipo.
       const nomeToSave = formData.tipo === 'residencial' 
         ? cepData ? `${cepData.logradouro}, ${formData.numero} - ${cepData.bairro}` : `${formData.endereco}, ${formData.numero}`
         : formData.nome;
 
+      // Insere o novo estacionamento no banco de dados.
       const { data: estacionamentoData, error: estacionamentoError } = await supabase
         .from('estacionamento')
         .insert({
@@ -126,7 +134,7 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
           cep: formData.cep,
           descricao: formData.descricao || null,
           numero_vagas: parseInt(formData.vagas),
-          preco: 0, // Will be replaced by pricing table
+          preco: 0, // O preço base é 0, pois será usado a tabela de preços.
           horario_funcionamento: {
             abertura: formData.horarioInicio,
             fechamento: formData.horarioFim
@@ -138,101 +146,54 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
         .select()
         .single();
 
-      if (estacionamentoError) {
-        console.error('Error creating estacionamento:', estacionamentoError);
-        throw estacionamentoError;
-      }
+      if (estacionamentoError) throw estacionamentoError;
 
-      // Then, create the pricing records using supabase client directly
+      // Insere os registros da tabela de preços.
       if (pricing.length > 0) {
         for (const row of pricing) {
-          const { error: pricingError } = await supabase
-            .from('estacionamento_precos' as any)
-            .insert({
-              estacionamento_id: estacionamentoData.id,
-              horas: parseInt(row.horas),
-              preco: parseFloat(row.preco)
-            });
-
-          if (pricingError) {
-            console.error('Error creating pricing row:', pricingError);
-            // Continue with other rows - estacionamento was created successfully
-          }
+          await supabase.from('estacionamento_precos' as any).insert({
+            estacionamento_id: estacionamentoData.id,
+            horas: parseInt(row.horas),
+            preco: parseFloat(row.preco)
+          });
         }
       }
 
-      toast({
-        title: "Vaga registrada!",
-        description: "Sua vaga foi registrada com sucesso.",
-      });
+      toast({ title: "Vaga registrada!", description: "Sua vaga foi registrada com sucesso." });
       
-      // Reset form
-      setFormData({
-        nome: "",
-        endereco: "",
-        numero: "",
-        cep: "",
-        descricao: "",
-        vagas: "",
-        horarioInicio: "",
-        horarioFim: "",
-        tipo: "",
-        cnpj: ""
-      });
+      // Reseta o formulário e fecha o diálogo.
+      setFormData({ nome: "", endereco: "", numero: "", cep: "", descricao: "", vagas: "", horarioInicio: "", horarioFim: "", tipo: "", cnpj: "" });
       setCepData(null);
       setEnderecoDisabled(false);
       setPricing([]);
       setPricingError("");
-      
       onOpenChange(false);
       onSuccess?.();
     } catch (error: any) {
-      console.error('Error submitting form:', error);
-      toast({
-        title: "Erro",
-        description: error.message || "Erro ao registrar a vaga. Tente novamente.",
-        variant: "destructive"
-      });
+      console.error('Erro ao submeter formulário:', error);
+      toast({ title: "Erro", description: error.message || "Erro ao registrar a vaga. Tente novamente.", variant: "destructive" });
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // Funções para lidar com mudanças nos inputs.
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleCepChange = async (value: string) => {
     const formattedCep = formatCep(value);
     handleInputChange("cep", formattedCep);
     
-    if (formattedCep.length === 9) {
-      // Validar o formato do CEP antes de fazer a requisição
-      const validation = validateCepFormat(formattedCep);
-      if (!validation.isValid) {
-        toast({
-          title: "CEP Inválido",
-          description: validation.message,
-          variant: "destructive"
-        });
-        return;
-      }
-      
+    if (formattedCep.length === 9 && validateCepFormat(formattedCep).isValid) {
       const cepData = await fetchCep(formattedCep);
       if (cepData) {
         setCepData(cepData);
-        // Formatar o endereço sem o número
         handleInputChange("endereco", `${cepData.logradouro}, ${cepData.bairro}, ${cepData.localidade} - ${cepData.uf}`);
         setEnderecoDisabled(true);
       } else if (cepError) {
-        toast({
-          title: "Erro",
-          description: cepError,
-          variant: "destructive"
-        });
+        toast({ title: "Erro", description: cepError, variant: "destructive" });
       }
     } else {
       setEnderecoDisabled(false);
@@ -241,8 +202,7 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
   };
 
   const handleVagasChange = (value: string) => {
-    const numericValue = value.replace(/\D/g, '');
-    handleInputChange("vagas", numericValue);
+    handleInputChange("vagas", value.replace(/\D/g, ''));
   };
 
   const openTimePicker = (type: 'inicio' | 'fim') => {
@@ -251,33 +211,23 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
   };
 
   const handleTimeSelect = (time: string) => {
-    if (timePickerType === 'inicio') {
-      handleInputChange("horarioInicio", time);
-    } else {
-      handleInputChange("horarioFim", time);
-    }
+    handleInputChange(timePickerType === 'inicio' ? "horarioInicio" : "horarioFim", time);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Car className="h-5 w-5 text-spatioo-green" />
-            Registrar Nova Vaga
-          </DialogTitle>
-          <DialogDescription>
-            Preencha os dados da sua vaga de estacionamento
-          </DialogDescription>
+          <DialogTitle className="flex items-center gap-2"><Car className="h-5 w-5 text-spatioo-green" />Registrar Nova Vaga</DialogTitle>
+          <DialogDescription>Preencha os dados da sua vaga de estacionamento</DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Seção de Tipo de Vaga */}
           <div className="space-y-2">
             <Label htmlFor="create-tipo">Tipo de Vaga</Label>
             <Select value={formData.tipo} onValueChange={(value) => handleInputChange("tipo", value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o tipo" />
-              </SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="Selecione o tipo" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="residencial">Residencial</SelectItem>
                 <SelectItem value="estacionamento">Estacionamento</SelectItem>
@@ -285,155 +235,83 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
             </Select>
           </div>
 
+          {/* Campos condicionais para tipo 'estacionamento' */}
           {formData.tipo === 'estacionamento' && (
             <div className="space-y-2">
               <Label htmlFor="create-nome">Nome do Estacionamento</Label>
-              <Input
-                id="create-nome"
-                placeholder="Ex: Estacionamento Centro"
-                value={formData.nome}
-                onChange={(e) => handleInputChange("nome", e.target.value)}
-                required
-              />
+              <Input id="create-nome" placeholder="Ex: Estacionamento Centro" value={formData.nome} onChange={(e) => handleInputChange("nome", e.target.value)} required />
             </div>
           )}
 
+          {/* Campos de Endereço */}
           <div className="space-y-2">
             <Label htmlFor="create-cep">CEP</Label>
-            <Input
-              id="create-cep"
-              placeholder="00000-000"
-              value={formData.cep}
-              onChange={(e) => handleCepChange(e.target.value)}
-              required
-              disabled={cepLoading}
-            />
-            {cepError && (
-              <p className="text-sm text-destructive">{cepError}</p>
-            )}
-            {cepData && (
-              <p className="text-sm text-muted-foreground">
-                {cepData.localidade} - {cepData.uf}
-              </p>
-            )}
+            <Input id="create-cep" placeholder="00000-000" value={formData.cep} onChange={(e) => handleCepChange(e.target.value)} required disabled={cepLoading} />
+            {cepError && <p className="text-sm text-destructive">{cepError}</p>}
+            {cepData && <p className="text-sm text-muted-foreground">{cepData.localidade} - {cepData.uf}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="create-endereco" className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              Endereço
-            </Label>
-            <Input
-              id="create-endereco"
-              placeholder="Será preenchido automaticamente pelo CEP"
-              value={formData.endereco}
-              onChange={(e) => handleInputChange("endereco", e.target.value)}
-              required
-              disabled={enderecoDisabled}
-              className={enderecoDisabled ? "bg-muted" : ""}
-            />
+            <Label htmlFor="create-endereco" className="flex items-center gap-2"><MapPin className="h-4 w-4" />Endereço</Label>
+            <Input id="create-endereco" placeholder="Será preenchido automaticamente pelo CEP" value={formData.endereco} onChange={(e) => handleInputChange("endereco", e.target.value)} required disabled={enderecoDisabled} className={enderecoDisabled ? "bg-muted" : ""} />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="create-numero">Número</Label>
-              <Input
-                id="create-numero"
-                placeholder="123"
-                value={formData.numero}
-                onChange={(e) => handleInputChange("numero", e.target.value)}
-                required
-              />
+              <Input id="create-numero" placeholder="123" value={formData.numero} onChange={(e) => handleInputChange("numero", e.target.value)} required />
             </div>
-            
             <div className="space-y-2">
               <Label htmlFor="create-vagas">Número de Vagas</Label>
-              <Input
-                id="create-vagas"
-                placeholder="1"
-                value={formData.vagas}
-                onChange={(e) => handleVagasChange(e.target.value)}
-                required
-              />
+              <Input id="create-vagas" placeholder="1" value={formData.vagas} onChange={(e) => handleVagasChange(e.target.value)} required />
             </div>
           </div>
 
           {formData.tipo === 'estacionamento' && (
             <div className="space-y-2">
               <Label htmlFor="create-cnpj">CNPJ</Label>
-              <Input
-                id="create-cnpj"
-                placeholder="00.000.000/0001-00"
-                value={formData.cnpj}
-                onChange={(e) => handleInputChange("cnpj", e.target.value)}
-                required
-              />
+              <Input id="create-cnpj" placeholder="00.000.000/0001-00" value={formData.cnpj} onChange={(e) => handleInputChange("cnpj", e.target.value)} required />
             </div>
           )}
 
-          <PricingTable 
-            pricing={pricing}
-            onChange={setPricing}
-            error={pricingError}
-          />
+          {/* Tabela de Preços */}
+          <PricingTable pricing={pricing} onChange={setPricing} error={pricingError} />
 
+          {/* Seletores de Horário */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <Clock className="h-4 w-4" />
-                Horário de Início
-              </Label>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => openTimePicker('inicio')}
-                className="w-full justify-start text-left font-normal"
-              >
+              <Label className="flex items-center gap-2"><Clock className="h-4 w-4" />Horário de Início</Label>
+              <Button type="button" variant="outline" onClick={() => openTimePicker('inicio')} className="w-full justify-start text-left font-normal">
                 <Clock className="mr-2 h-4 w-4" />
                 {formData.horarioInicio || "Selecionar horário"}
               </Button>
             </div>
-            
             <div className="space-y-2">
               <Label>Horário de Fim</Label>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => openTimePicker('fim')}
-                className="w-full justify-start text-left font-normal"
-              >
+              <Button type="button" variant="outline" onClick={() => openTimePicker('fim')} className="w-full justify-start text-left font-normal">
                 <Clock className="mr-2 h-4 w-4" />
                 {formData.horarioFim || "Selecionar horário"}
               </Button>
             </div>
           </div>
 
+          {/* Descrição Adicional */}
           <div className="space-y-2">
             <Label htmlFor="create-descricao">Descrição Adicional</Label>
-            <Textarea
-              id="create-descricao"
-              placeholder="Informações extras sobre a vaga (opcional)"
-              value={formData.descricao}
-              onChange={(e) => handleInputChange("descricao", e.target.value)}
-              rows={3}
-            />
+            <Textarea id="create-descricao" placeholder="Informações extras sobre a vaga (opcional)" value={formData.descricao} onChange={(e) => handleInputChange("descricao", e.target.value)} rows={3} />
           </div>
 
+          {/* Botões de Ação */}
           <div className="flex gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
-              Cancelar
-            </Button>
-            <Button 
-              type="submit" 
-              className="flex-1 bg-spatioo-green hover:bg-spatioo-green/90"
-              disabled={isSubmitting}
-            >
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">Cancelar</Button>
+            <Button type="submit" className="flex-1 bg-spatioo-green hover:bg-spatioo-green/90" disabled={isSubmitting}>
               {isSubmitting ? "Registrando..." : "Registrar Vaga"}
             </Button>
           </div>
         </form>
       </DialogContent>
       
+      {/* Diálogo para selecionar a hora */}
       <TimePickerDialog
         open={timePickerOpen}
         onOpenChange={setTimePickerOpen}
