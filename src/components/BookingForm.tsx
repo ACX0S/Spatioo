@@ -190,7 +190,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
               <div className="flex justify-between items-center pt-2 border-t border-spatioo-green/20">
                 <span className="text-xs text-muted-foreground">Status:</span>
                 <span className="text-xs font-medium text-green-600">
-                  ⚡ Ativação imediata
+                   Ativação imediata
                 </span>
               </div>
             </div>
