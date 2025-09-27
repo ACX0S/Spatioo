@@ -107,7 +107,7 @@ const ParkingDetails = () => {
       
       <div className="flex justify-between items-center pl-1 bg-muted/30 rounded-lg mb-6">
         <div className="text-left w-full">
-          <p className="text-lg text-spatioo-black font-bold">Total de vagas disponíveis</p>
+          <p className="text-lg  font-bold">Total de vagas disponíveis</p>
           <p className="text-xl font-bold">{parkingSpot.numero_vagas}</p>
         </div>
       </div>
