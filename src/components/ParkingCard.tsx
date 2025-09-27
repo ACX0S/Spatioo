@@ -1,7 +1,5 @@
 import React, { memo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Car, MapPin, Clock, Star } from 'lucide-react';
 import { PublicParkingData } from '@/services/parkingService';
 
@@ -67,18 +65,10 @@ const ParkingCard = memo(({
                 {parkingSpot.nome}
               </h3>
             )}
-            <div className="flex flex-col items-end flex-shrink-0">
-              <Badge variant="secondary" className="text-xs">
-                R$ {parkingSpot.preco_fixo_1h ? Number(parkingSpot.preco_fixo_1h).toFixed(2) : parkingSpot.preco.toFixed(2)}/h
-              </Badge>
-              <span className="text-[10px] text-muted-foreground mt-1">
-                Preço fixo (1h)
-              </span>
-            </div>
           </div>
 
           <div className="flex items-center text-xs text-muted-foreground">
-            <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
+            <MapPin className="w-3.5 h-3.5 mr-1 flex-shrink-0 text-spatioo-green-dark" />
             <span className="truncate" title={parkingSpot.endereco}>
               {parkingSpot.endereco}
             </span>
@@ -86,12 +76,12 @@ const ParkingCard = memo(({
 
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center text-muted-foreground">
-              <Car className="w-3 h-3 mr-1" />
+              <Car className="w-3.5 h-3.5 mr-1 text-spatioo-green-dark" />
               <span>{parkingSpot.numero_vagas} vagas disponíveis</span>
             </div>
 
             <div className="flex items-center text-muted-foreground min-w-0">
-              <Clock className="w-3 h-3 mr-1 flex-shrink-0" />
+              <Clock className="w-3 h-3 mr-1 flex-shrink-0 text-spatioo-green-dark" />
               <span className="truncate" title={formatHorario(parkingSpot.horario_funcionamento)}>
                 {formatHorario(parkingSpot.horario_funcionamento)}
               </span>
