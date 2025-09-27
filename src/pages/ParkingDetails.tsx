@@ -105,25 +105,16 @@ const ParkingDetails = () => {
       {/* Pricing Table */}
       <PricingTable parkingSpotId={parkingSpot.id} />
       
-      <div className="flex justify-between items-center p-4 bg-muted/30 rounded-lg mb-6">
-        <div className="text-right w-full">
-          <p className="text-sm text-muted-foreground">Total de vagas</p>
+      <div className="flex justify-between items-center pl-1 bg-muted/30 rounded-lg mb-6">
+        <div className="text-left w-full">
+          <p className="text-lg text-spatioo-black font-bold">Total de vagas disponíveis</p>
           <p className="text-xl font-bold">{parkingSpot.numero_vagas}</p>
-        </div>
-      </div>
-      
-      {/* Endereço Info */}
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-2">Informações do estabelecimento</h2>
-        <div className="p-3 bg-muted/30 rounded-lg">
-          <p className="text-sm text-muted-foreground">Endereço: {parkingSpot.endereco}</p>
-          {/* CEP não disponível para dados públicos por segurança */}
         </div>
       </div>
       
       {/* Amenities */}
       <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-2">Comodidades</h2>
+        <h2 className="text-lg font-bold mb-2 pl-1">Comodidades</h2>
         <div className="grid grid-cols-2 gap-2">
           <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-md">
             <div className="bg-spatioo-green/20 p-1 rounded-md">
