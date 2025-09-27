@@ -1,11 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CreditCard, Clock } from 'lucide-react';
+import { CreditCard, Clock, Info } from 'lucide-react';
 import { createImmediateBooking } from '@/services/bookingService';
 import { toast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,50 +14,37 @@ interface BookingFormProps {
   parkingSpot: PublicParkingData;
 }
 
-interface PricingOption {
-  id: string;
-  horas: number;
-  preco: number;
-}
-
 const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [selectedDuration, setSelectedDuration] = useState<string>('');
-  const [pricingOptions, setPricingOptions] = useState<PricingOption[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [precoFixo1h, setPrecoFixo1h] = useState<number | null>(null);
 
   useEffect(() => {
-    const fetchPricingOptions = async () => {
+    const fetchFixedPrice = async () => {
       try {
         setLoading(true);
         const { data, error } = await supabase
           .from('estacionamento_precos')
-          .select('id, horas, preco')
+          .select('preco')
           .eq('estacionamento_id', parkingSpot.id)
-          .order('horas', { ascending: true });
+          .eq('horas', 1)
+          .maybeSingle();
 
         if (error) throw error;
         
-        setPricingOptions(data || []);
-        if (data && data.length > 0) {
-          setSelectedDuration(data[0].id);
-        }
+        setPrecoFixo1h(data?.preco || parkingSpot.preco);
       } catch (error) {
-        console.error('Error fetching pricing options:', error);
-        setPricingOptions([]);
+        console.error('Error fetching fixed price:', error);
+        setPrecoFixo1h(parkingSpot.preco);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPricingOptions();
-  }, [parkingSpot.id]);
-
-  const selectedOption = pricingOptions.find(option => option.id === selectedDuration);
-  const selectedPrice = selectedOption?.preco || 0;
-  const selectedHours = selectedOption?.horas || 1;
+    fetchFixedPrice();
+  }, [parkingSpot.id, parkingSpot.preco]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,10 +59,10 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
       return;
     }
 
-    if (!selectedOption) {
+    if (!precoFixo1h) {
       toast({
         title: "Erro",
-        description: "Selecione uma opção de tempo.",
+        description: "Preço não disponível.",
         variant: "destructive"
       });
       return;
@@ -88,13 +73,13 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
       
       await createImmediateBooking({
         estacionamento_id: parkingSpot.id,
-        duration_hours: selectedHours,
-        price: selectedPrice
+        duration_hours: 1,
+        price: precoFixo1h
       });
       
       toast({
         title: "Reserva confirmada!",
-        description: `Sua vaga foi reservada por ${selectedHours} hora${selectedHours > 1 ? 's' : ''} e já está ativa.`,
+        description: "Sua vaga foi reservada e já está ativa. O valor final será calculado na saída.",
         duration: 4000
       });
       
@@ -126,7 +111,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
     );
   }
 
-  if (pricingOptions.length === 0) {
+  if (!precoFixo1h) {
     return (
       <Card>
         <CardHeader>
@@ -134,7 +119,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground text-center py-4">
-            Opções de preço não disponíveis para este estacionamento.
+            Preço não disponível para este estacionamento.
           </p>
         </CardContent>
       </Card>
@@ -149,26 +134,23 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
           Reserva Imediata
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Sua vaga será reservada imediatamente e ficará ativa por tempo selecionado
+          Sua vaga será reservada imediatamente. O valor final será calculado na saída.
         </p>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
-          {/* Duration Selector */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Tempo de permanência</label>
-            <Select value={selectedDuration} onValueChange={setSelectedDuration}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Selecione o tempo de permanência" />
-              </SelectTrigger>
-              <SelectContent>
-                {pricingOptions.map((option) => (
-                  <SelectItem key={option.id} value={option.id}>
-                    {option.horas} hora{option.horas > 1 ? 's' : ''} - R$ {Number(option.preco).toFixed(2)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          {/* Info sobre cobrança */}
+          <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 p-4 rounded-lg">
+            <div className="flex items-start gap-3">
+              <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <div className="space-y-2">
+                <h4 className="font-medium text-blue-900 dark:text-blue-100">Como funciona o pagamento</h4>
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  Você paga um valor fixo de <strong>R$ {Number(precoFixo1h).toFixed(2)}</strong> para reservar a vaga. 
+                  O valor final será calculado automaticamente com base no tempo real de permanência ao sair do estacionamento.
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Resumo */}
@@ -176,21 +158,21 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
             <h3 className="font-medium mb-3 text-spatioo-green">Resumo da Reserva</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Duração:</span>
-                <span className="font-medium">
-                  {selectedHours} hora{selectedHours > 1 ? 's' : ''}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Valor total:</span>
+                <span className="text-muted-foreground">Valor da reserva:</span>
                 <span className="text-xl font-bold text-spatioo-green">
-                  R$ {Number(selectedPrice).toFixed(2)}
+                  R$ {Number(precoFixo1h).toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between items-center pt-2 border-t border-spatioo-green/20">
                 <span className="text-xs text-muted-foreground">Status:</span>
                 <span className="text-xs font-medium text-green-600">
-                   Ativação imediata
+                  Ativação imediata
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-muted-foreground">Cobrança final:</span>
+                <span className="text-xs font-medium text-blue-600">
+                  Calculada na saída
                 </span>
               </div>
             </div>
@@ -200,7 +182,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
           <Button 
             type="submit" 
             className="w-full bg-spatioo-green hover:bg-spatioo-green-dark text-black"
-            disabled={isSubmitting || !selectedOption}
+            disabled={isSubmitting || !precoFixo1h}
           >
             <CreditCard className="mr-2 h-4 w-4" />
             {isSubmitting ? 'Processando...' : 'Confirmar Reserva Imediata'}
