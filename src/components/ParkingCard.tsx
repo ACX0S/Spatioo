@@ -54,12 +54,19 @@ const ParkingCard = memo(({
 
         <div className="space-y-2">
           <div className="flex items-start justify-between gap-2">
-            <h3 
-              className="font-semibold text-sm leading-tight truncate flex-1 min-w-0" 
-              title={parkingSpot.nome}
-            >
-              {parkingSpot.nome}
-            </h3>
+            {showDistance && distance !== undefined ? (
+              <div className="flex items-center text-primary font-semibold text-sm">
+                <Star className="w-3 h-3 mr-1" />
+                <span>{distance.toFixed(1)} km de distância</span>
+              </div>
+            ) : (
+              <h3 
+                className="font-semibold text-sm leading-tight truncate flex-1 min-w-0" 
+                title={parkingSpot.nome}
+              >
+                {parkingSpot.nome}
+              </h3>
+            )}
             <div className="flex flex-col items-end flex-shrink-0">
               <Badge variant="secondary" className="text-xs">
                 R$ {parkingSpot.preco_fixo_1h ? Number(parkingSpot.preco_fixo_1h).toFixed(2) : parkingSpot.preco.toFixed(2)}/h
@@ -80,7 +87,7 @@ const ParkingCard = memo(({
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center text-muted-foreground">
               <Car className="w-3 h-3 mr-1" />
-              <span>{parkingSpot.numero_vagas} vagas</span>
+              <span>{parkingSpot.numero_vagas} vagas disponíveis</span>
             </div>
 
             <div className="flex items-center text-muted-foreground min-w-0">
@@ -91,23 +98,6 @@ const ParkingCard = memo(({
             </div>
           </div>
 
-          {showDistance && distance !== undefined && (
-            <div className="flex items-center text-xs text-primary">
-              <Star className="w-3 h-3 mr-1" />
-              <span>{distance.toFixed(1)} km de distância</span>
-            </div>
-          )}
-
-          <Button 
-            size="sm" 
-            className="w-full mt-3 text-xs h-8"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleClick();
-            }}
-          >
-            Ver Detalhes
-          </Button>
         </div>
       </CardContent>
     </Card>

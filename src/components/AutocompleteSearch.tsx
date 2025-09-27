@@ -163,3 +163,5 @@ const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
     </div>
   );
 };
+
+export default AutocompleteSearch;
