@@ -83,12 +83,11 @@ const Layout = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative">
       {/* Header */}
       <header 
         className={cn(
-          "sticky top-0 z-40 w-full transition-all duration-200",
-          isScrolled ? "bg-opacity-5 backdrop-blur-none" : "bg-opacity-5"
+          "absolute top-0 z-40 w-full transition-all duration-200"
         )}
       >
         <div className="container px-4 h-16 flex items-center justify-between">
@@ -97,13 +96,13 @@ const Layout = () => {
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="rounded-full" 
+                className="rounded-full bg-black/20 hover:bg-black/30 text-white" 
                 onClick={() => navigate(-1)}
               >
                 <ChevronLeft className="h-5 w-5" />
               </Button>
             )}
-            <h1 className="text-lg font-semibold">{pageTitle}</h1>
+            <h1 className="text-lg font-semibold text-white">{pageTitle}</h1>
           </div>
           
           <div className="flex items-center gap-2">
@@ -112,7 +111,7 @@ const Layout = () => {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="rounded-full"
+              className="rounded-full bg-black/20 hover:bg-black/30"
               onClick={() => navigate('/profile')}
             >
               <Avatar className="h-8 w-8">
@@ -127,7 +126,7 @@ const Layout = () => {
       </header>
       
       {/* Main Content */}
-      <main className="flex-1">
+      <main className="flex-1 min-h-screen">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
@@ -135,7 +134,7 @@ const Layout = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="h-full"
+            className="min-h-screen"
           >
             <Outlet />
           </motion.div>
@@ -143,13 +142,13 @@ const Layout = () => {
       </main>
       
       {/* Bottom Navigation Bar */}
-      <nav className="sticky bottom-0 z-40 bg-background/95 backdrop-blur-md border-t border-border h-16 w-full">
+      <nav className="fixed bottom-0 z-40 bg-black/20 backdrop-blur-md border-t border-white/10 h-16 w-full">
         <div className="max-w-5xl mx-auto h-full grid grid-cols-4">
           <Link 
             to="/home" 
             className={cn(
-              "flex flex-col items-center justify-center",
-              isActive("/home") ? "text-spatioo-green" : "text-muted-foreground"
+              "flex flex-col items-center justify-center text-white transition-colors",
+              isActive("/home") ? "text-spatioo-green" : "text-white/70"
             )}
           >
             <Map className="h-5 w-5" />
@@ -159,8 +158,8 @@ const Layout = () => {
           <Link 
             to="/explore" 
             className={cn(
-              "flex flex-col items-center justify-center",
-              isActive("/explore") ? "text-spatioo-green" : "text-muted-foreground"
+              "flex flex-col items-center justify-center text-white transition-colors",
+              isActive("/explore") ? "text-spatioo-green" : "text-white/70"
             )}
           >
             <Compass className="h-5 w-5" />
@@ -170,8 +169,8 @@ const Layout = () => {
           <Link 
             to="/ofertar" 
             className={cn(
-              "flex flex-col items-center justify-center",
-              isActive("/ofertar") ? "text-spatioo-green" : "text-muted-foreground"
+              "flex flex-col items-center justify-center text-white transition-colors",
+              isActive("/ofertar") ? "text-spatioo-green" : "text-white/70"
             )}
           >
             <Plus className="h-5 w-5" />
@@ -181,8 +180,8 @@ const Layout = () => {
           <Link 
             to="/dashboard" 
             className={cn(
-              "flex flex-col items-center justify-center",
-              isActive("/dashboard") ? "text-spatioo-green" : "text-muted-foreground"
+              "flex flex-col items-center justify-center text-white transition-colors",
+              isActive("/dashboard") ? "text-spatioo-green" : "text-white/70"
             )}
           >
             <Calendar className="h-5 w-5" />
