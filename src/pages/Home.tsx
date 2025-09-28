@@ -142,7 +142,7 @@ const Home = () => {
         className="text-center space-y-2"
       >
         <h1 className="text-2xl font-bold">
-          Olá{profile?.name ? `, ${profile.name}` : ''}! 👋
+          Bem Vindo{profile?.name ? `, ${profile.name}` : ''}!
         </h1>
         <p className="text-muted-foreground">
           <MapPin className="inline w-4 h-4 mr-1" />
