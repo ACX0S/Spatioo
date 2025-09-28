@@ -129,7 +129,11 @@ const Home = () => {
   }, [navigate]);
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-background via-spatioo-light/5 to-spatioo-primary/5">
+      <div className="container mx-auto p-4 space-y-6 relative">
+        {/* Background decoration */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-spatioo-secondary/10 rounded-full blur-3xl -z-10" />
+        <div className="absolute bottom-20 left-0 w-24 h-24 bg-spatioo-primary/10 rounded-full blur-2xl -z-10" />
       {/* Header with greeting */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
@@ -251,6 +255,7 @@ const Home = () => {
           </Button>
         </motion.div>
       )}
+      </div>
     </div>
   );
 };

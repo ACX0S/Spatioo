@@ -64,13 +64,18 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				spatioo: {
+					primary: '#02A388',
+					secondary: '#01E979',
+					light: '#E6E6E6',
+					'gray-light': '#AFAFAF',
+					'gray-medium': '#818181',
+					'gray-dark': '#272A2A',
+					black: '#000000',
+					'black-dark': '#0C0C0C',
+					// Mantendo cores legadas para compatibilidade
 					green: '#01E979',
 					'green-light': '#63fca7',
-					'green-dark': '#00c868',
-					black: '#151715',
-					'gray-dark': '#333333',
-					'gray-medium': '#666666',
-					'gray-light': '#f4f4f4',
+					'green-dark': '#02A388',
 					white: '#E6E6E6',
 				}
 			},

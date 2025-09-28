@@ -90,7 +90,11 @@ const Explore = () => {
   }, []);
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="min-h-screen bg-gradient-to-br from-background via-spatioo-gray-light/10 to-spatioo-primary/10">
+      <div className="container mx-auto p-4 relative">
+        {/* Background decoration */}
+        <div className="absolute top-10 right-10 w-20 h-20 bg-spatioo-secondary/20 rounded-full blur-xl -z-10" />
+        <div className="absolute bottom-32 left-8 w-16 h-16 bg-spatioo-primary/15 rounded-full blur-lg -z-10" />
       {/* Header */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
@@ -159,6 +163,7 @@ const Explore = () => {
           loadingText="Buscando estacionamentos..."
         />
       </motion.div>
+      </div>
     </div>
   );
 };
