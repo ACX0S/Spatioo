@@ -83,12 +83,12 @@ const Layout = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col">
       {/* Header */}
       <header 
         className={cn(
           "sticky top-0 z-40 w-full transition-all duration-200",
-          isScrolled ? "bg-background/95 backdrop-blur-md shadow-sm" : "bg-background"
+          isScrolled ? "bg-opacity-5 backdrop-blur-none" : "bg-opacity-5"
         )}
       >
         <div className="container px-4 h-16 flex items-center justify-between">
