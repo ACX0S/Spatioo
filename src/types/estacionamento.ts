@@ -18,6 +18,7 @@ export interface Estacionamento {
   longitude?: number;
   descricao?: string;
   ativo?: boolean;
+  hora_extra?: number; // Valor cobrado por hora adicional quando não há preço específico
 }
 
 export interface EstacionamentoInsert {
@@ -35,6 +36,7 @@ export interface EstacionamentoInsert {
   user_id: string;
   latitude?: number;
   longitude?: number;
+  hora_extra?: number; // Valor obrigatório para hora adicional
 }
 
 export interface EstacionamentoUpdate {
@@ -52,4 +54,5 @@ export interface EstacionamentoUpdate {
   latitude?: number;
   longitude?: number;
   ativo?: boolean;
+  hora_extra?: number; // Valor para hora adicional
 }

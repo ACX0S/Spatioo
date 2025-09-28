@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCep } from "@/hooks/useCep";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { formatCnpj } from "@/lib/utils"; // Importa função de formatação do utils
 import TimePickerDialog from "@/components/TimePickerDialog";
 import PricingTable, { PricingRow } from "@/components/PricingTable";
 
@@ -62,7 +63,8 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
     horarioInicio: "",
     horarioFim: "",
     tipo: "",
-    cnpj: ""
+    cnpj: "",
+    horaExtra: "" // Valor para hora adicional quando não há preço específico cadastrado
   });
   
   // Estado para controlar a edição do campo de endereço.
@@ -79,6 +81,43 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
   const [isSubmitting, setIsSubmitting] = useState(false); 
 
   /**
+   * @function validatePricingTable
+   * @description Valida se a tabela de preços tem pelo menos o valor de 1 hora e hora extra.
+   */
+  const validatePricingTable = () => {
+    // Verifica se existe pelo menos uma configuração de 1 hora
+    const hasOneHour = pricing.some(row => parseInt(row.horas) === 1);
+    if (!hasOneHour) {
+      setPricingError("É obrigatório ter pelo menos um valor configurado para 1 hora de estacionamento.");
+      return false;
+    }
+
+    // Verifica se o campo hora extra está preenchido
+    if (!formData.horaExtra || parseFloat(formData.horaExtra) <= 0) {
+      setPricingError("É obrigatório definir o valor da hora extra.");
+      return false;
+    }
+
+    // Validações existentes
+    if (pricing.length === 0) {
+      setPricingError("Adicione pelo menos uma configuração de preço.");
+      return false;
+    }
+    const invalidPricing = pricing.some(row => !row.horas || !row.preco || parseFloat(row.horas) <= 0 || parseFloat(row.preco) <= 0);
+    if (invalidPricing) {
+      setPricingError("Todos os campos de horas e preços devem ser preenchidos com valores positivos.");
+      return false;
+    }
+    const horasSet = new Set(pricing.map(row => row.horas));
+    if (horasSet.size !== pricing.length) {
+      setPricingError("Não é possível ter configurações duplicadas para a mesma quantidade de horas.");
+      return false;
+    }
+    
+    setPricingError("");
+    return true;
+  };
+  /**
    * @function handleSubmit
    * @description Lida com a submissão do formulário, valida os dados e envia para o Supabase.
    */
@@ -91,31 +130,19 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
     }
 
     // Validação de campos obrigatórios.
-    const requiredFields = [formData.endereco, formData.numero, formData.cep, formData.vagas, formData.horarioInicio, formData.horarioFim, formData.tipo];
+    const requiredFields = [formData.endereco, formData.numero, formData.cep, formData.vagas, formData.horarioInicio, formData.horarioFim, formData.tipo, formData.horaExtra];
     if (formData.tipo === 'estacionamento') {
       requiredFields.push(formData.nome, formData.cnpj);
     }
     if (requiredFields.some(field => !field)) {
-      toast({ title: "Erro", description: "Por favor, preencha todos os campos obrigatórios.", variant: "destructive" });
+      toast({ title: "Erro", description: "Por favor, preencha todos os campos obrigatórios, incluindo o valor da hora extra.", variant: "destructive" });
       return;
     }
 
-    // Validação da tabela de preços.
-    if (pricing.length === 0) {
-      setPricingError("Adicione pelo menos uma configuração de preço.");
+    // Validação da tabela de preços com as novas regras.
+    if (!validatePricingTable()) {
       return;
     }
-    const invalidPricing = pricing.some(row => !row.horas || !row.preco || parseFloat(row.horas) <= 0 || parseFloat(row.preco) <= 0);
-    if (invalidPricing) {
-      setPricingError("Todos os campos de horas e preços devem ser preenchidos com valores positivos.");
-      return;
-    }
-    const horasSet = new Set(pricing.map(row => row.horas));
-    if (horasSet.size !== pricing.length) {
-      setPricingError("Não é possível ter configurações duplicadas para a mesma quantidade de horas.");
-      return;
-    }
-    setPricingError("");
 
     setIsSubmitting(true);
 
@@ -125,7 +152,7 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
         ? cepData ? `${cepData.logradouro}, ${formData.numero} - ${cepData.bairro}` : `${formData.endereco}, ${formData.numero}`
         : formData.nome;
 
-      // Insere o novo estacionamento no banco de dados.
+      // Insere o novo estacionamento no banco de dados incluindo hora_extra.
       const { data: estacionamentoData, error: estacionamentoError } = await supabase
         .from('estacionamento')
         .insert({
@@ -141,7 +168,8 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
           },
           user_id: user.id,
           cnpj: formData.tipo === 'estacionamento' ? formData.cnpj : '',
-          tipo: formData.tipo
+          tipo: formData.tipo,
+          hora_extra: parseFloat(formData.horaExtra) // Adiciona o valor da hora extra
         })
         .select()
         .single();
@@ -162,7 +190,7 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
       toast({ title: "Vaga registrada!", description: "Sua vaga foi registrada com sucesso." });
       
       // Reseta o formulário e fecha o diálogo.
-      setFormData({ nome: "", endereco: "", numero: "", cep: "", descricao: "", vagas: "", horarioInicio: "", horarioFim: "", tipo: "", cnpj: "" });
+      setFormData({ nome: "", endereco: "", numero: "", cep: "", descricao: "", vagas: "", horarioInicio: "", horarioFim: "", tipo: "", cnpj: "", horaExtra: "" });
       setCepData(null);
       setEnderecoDisabled(false);
       setPricing([]);
@@ -180,6 +208,34 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
   // Funções para lidar com mudanças nos inputs.
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  /**
+   * @function handleCnpjChange
+   * @description Aplica formatação de CNPJ limitando a 14 dígitos numéricos.
+   */
+  const handleCnpjChange = (value: string) => {
+    const formattedCnpj = formatCnpj(value);
+    handleInputChange("cnpj", formattedCnpj);
+  };
+
+  /**
+   * @function handleHoraExtraChange
+   * @description Permite apenas valores numéricos com até 2 casas decimais para hora extra.
+   */
+  const handleHoraExtraChange = (value: string) => {
+    // Permite apenas números e ponto decimal
+    const numericValue = value.replace(/[^0-9.,]/g, '').replace(',', '.');
+    // Limita a 2 casas decimais
+    const parts = numericValue.split('.');
+    if (parts.length > 2) {
+      parts.length = 2;
+    }
+    if (parts[1] && parts[1].length > 2) {
+      parts[1] = parts[1].substring(0, 2);
+    }
+    const formattedValue = parts.join('.');
+    handleInputChange("horaExtra", formattedValue);
   };
 
   const handleCepChange = async (value: string) => {
@@ -268,14 +324,51 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
           </div>
 
           {formData.tipo === 'estacionamento' && (
-            <div className="space-y-2">
-              <Label htmlFor="create-cnpj">CNPJ</Label>
-              <Input id="create-cnpj" placeholder="00.000.000/0001-00" value={formData.cnpj} onChange={(e) => handleInputChange("cnpj", e.target.value)} required />
-            </div>
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="create-cnpj">CNPJ *</Label>
+                <Input 
+                  id="create-cnpj" 
+                  placeholder="99.999.999/9999-99" 
+                  value={formData.cnpj} 
+                  onChange={(e) => handleCnpjChange(e.target.value)} 
+                  maxLength={18} // Formatado: 99.999.999/9999-99
+                  required 
+                />
+                <p className="text-xs text-muted-foreground">Digite apenas números. Máximo 14 dígitos.</p>
+              </div>
+            </>
           )}
 
+          {/* Campo obrigatório para Hora Extra */}
+          <div className="space-y-2">
+            <Label htmlFor="create-hora-extra" className="flex items-center gap-2">
+              <DollarSign className="h-4 w-4" />
+              Valor da Hora Extra *
+            </Label>
+            <Input 
+              id="create-hora-extra" 
+              placeholder="Ex: 5.00" 
+              value={formData.horaExtra} 
+              onChange={(e) => handleHoraExtraChange(e.target.value)} 
+              required 
+            />
+            <p className="text-xs text-muted-foreground">
+              Valor cobrado quando não há preço específico cadastrado para o período de permanência.
+            </p>
+          </div>
+
           {/* Tabela de Preços */}
-          <PricingTable pricing={pricing} onChange={setPricing} error={pricingError} />
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <DollarSign className="h-4 w-4" />
+              Configuração de Preços *
+            </Label>
+            <p className="text-xs text-muted-foreground mb-2">
+              Configure pelo menos o valor de 1 hora (obrigatório). Para períodos não cadastrados, será aplicado o valor da hora extra.
+            </p>
+            <PricingTable pricing={pricing} onChange={setPricing} error={pricingError} />
+          </div>
 
           {/* Seletores de Horário */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
