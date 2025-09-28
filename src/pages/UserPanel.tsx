@@ -6,10 +6,13 @@ import {
   Building 
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 const UserPanel = () => {
   const navigate = useNavigate();
+  const { profile } = useAuth();
 
+  // Lista de opções do painel, com o menu "Estacionamento" condicionado ao status de proprietário
   const panelOptions = [
     {
       title: "Minhas vagas",
@@ -27,14 +30,15 @@ const UserPanel = () => {
       color: "text-spatioo-green",
       bgColor: "bg-spatioo-green/10"
     },
-    {
+    // Menu "Estacionamento" só aparece para proprietários (dono_estacionamento = true)
+    ...(profile?.dono_estacionamento ? [{
       title: "Estacionamento",
       description: "Gerenciar sua empresa, vagas e ver seus dashboards",
       icon: Building,
       route: "/admin",
       color: "text-spatioo-green",
       bgColor: "bg-spatioo-green/10"
-    }
+    }] : [])
   ];
 
   const handleOptionClick = (route: string) => {

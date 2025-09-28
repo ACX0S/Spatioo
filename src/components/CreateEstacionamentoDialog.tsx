@@ -10,7 +10,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useCep } from "@/hooks/useCep";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { formatCnpj } from "@/lib/utils"; // Importa função de formatação do utils
 import TimePickerDialog from "@/components/TimePickerDialog";
 import PricingTable, { PricingRow } from "@/components/PricingTable";
 
@@ -52,7 +51,7 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
   const [timePickerType, setTimePickerType] = useState<'inicio' | 'fim'>('inicio');
   const [cepData, setCepData] = useState<any>(null);
   
-  // Estado para armazenar os dados do formulário.
+  // Estado para armazenar os dados do formulário com tipo definido como residencial.
   const [formData, setFormData] = useState({
     nome: "",
     endereco: "",
@@ -62,8 +61,7 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
     vagas: "",
     horarioInicio: "",
     horarioFim: "",
-    tipo: "",
-    cnpj: "",
+    tipo: "residencial", // Tipo fixo como residencial, não mais selecionável
     horaExtra: "" // Valor para hora adicional quando não há preço específico cadastrado
   });
   
@@ -129,11 +127,8 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
       return;
     }
 
-    // Validação de campos obrigatórios.
-    const requiredFields = [formData.endereco, formData.numero, formData.cep, formData.vagas, formData.horarioInicio, formData.horarioFim, formData.tipo, formData.horaExtra];
-    if (formData.tipo === 'estacionamento') {
-      requiredFields.push(formData.nome, formData.cnpj);
-    }
+    // Validação de campos obrigatórios (sem campos específicos de estacionamento).
+    const requiredFields = [formData.endereco, formData.numero, formData.cep, formData.vagas, formData.horarioInicio, formData.horarioFim, formData.horaExtra];
     if (requiredFields.some(field => !field)) {
       toast({ title: "Erro", description: "Por favor, preencha todos os campos obrigatórios, incluindo o valor da hora extra.", variant: "destructive" });
       return;
@@ -167,7 +162,7 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
             fechamento: formData.horarioFim
           },
           user_id: user.id,
-          cnpj: formData.tipo === 'estacionamento' ? formData.cnpj : '',
+          cnpj: '', // CNPJ vazio para vagas residenciais
           tipo: formData.tipo,
           hora_extra: parseFloat(formData.horaExtra) // Adiciona o valor da hora extra
         })
@@ -190,7 +185,7 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
       toast({ title: "Vaga registrada!", description: "Sua vaga foi registrada com sucesso." });
       
       // Reseta o formulário e fecha o diálogo.
-      setFormData({ nome: "", endereco: "", numero: "", cep: "", descricao: "", vagas: "", horarioInicio: "", horarioFim: "", tipo: "", cnpj: "", horaExtra: "" });
+      setFormData({ nome: "", endereco: "", numero: "", cep: "", descricao: "", vagas: "", horarioInicio: "", horarioFim: "", tipo: "residencial", horaExtra: "" });
       setCepData(null);
       setEnderecoDisabled(false);
       setPricing([]);
@@ -208,15 +203,6 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
   // Funções para lidar com mudanças nos inputs.
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  /**
-   * @function handleCnpjChange
-   * @description Aplica formatação de CNPJ limitando a 14 dígitos numéricos.
-   */
-  const handleCnpjChange = (value: string) => {
-    const formattedCnpj = formatCnpj(value);
-    handleInputChange("cnpj", formattedCnpj);
   };
 
   /**
@@ -279,25 +265,7 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Seção de Tipo de Vaga */}
-          <div className="space-y-2">
-            <Label htmlFor="create-tipo">Tipo de Vaga</Label>
-            <Select value={formData.tipo} onValueChange={(value) => handleInputChange("tipo", value)}>
-              <SelectTrigger><SelectValue placeholder="Selecione o tipo" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="residencial">Residencial</SelectItem>
-                <SelectItem value="estacionamento">Estacionamento</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Campos condicionais para tipo 'estacionamento' */}
-          {formData.tipo === 'estacionamento' && (
-            <div className="space-y-2">
-              <Label htmlFor="create-nome">Nome do Estacionamento</Label>
-              <Input id="create-nome" placeholder="Ex: Estacionamento Centro" value={formData.nome} onChange={(e) => handleInputChange("nome", e.target.value)} required />
-            </div>
-          )}
+          {/* Tipo de vaga definido automaticamente como "residencial" */}
 
           {/* Campos de Endereço */}
           <div className="space-y-2">
@@ -322,23 +290,6 @@ const CreateEstacionamentoDialog = ({ open, onOpenChange, onSuccess }: CreateEst
               <Input id="create-vagas" placeholder="1" value={formData.vagas} onChange={(e) => handleVagasChange(e.target.value)} required />
             </div>
           </div>
-
-          {formData.tipo === 'estacionamento' && (
-            <>
-              <div className="space-y-2">
-                <Label htmlFor="create-cnpj">CNPJ *</Label>
-                <Input 
-                  id="create-cnpj" 
-                  placeholder="99.999.999/9999-99" 
-                  value={formData.cnpj} 
-                  onChange={(e) => handleCnpjChange(e.target.value)} 
-                  maxLength={18} // Formatado: 99.999.999/9999-99
-                  required 
-                />
-                <p className="text-xs text-muted-foreground">Digite apenas números. Máximo 14 dígitos.</p>
-              </div>
-            </>
-          )}
 
           {/* Campo obrigatório para Hora Extra */}
           <div className="space-y-2">

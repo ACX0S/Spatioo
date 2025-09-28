@@ -228,8 +228,13 @@ const EstacionamentoDashboard = () => {
                   <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">R$ 0,00</div>
-                  <p className="text-xs text-muted-foreground">Últimas 24h</p>
+                  <div className="text-2xl font-bold">
+                    {bookings.length > 0 
+                      ? formatPrice(bookings.reduce((total, booking) => total + Number(booking.price), 0))
+                      : "R$ 0,00"
+                    }
+                  </div>
+                  <p className="text-xs text-muted-foreground">Total de reservas</p>
                 </CardContent>
               </Card>
             </div>
@@ -263,10 +268,26 @@ const EstacionamentoDashboard = () => {
                   <CardTitle>Atividade Recente</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Calendar className="h-8 w-8 mx-auto mb-2" />
-                    <p>Nenhuma atividade recente</p>
-                  </div>
+                  {bookings.length > 0 ? (
+                    <div className="space-y-3">
+                      {bookings.slice(0, 3).map((booking) => (
+                        <div key={booking.id} className="flex justify-between items-center p-2 bg-muted/20 rounded-lg">
+                          <div>
+                            <p className="font-medium text-sm">{booking.spot_number}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {format(new Date(booking.date), 'dd/MM/yyyy')} - {booking.start_time} às {booking.end_time}
+                            </p>
+                          </div>
+                          <span className="text-sm font-medium">{formatPrice(Number(booking.price))}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Calendar className="h-8 w-8 mx-auto mb-2" />
+                      <p>Nenhuma reserva registrada</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
