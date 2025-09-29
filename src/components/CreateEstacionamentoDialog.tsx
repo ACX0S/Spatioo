@@ -222,22 +222,6 @@ const CreateEstacionamentoDialog = ({
 
       if (estacionamentoError) throw estacionamentoError;
 
-      // Atualiza o perfil do usuário para marcar como dono de estacionamento
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ dono_estacionamento: true })
-        .eq('id', user.id);
-
-      if (profileError) {
-        console.error('Erro ao atualizar perfil do usuário:', profileError);
-        // Não lança erro aqui pois o estacionamento já foi criado com sucesso
-        toast({
-          title: "Atenção",
-          description: "Estacionamento criado, mas houve um problema ao atualizar seu perfil. Faça logout e login novamente.",
-          variant: "destructive"
-        });
-      }
-
       // Insere os registros da tabela de preços.
       if (pricing.length > 0) {
         for (const row of pricing) {
@@ -425,28 +409,6 @@ const CreateEstacionamentoDialog = ({
             </div>
           </div>
 
-          {/* Campo obrigatório para Hora Extra */}
-          <div className="space-y-2">
-            <Label
-              htmlFor="create-hora-extra"
-              className="flex items-center gap-2"
-            >
-              <DollarSign className="h-4 w-4" />
-              Valor da Hora Extra *
-            </Label>
-            <Input
-              id="create-hora-extra"
-              placeholder="Ex: 5.00"
-              value={formData.horaExtra}
-              onChange={(e) => handleHoraExtraChange(e.target.value)}
-              required
-            />
-            <p className="text-xs text-muted-foreground">
-              Valor cobrado quando não há preço específico cadastrado para o
-              período de permanência.
-            </p>
-          </div>
-
           {/* Tabela de Preços */}
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
@@ -461,6 +423,24 @@ const CreateEstacionamentoDialog = ({
               pricing={pricing}
               onChange={setPricing}
               error={pricingError}
+            />
+          </div>
+          
+          {/* Campo obrigatório para Hora Extra */}
+          <div>
+            <Label
+              htmlFor="create-hora-extra"
+              className="flex items-center gap-2 mb-2"
+            >
+              <DollarSign className="h-4 w-4" />
+              Valor da Hora Extra *
+            </Label>
+            <Input
+              id="create-hora-extra"
+              placeholder="Ex: 5.00"
+              value={formData.horaExtra}
+              onChange={(e) => handleHoraExtraChange(e.target.value)}
+              required
             />
           </div>
 
