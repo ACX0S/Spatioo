@@ -154,7 +154,7 @@ const Layout = () => {
       </main>
       
       {/* Bottom Navigation Bar */}
-      <nav className="fixed bottom-0 z-40 backdrop-blur-md border-t border-border h-16 w-full">
+      <nav className="fixed bottom-0 z-40 bg-background/80 backdrop-blur-md border-t border-border h-16 w-full">
         <div className="max-w-5xl mx-auto h-full grid grid-cols-4">
           <Link 
             to="/home" 
