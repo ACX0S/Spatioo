@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, Mail, Phone, Camera, ChevronLeft, CreditCard, Shield, Bell, LogOut, MapPin, Home, Building2, Check } from 'lucide-react';
+import { User, Mail, Phone, Camera, ChevronLeft, CreditCard, Shield, Bell, LogOut, MapPin, Home, Building2, Check, KeyRound } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -421,13 +421,13 @@ const Profile = () => {
                         <Building2 className="h-5 w-5 text-spatioo-green" />
                       </div>  
                       <div>
-                        <p className="font-medium">Estacionamento Cadastrado</p>
+                        <p className="font-medium text-spatioo-green/90">Estacionamento Cadastrado</p>
                         <p className="text-sm text-muted-foreground">
-                          Você pode gerenciar seu estacionamento através do menu lateral.
+                          Você pode gerenciar seu estacionamento na página Painel.
                         </p>
                       </div>
                     </div>
-                    <div className="bg-spatioo-green/10 px-3 py-1 rounded-full">
+                    <div className="">
                       <span className="text-spatioo-green"><Check/></span>
                     </div>
                   </div>
@@ -445,7 +445,7 @@ const Profile = () => {
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-red-100 rounded-lg">
-                      <Shield className="h-5 w-5 text-red-600" />
+                      <KeyRound className="h-5 w-5 text-red-600" />
                     </div>
                     <div>
                       <p className="font-medium">Alterar senha</p>
