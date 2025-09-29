@@ -222,6 +222,22 @@ const CreateEstacionamentoDialog = ({
 
       if (estacionamentoError) throw estacionamentoError;
 
+      // Atualiza o perfil do usuário para marcar como dono de estacionamento
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ dono_estacionamento: true })
+        .eq('id', user.id);
+
+      if (profileError) {
+        console.error('Erro ao atualizar perfil do usuário:', profileError);
+        // Não lança erro aqui pois o estacionamento já foi criado com sucesso
+        toast({
+          title: "Atenção",
+          description: "Estacionamento criado, mas houve um problema ao atualizar seu perfil. Faça logout e login novamente.",
+          variant: "destructive"
+        });
+      }
+
       // Insere os registros da tabela de preços.
       if (pricing.length > 0) {
         for (const row of pricing) {

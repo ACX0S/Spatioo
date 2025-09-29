@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useTheme } from "@/components/theme-provider";
 import { 
   Map, 
   Calendar, 
@@ -18,6 +19,7 @@ const Layout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { profile } = useAuth();
+  const { theme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [pageTitle, setPageTitle] = useState("Spatioo");
 
@@ -82,27 +84,37 @@ const Layout = () => {
       .slice(0, 2);
   };
 
+  // Define se o texto da navegação deve ser escuro ou claro baseado no tema
+  const getNavTextColor = (isActive: boolean) => {
+    if (isActive) return "text-spatioo-green";
+    
+    if (theme === "light") {
+      return "text-black/80";
+    } else if (theme === "dark") {
+      return "text-white/70";
+    } else {
+      // Tema system - usa media query para detectar
+      return "text-white/70 dark:text-white/70 light:text-black/80";
+    }
+  };
+
   return (
-    <div className="min-h-screen flex flex-col relative">
+    <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header 
-        className={cn(
-          "absolute top-0 z-40 w-full transition-all duration-200"
-        )}
-      >
+      <header className="fixed top-0 z-40 w-full bg-background/80 backdrop-blur-sm border-b border-border">
         <div className="container px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {location.pathname !== "/home" && (
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="rounded-full bg-black/20 hover:bg-black/30 text-white" 
+                className="rounded-full" 
                 onClick={() => navigate(-1)}
               >
                 <ChevronLeft className="h-5 w-5" />
               </Button>
             )}
-            <h1 className="text-lg font-semibold text-white">{pageTitle}</h1>
+            <h1 className="text-lg font-semibold">{pageTitle}</h1>
           </div>
           
           <div className="flex items-center gap-2">
@@ -111,7 +123,7 @@ const Layout = () => {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="rounded-full bg-black/20 hover:bg-black/30"
+              className="rounded-full"
               onClick={() => navigate('/profile')}
             >
               <Avatar className="h-8 w-8">
@@ -126,7 +138,7 @@ const Layout = () => {
       </header>
       
       {/* Main Content */}
-      <main className="flex-1 min-h-screen">
+      <main className="flex-1 pt-16 pb-16">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
@@ -134,7 +146,7 @@ const Layout = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="min-h-screen"
+            className="min-h-full"
           >
             <Outlet />
           </motion.div>
@@ -142,13 +154,13 @@ const Layout = () => {
       </main>
       
       {/* Bottom Navigation Bar */}
-      <nav className="fixed bottom-0 z-40 backdrop-blur-md border-t border-white/10 h-16 w-full">
+      <nav className="fixed bottom-0 z-40 bg-background/80 backdrop-blur-md border-t border-border h-16 w-full">
         <div className="max-w-5xl mx-auto h-full grid grid-cols-4">
           <Link 
             to="/home" 
             className={cn(
-              "flex flex-col items-center justify-center text-white transition-colors",
-              isActive("/home") ? "text-spatioo-green" : "text-white/70"
+              "flex flex-col items-center justify-center transition-colors",
+              getNavTextColor(isActive("/home"))
             )}
           >
             <Map className="h-5 w-5" />
@@ -158,8 +170,8 @@ const Layout = () => {
           <Link 
             to="/explore" 
             className={cn(
-              "flex flex-col items-center justify-center text-white transition-colors",
-              isActive("/explore") ? "text-spatioo-green" : "text-white/70"
+              "flex flex-col items-center justify-center transition-colors",
+              getNavTextColor(isActive("/explore"))
             )}
           >
             <Compass className="h-5 w-5" />
@@ -169,8 +181,8 @@ const Layout = () => {
           <Link 
             to="/ofertar" 
             className={cn(
-              "flex flex-col items-center justify-center text-white transition-colors",
-              isActive("/ofertar") ? "text-spatioo-green" : "text-white/70"
+              "flex flex-col items-center justify-center transition-colors",
+              getNavTextColor(isActive("/ofertar"))
             )}
           >
             <Plus className="h-5 w-5" />
@@ -180,8 +192,8 @@ const Layout = () => {
           <Link 
             to="/dashboard" 
             className={cn(
-              "flex flex-col items-center justify-center text-white transition-colors",
-              isActive("/dashboard") ? "text-spatioo-green" : "text-white/70"
+              "flex flex-col items-center justify-center transition-colors",
+              getNavTextColor(isActive("/dashboard"))
             )}
           >
             <Calendar className="h-5 w-5" />
