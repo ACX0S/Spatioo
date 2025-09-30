@@ -77,7 +77,7 @@ const Login = () => {
 
     setIsSubmitting(true);
     try {
-      await signUp(email, password, name);
+      await signUp(email, password, name, phone);
     } finally {
       setIsSubmitting(false);
     }

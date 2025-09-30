@@ -11,7 +11,7 @@ interface AuthContextType {
   user: User | null;
   profile: Profile | null;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, name: string) => Promise<void>;
+  signUp: (email: string, password: string, name: string, phone?: string) => Promise<void>;
   signOut: () => Promise<void>;
   loading: boolean;
   updateProfile: (profile: Partial<Profile>) => Promise<void>;
@@ -52,11 +52,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
             const userName = user.user_metadata?.name || user.email?.split('@')[0] || 'Usuário';
+            const userPhone = user.user_metadata?.phone || null;
             const { data: newProfile, error: insertError } = await supabase
               .from('profiles')
               .insert({ 
                 id: userId, 
-                name: userName 
+                name: userName,
+                phone: userPhone
               })
               .select()
               .single();
@@ -168,9 +170,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Sign up with email and password
-  const signUp = async (email: string, password: string, name: string) => {
+  const signUp = async (email: string, password: string, name: string, phone?: string) => {
     try {
-      console.log('Attempting to sign up with:', email, 'name:', name);
+      console.log('Attempting to sign up with:', email, 'name:', name, 'phone:', phone);
       
       // Verificar se o usuário já existe
       const { data: existingUser } = await supabase.auth.signInWithPassword({
@@ -194,7 +196,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         password,
         options: {
           data: {
-            name: name
+            name: name,
+            phone: phone
           },
           emailRedirectTo: `${window.location.origin}/`
         }
