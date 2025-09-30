@@ -8,6 +8,7 @@ import { Lock, Mail, User, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isResending, setIsResending] = useState(false);
 
   // Redirecionar se o usuário já estiver logado
   useEffect(() => {
@@ -80,7 +82,42 @@ const Login = () => {
       setIsSubmitting(false);
     }
   };
-    function setAgreeTerms(value: boolean) {
+
+  const handleResendConfirmation = async () => {
+    if (!email) {
+      toast({
+        title: "Informe seu email",
+        description: "Digite o email usado no cadastro para reenviar a confirmação.",
+        variant: "destructive",
+        duration: 2000
+      });
+      return;
+    }
+    setIsResending(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: { emailRedirectTo: `${window.location.origin}/` }
+      } as any);
+      if (error) throw error;
+      toast({
+        title: "E-mail reenviado",
+        description: "Verifique sua caixa de entrada e spam.",
+        duration: 2500
+      });
+    } catch (error: any) {
+      toast({
+        title: "Falha ao reenviar",
+        description: error.message ?? "Tente novamente em instantes.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  function setAgreeTerms(value: boolean) {
     value ? toast({
         title: "Termos de uso aceitos",
         variant: "default",
@@ -309,6 +346,18 @@ const Login = () => {
                 {isSubmitting ? 'Processando...' : 'Criar conta'}
                 {!isSubmitting && <ArrowRight className="ml-2 h-4 w-4" />}
               </Button>
+
+              <div className="mt-3 text-center">
+                <Button
+                  type="button"
+                  variant="link"
+                  className="h-auto p-0 text-xs text-muted-foreground"
+                  onClick={handleResendConfirmation}
+                  disabled={isResending || !email}
+                >
+                  {isResending ? 'Reenviando...' : 'Não recebeu o e-mail? Reenviar confirmação'}
+                </Button>
+              </div>
             </form>
           </TabsContent>
         </Tabs>
