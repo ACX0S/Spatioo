@@ -29,6 +29,7 @@ import {
   PieChart
 } from 'lucide-react';
 import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+import CreateEstacionamentoDialog from "@/components/CreateEstacionamentoDialog"; // Reutiliza o mesmo formulário de Registrar Vaga
 
 // Mock data for parking spots
 const PARKING_SPOTS = [
@@ -200,140 +201,26 @@ const ParkingOwnerDashboard = () => {
               </Button>
             </div>
             
-            <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-              <DialogTrigger asChild>
-                <Button className="bg-spatioo-green hover:bg-spatioo-green-dark text-black font-medium">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Adicionar novo
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px]">
-                <DialogHeader>
-                  <DialogTitle>Adicionar novo estacionamento</DialogTitle>
-                  <DialogDescription>
-                    Preencha as informações abaixo para cadastrar um novo local de estacionamento.
-                  </DialogDescription>
-                </DialogHeader>
-                
-                <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto">
-                  {/* NOTA: Este é um formulário mockado. Para implementação real, */}
-                  {/* use o componente CreateEstacionamentoDialog ou crie um novo */}
-                  {/* componente para estacionamentos comerciais com CNPJ e comodidades */}
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Nome do estacionamento *</label>
-                    <Input placeholder="Ex.: Estacionamento Central" />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">CNPJ *</label>
-                    <Input placeholder="00.000.000/0000-00" />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">CEP *</label>
-                      <Input placeholder="00000-000" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Número *</label>
-                      <Input placeholder="123" />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Endereço completo *</label>
-                    <Input placeholder="Será preenchido automaticamente pelo CEP" disabled />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Total de vagas *</label>
-                      <Input type="number" placeholder="Ex.: 50" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Valor da hora extra (R$) *</label>
-                      <Input type="number" step="0.01" placeholder="Ex.: 5.00" />
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Horário de abertura *</label>
-                      <Input type="time" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Horário de fechamento *</label>
-                      <Input type="time" />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Comodidades do estacionamento</label>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="funcionamento-24h" className="h-4 w-4" />
-                        <label htmlFor="funcionamento-24h" className="text-sm cursor-pointer">
-                          Funcionamento 24h
-                        </label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="suporte-eletrico" className="h-4 w-4" />
-                        <label htmlFor="suporte-eletrico" className="text-sm cursor-pointer">
-                          Suporte a carro elétrico
-                        </label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="vaga-coberta" className="h-4 w-4" />
-                        <label htmlFor="vaga-coberta" className="text-sm cursor-pointer">
-                          Vaga coberta
-                        </label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="manobrista" className="h-4 w-4" />
-                        <label htmlFor="manobrista" className="text-sm cursor-pointer">
-                          Manobrista
-                        </label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="suporte-caminhao" className="h-4 w-4" />
-                        <label htmlFor="suporte-caminhao" className="text-sm cursor-pointer">
-                          Suporte a caminhão
-                        </label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="vaga-moto" className="h-4 w-4" />
-                        <label htmlFor="vaga-moto" className="text-sm cursor-pointer">
-                          Vaga para motos
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Descrição</label>
-                    <textarea 
-                      className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                      placeholder="Descreva o seu estacionamento..."
-                      rows={3}
-                    ></textarea>
-                  </div>
-                  
-                  <p className="text-xs text-muted-foreground">
-                    * Campos obrigatórios
-                  </p>
-                </div>
-                
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setShowAddDialog(false)}>
-                    Cancelar
-                  </Button>
-                  <Button className="bg-spatioo-green hover:bg-spatioo-green-dark text-black font-medium">
-                    Cadastrar estacionamento
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+              {/* Botão para abrir o formulário real de Registrar Vaga (reutilizando o componente existente) */
+              }
+              <Button 
+                className="bg-spatioo-green hover:bg-spatioo-green-dark text-black font-medium"
+                onClick={() => setShowAddDialog(true)}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Adicionar novo
+              </Button>
+
+              {/* Reutiliza exatamente o mesmo formulário de "Registrar vaga" (residencial) */}
+              {/* Mantemos um único formulário fonte para evitar divergência de lógica/validação */}
+              <CreateEstacionamentoDialog 
+                open={showAddDialog}
+                onOpenChange={setShowAddDialog}
+                // Quando cadastrar com sucesso, podemos futuramente atualizar uma lista real de estacionamentos
+                onSuccess={() => {
+                  // Comentário: aqui poderíamos disparar um refetch se a listagem fosse real (não mockada)
+                }}
+              />
           </div>
           
           <div className="grid gap-4">
