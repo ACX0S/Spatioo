@@ -35,21 +35,6 @@ const ParkingCard = memo(({
       onClick={handleClick}
     >
       <CardContent className="p-4">
-        {/* Image with lazy loading */}
-        {parkingSpot.fotos && parkingSpot.fotos.length > 0 && (
-          <div className="w-full h-32 bg-gray-200 rounded-lg mb-3 overflow-hidden">
-            <img
-              src={parkingSpot.fotos[0]}
-              alt={`Foto de ${parkingSpot.nome}`}
-              className="w-full h-full object-cover"
-              loading="lazy"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
-            />
-          </div>
-        )}
-
         <div className="space-y-2">
           <div className="flex items-start justify-between gap-2">
             {showDistance && distance !== undefined ? (

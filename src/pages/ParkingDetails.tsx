@@ -50,7 +50,7 @@ const ParkingDetails = () => {
                 <CarouselItem key={index}>
                   <div className="relative h-48 bg-muted rounded-lg overflow-hidden">
                     <img 
-                      src={`https://ojnayvmppwpbdcsddpaw.supabase.co/storage/v1/object/public/estacionamento-photos/${foto}`}
+                      src={foto}
                       alt={`${parkingSpot.nome} - Foto ${index + 1}`} 
                       className="w-full h-full object-cover"
                     />
