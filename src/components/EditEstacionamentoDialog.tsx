@@ -5,6 +5,7 @@ import { Estacionamento, EstacionamentoUpdate } from "@/types/estacionamento";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -40,6 +41,13 @@ const EditEstacionamentoDialog = ({ estacionamento, onSuccess }: EditEstacioname
     preco: estacionamento.preco,
     latitude: estacionamento.latitude,
     longitude: estacionamento.longitude,
+    // Comodidades
+    funcionamento_24h: estacionamento.funcionamento_24h || false,
+    suporte_carro_eletrico: estacionamento.suporte_carro_eletrico || false,
+    vaga_coberta: estacionamento.vaga_coberta || false,
+    manobrista: estacionamento.manobrista || false,
+    suporte_caminhao: estacionamento.suporte_caminhao || false,
+    vaga_moto: estacionamento.vaga_moto || false,
   });
 
   useEffect(() => {
@@ -54,6 +62,13 @@ const EditEstacionamentoDialog = ({ estacionamento, onSuccess }: EditEstacioname
       preco: estacionamento.preco,
       latitude: estacionamento.latitude,
       longitude: estacionamento.longitude,
+      // Comodidades
+      funcionamento_24h: estacionamento.funcionamento_24h || false,
+      suporte_carro_eletrico: estacionamento.suporte_carro_eletrico || false,
+      vaga_coberta: estacionamento.vaga_coberta || false,
+      manobrista: estacionamento.manobrista || false,
+      suporte_caminhao: estacionamento.suporte_caminhao || false,
+      vaga_moto: estacionamento.vaga_moto || false,
     });
   }, [estacionamento]);
 
@@ -247,6 +262,91 @@ const EditEstacionamentoDialog = ({ estacionamento, onSuccess }: EditEstacioname
             />
           </div>
         </div>
+
+        {/* Comodidades do Estacionamento */}
+        <div className="space-y-4 mt-4">
+          <Label className="text-base font-semibold">Comodidades</Label>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="edit-funcionamento-24h"
+                checked={formData.funcionamento_24h || false}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, funcionamento_24h: checked as boolean })
+                }
+              />
+              <Label htmlFor="edit-funcionamento-24h" className="text-sm font-normal cursor-pointer">
+                Funcionamento 24h
+              </Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="edit-suporte-carro-eletrico"
+                checked={formData.suporte_carro_eletrico || false}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, suporte_carro_eletrico: checked as boolean })
+                }
+              />
+              <Label htmlFor="edit-suporte-carro-eletrico" className="text-sm font-normal cursor-pointer">
+                Suporte a carro elétrico
+              </Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="edit-vaga-coberta"
+                checked={formData.vaga_coberta || false}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, vaga_coberta: checked as boolean })
+                }
+              />
+              <Label htmlFor="edit-vaga-coberta" className="text-sm font-normal cursor-pointer">
+                Vaga coberta
+              </Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="edit-manobrista"
+                checked={formData.manobrista || false}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, manobrista: checked as boolean })
+                }
+              />
+              <Label htmlFor="edit-manobrista" className="text-sm font-normal cursor-pointer">
+                Manobrista
+              </Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="edit-suporte-caminhao"
+                checked={formData.suporte_caminhao || false}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, suporte_caminhao: checked as boolean })
+                }
+              />
+              <Label htmlFor="edit-suporte-caminhao" className="text-sm font-normal cursor-pointer">
+                Suporte a caminhão
+              </Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="edit-vaga-moto"
+                checked={formData.vaga_moto || false}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, vaga_moto: checked as boolean })
+                }
+              />
+              <Label htmlFor="edit-vaga-moto" className="text-sm font-normal cursor-pointer">
+                Vaga para motos
+              </Label>
+            </div>
+          </div>
+        </div>
+
         <DialogFooter>
           <Button variant="outline" onClick={() => setIsOpen(false)} disabled={loading}>
             Cancelar

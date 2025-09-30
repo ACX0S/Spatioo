@@ -15,6 +15,13 @@ export type PublicParkingData = {
   created_at: string;
   latitude: number | null;
   longitude: number | null;
+  // Comodidades do estacionamento
+  funcionamento_24h?: boolean;
+  suporte_carro_eletrico?: boolean;
+  vaga_coberta?: boolean;
+  manobrista?: boolean;
+  suporte_caminhao?: boolean;
+  vaga_moto?: boolean;
 };
 
 // Add owner-specific functions that return full data
@@ -106,6 +113,7 @@ export const fetchParkingSpotById = async (id: string): Promise<PublicParkingDat
       .from('estacionamento')
       .select(`
         id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude,
+        funcionamento_24h, suporte_carro_eletrico, vaga_coberta, manobrista, suporte_caminhao, vaga_moto,
         estacionamento_precos(preco, horas)
       `)
       .eq('id', id)
@@ -133,7 +141,13 @@ export const fetchParkingSpotById = async (id: string): Promise<PublicParkingDat
       fotos: data.fotos,
       created_at: data.created_at,
       latitude: data.latitude,
-      longitude: data.longitude
+      longitude: data.longitude,
+      funcionamento_24h: data.funcionamento_24h,
+      suporte_carro_eletrico: data.suporte_carro_eletrico,
+      vaga_coberta: data.vaga_coberta,
+      manobrista: data.manobrista,
+      suporte_caminhao: data.suporte_caminhao,
+      vaga_moto: data.vaga_moto
     };
   } catch (error: any) {
     console.error('Failed to fetch estacionamento:', error.message);

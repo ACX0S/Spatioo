@@ -70,17 +70,23 @@ export type Database = {
           descricao: string | null
           endereco: string
           fotos: string[] | null
+          funcionamento_24h: boolean | null
           hora_extra: number
           horario_funcionamento: Json
           id: string
           latitude: number | null
           longitude: number | null
+          manobrista: boolean | null
           nome: string
           numero_vagas: number
           preco: number
+          suporte_caminhao: boolean | null
+          suporte_carro_eletrico: boolean | null
           tipo: string | null
           updated_at: string
           user_id: string
+          vaga_coberta: boolean | null
+          vaga_moto: boolean | null
         }
         Insert: {
           ativo?: boolean
@@ -90,17 +96,23 @@ export type Database = {
           descricao?: string | null
           endereco: string
           fotos?: string[] | null
+          funcionamento_24h?: boolean | null
           hora_extra?: number
           horario_funcionamento: Json
           id?: string
           latitude?: number | null
           longitude?: number | null
+          manobrista?: boolean | null
           nome: string
           numero_vagas: number
           preco: number
+          suporte_caminhao?: boolean | null
+          suporte_carro_eletrico?: boolean | null
           tipo?: string | null
           updated_at?: string
           user_id: string
+          vaga_coberta?: boolean | null
+          vaga_moto?: boolean | null
         }
         Update: {
           ativo?: boolean
@@ -110,17 +122,23 @@ export type Database = {
           descricao?: string | null
           endereco?: string
           fotos?: string[] | null
+          funcionamento_24h?: boolean | null
           hora_extra?: number
           horario_funcionamento?: Json
           id?: string
           latitude?: number | null
           longitude?: number | null
+          manobrista?: boolean | null
           nome?: string
           numero_vagas?: number
           preco?: number
+          suporte_caminhao?: boolean | null
+          suporte_carro_eletrico?: boolean | null
           tipo?: string | null
           updated_at?: string
           user_id?: string
+          vaga_coberta?: boolean | null
+          vaga_moto?: boolean | null
         }
         Relationships: [
           {

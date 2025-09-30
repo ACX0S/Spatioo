@@ -112,36 +112,67 @@ const ParkingDetails = () => {
         </div>
       </div>
       
-      {/* Amenities */}
-      <div className="mb-6">
-        <h2 className="text-lg font-bold mb-2 pl-1">Comodidades</h2>
-        <div className="grid grid-cols-2 gap-2">
-          <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-md">
-            <div className="bg-spatioo-green/20 p-1 rounded-md">
-              <Car className="h-4 w-4 text-spatioo-green" />
-            </div>
-            <span className="text-sm">Vigilância 24h</span>
-          </div>
-          <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-md">
-            <div className="bg-spatioo-green/20 p-1 rounded-md">
-              <Car className="h-4 w-4 text-spatioo-green" />
-            </div>
-            <span className="text-sm">Cobertura</span>
-          </div>
-          <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-md">
-            <div className="bg-spatioo-green/20 p-1 rounded-md">
-              <Car className="h-4 w-4 text-spatioo-green" />
-            </div>
-            <span className="text-sm">Seguro incluso</span>
-          </div>
-          <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-md">
-            <div className="bg-spatioo-green/20 p-1 rounded-md">
-              <Car className="h-4 w-4 text-spatioo-green" />
-            </div>
-            <span className="text-sm">Câmeras</span>
+      {/* Comodidades - mostrar apenas se houver alguma comodidade ativa */}
+      {(parkingSpot.funcionamento_24h || 
+        parkingSpot.suporte_carro_eletrico || 
+        parkingSpot.vaga_coberta || 
+        parkingSpot.manobrista || 
+        parkingSpot.suporte_caminhao || 
+        parkingSpot.vaga_moto) && (
+        <div className="mb-6">
+          <h2 className="text-lg font-bold mb-2 pl-1">Comodidades</h2>
+          <div className="grid grid-cols-2 gap-2">
+            {parkingSpot.funcionamento_24h && (
+              <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-md">
+                <div className="bg-spatioo-green/20 p-1 rounded-md">
+                  <Clock className="h-4 w-4 text-spatioo-green" />
+                </div>
+                <span className="text-sm">Funcionamento 24h</span>
+              </div>
+            )}
+            {parkingSpot.suporte_carro_eletrico && (
+              <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-md">
+                <div className="bg-spatioo-green/20 p-1 rounded-md">
+                  <Car className="h-4 w-4 text-spatioo-green" />
+                </div>
+                <span className="text-sm">Suporte a carro elétrico</span>
+              </div>
+            )}
+            {parkingSpot.vaga_coberta && (
+              <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-md">
+                <div className="bg-spatioo-green/20 p-1 rounded-md">
+                  <Car className="h-4 w-4 text-spatioo-green" />
+                </div>
+                <span className="text-sm">Vaga coberta</span>
+              </div>
+            )}
+            {parkingSpot.manobrista && (
+              <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-md">
+                <div className="bg-spatioo-green/20 p-1 rounded-md">
+                  <Car className="h-4 w-4 text-spatioo-green" />
+                </div>
+                <span className="text-sm">Manobrista</span>
+              </div>
+            )}
+            {parkingSpot.suporte_caminhao && (
+              <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-md">
+                <div className="bg-spatioo-green/20 p-1 rounded-md">
+                  <Car className="h-4 w-4 text-spatioo-green" />
+                </div>
+                <span className="text-sm">Suporte a caminhão</span>
+              </div>
+            )}
+            {parkingSpot.vaga_moto && (
+              <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-md">
+                <div className="bg-spatioo-green/20 p-1 rounded-md">
+                  <Car className="h-4 w-4 text-spatioo-green" />
+                </div>
+                <span className="text-sm">Vaga para motos</span>
+              </div>
+            )}
           </div>
         </div>
-      </div>
+      )}
       
       <Separator className="my-6" />
       

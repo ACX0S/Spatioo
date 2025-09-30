@@ -19,6 +19,13 @@ export interface Estacionamento {
   descricao?: string;
   ativo?: boolean;
   hora_extra?: number; // Valor cobrado por hora adicional quando não há preço específico
+  // Comodidades do estacionamento
+  funcionamento_24h?: boolean;
+  suporte_carro_eletrico?: boolean;
+  vaga_coberta?: boolean;
+  manobrista?: boolean;
+  suporte_caminhao?: boolean;
+  vaga_moto?: boolean;
 }
 
 export interface EstacionamentoInsert {
@@ -37,6 +44,13 @@ export interface EstacionamentoInsert {
   latitude?: number;
   longitude?: number;
   hora_extra?: number; // Valor obrigatório para hora adicional
+  // Comodidades do estacionamento
+  funcionamento_24h?: boolean;
+  suporte_carro_eletrico?: boolean;
+  vaga_coberta?: boolean;
+  manobrista?: boolean;
+  suporte_caminhao?: boolean;
+  vaga_moto?: boolean;
 }
 
 export interface EstacionamentoUpdate {
@@ -55,4 +69,11 @@ export interface EstacionamentoUpdate {
   longitude?: number;
   ativo?: boolean;
   hora_extra?: number; // Valor para hora adicional
+  // Comodidades do estacionamento
+  funcionamento_24h?: boolean;
+  suporte_carro_eletrico?: boolean;
+  vaga_coberta?: boolean;
+  manobrista?: boolean;
+  suporte_caminhao?: boolean;
+  vaga_moto?: boolean;
 }
