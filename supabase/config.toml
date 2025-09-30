@@ -1,1 +1,5 @@
 project_id = "ojnayvmppwpbdcsddpaw"
+
+[auth.email.template.confirmation]
+subject = "Confirme seu cadastro no Spatioo"
+content_path = "./supabase/templates/confirmation.html"
