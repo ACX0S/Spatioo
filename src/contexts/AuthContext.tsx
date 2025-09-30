@@ -171,6 +171,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string, name: string) => {
     try {
       console.log('Attempting to sign up with:', email, 'name:', name);
+      
+      // Verificar se o usuário já existe
+      const { data: existingUser } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+      
+      if (existingUser?.user) {
+        // Usuário já existe e as credenciais estão corretas
+        toast({
+          title: "Você já tem uma conta",
+          description: "Fazendo login automaticamente...",
+          duration: 2000
+        });
+        navigate('/home');
+        return;
+      }
+      
       const { data, error } = await supabase.auth.signUp({ 
         email, 
         password,
@@ -183,32 +201,57 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       
       if (error) {
+        // Verificar se é erro de usuário já existente
+        if (error.message.includes('already') || error.message.includes('User already registered')) {
+          toast({
+            title: "Conta já existe",
+            description: "Este email já está cadastrado. Por favor, faça login ou recupere sua senha.",
+            variant: "destructive",
+            duration: 4000
+          });
+          throw new Error('Usuário já cadastrado');
+        }
         console.error('Sign up error:', error);
         throw error;
       }
 
       console.log('Sign up successful:', data);
       
+      // Verificar se o usuário já existe mas não confirmou email
+      if (data.user && data.user.identities && data.user.identities.length === 0) {
+        toast({
+          title: "Conta já existe",
+          description: "Este email já está cadastrado. Verifique seu email para confirmar a conta ou faça login se já confirmou.",
+          variant: "default",
+          duration: 5000
+        });
+        return;
+      }
+      
       if (data.user && !data.session) {
         toast({
           title: "Cadastro realizado com sucesso",
           description: "Verifique seu email para confirmar a conta.",
+          duration: 4000
         });
       } else if (data.session) {
         toast({
           title: "Cadastro realizado com sucesso",
           description: "Bem-vindo ao Spatioo!",
+          duration: 2000
         });
         navigate('/home');
       }
     } catch (error: any) {
       console.error('Signup error:', error);
-      toast({
-        title: "Erro ao criar conta",
-        description: error.message,
-        variant: "destructive",
-        duration : 3000
-      });
+      if (error.message !== 'Usuário já cadastrado') {
+        toast({
+          title: "Erro ao criar conta",
+          description: error.message,
+          variant: "destructive",
+          duration: 3000
+        });
+      }
       throw error;
     }
   };
