@@ -215,46 +215,97 @@ const ParkingOwnerDashboard = () => {
                   </DialogDescription>
                 </DialogHeader>
                 
-                <div className="grid gap-4 py-4">
+                <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto">
+                  {/* NOTA: Este é um formulário mockado. Para implementação real, */}
+                  {/* use o componente CreateEstacionamentoDialog ou crie um novo */}
+                  {/* componente para estacionamentos comerciais com CNPJ e comodidades */}
+                  
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Nome do estacionamento</label>
+                    <label className="text-sm font-medium">Nome do estacionamento *</label>
                     <Input placeholder="Ex.: Estacionamento Central" />
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Endereço completo</label>
-                    <Input placeholder="Rua, número, bairro, cidade" />
+                    <label className="text-sm font-medium">CNPJ *</label>
+                    <Input placeholder="00.000.000/0000-00" />
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Total de vagas</label>
-                      <Input type="number" placeholder="Ex.: 50" />
+                      <label className="text-sm font-medium">CEP *</label>
+                      <Input placeholder="00000-000" />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Preço por hora (R$)</label>
-                      <Input type="number" step="0.01" placeholder="Ex.: 5.50" />
+                      <label className="text-sm font-medium">Número *</label>
+                      <Input placeholder="123" />
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Características</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="flex items-center">
-                        <input type="checkbox" id="covered" className="mr-2" />
-                        <label htmlFor="covered" className="text-sm">Coberto</label>
+                    <label className="text-sm font-medium">Endereço completo *</label>
+                    <Input placeholder="Será preenchido automaticamente pelo CEP" disabled />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Total de vagas *</label>
+                      <Input type="number" placeholder="Ex.: 50" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Valor da hora extra (R$) *</label>
+                      <Input type="number" step="0.01" placeholder="Ex.: 5.00" />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Horário de abertura *</label>
+                      <Input type="time" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Horário de fechamento *</label>
+                      <Input type="time" />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Comodidades do estacionamento</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="flex items-center space-x-2">
+                        <input type="checkbox" id="funcionamento-24h" className="h-4 w-4" />
+                        <label htmlFor="funcionamento-24h" className="text-sm cursor-pointer">
+                          Funcionamento 24h
+                        </label>
                       </div>
-                      <div className="flex items-center">
-                        <input type="checkbox" id="security" className="mr-2" />
-                        <label htmlFor="security" className="text-sm">Segurança 24h</label>
+                      <div className="flex items-center space-x-2">
+                        <input type="checkbox" id="suporte-eletrico" className="h-4 w-4" />
+                        <label htmlFor="suporte-eletrico" className="text-sm cursor-pointer">
+                          Suporte a carro elétrico
+                        </label>
                       </div>
-                      <div className="flex items-center">
-                        <input type="checkbox" id="camera" className="mr-2" />
-                        <label htmlFor="camera" className="text-sm">Câmeras</label>
+                      <div className="flex items-center space-x-2">
+                        <input type="checkbox" id="vaga-coberta" className="h-4 w-4" />
+                        <label htmlFor="vaga-coberta" className="text-sm cursor-pointer">
+                          Vaga coberta
+                        </label>
                       </div>
-                      <div className="flex items-center">
-                        <input type="checkbox" id="ev_charging" className="mr-2" />
-                        <label htmlFor="ev_charging" className="text-sm">Carregamento EV</label>
+                      <div className="flex items-center space-x-2">
+                        <input type="checkbox" id="manobrista" className="h-4 w-4" />
+                        <label htmlFor="manobrista" className="text-sm cursor-pointer">
+                          Manobrista
+                        </label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input type="checkbox" id="suporte-caminhao" className="h-4 w-4" />
+                        <label htmlFor="suporte-caminhao" className="text-sm cursor-pointer">
+                          Suporte a caminhão
+                        </label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input type="checkbox" id="vaga-moto" className="h-4 w-4" />
+                        <label htmlFor="vaga-moto" className="text-sm cursor-pointer">
+                          Vaga para motos
+                        </label>
                       </div>
                     </div>
                   </div>
@@ -267,6 +318,10 @@ const ParkingOwnerDashboard = () => {
                       rows={3}
                     ></textarea>
                   </div>
+                  
+                  <p className="text-xs text-muted-foreground">
+                    * Campos obrigatórios
+                  </p>
                 </div>
                 
                 <DialogFooter>

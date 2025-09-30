@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
+// Checkbox removido - não é necessário para vagas residenciais
 import {
   Select,
   SelectContent,
@@ -84,15 +84,7 @@ const CreateEstacionamentoDialog = ({
     horaExtra: "", // Valor para hora adicional quando não há preço específico cadastrado
   });
 
-  // Estado para armazenar as comodidades selecionadas
-  const [comodidades, setComodidades] = useState({
-    funcionamento_24h: false,
-    suporte_carro_eletrico: false,
-    vaga_coberta: false,
-    manobrista: false,
-    suporte_caminhao: false,
-    vaga_moto: false,
-  });
+  // Comodidades não são necessárias para vagas residenciais
 
   // Estado para controlar a edição do campo de endereço.
   const [enderecoDisabled, setEnderecoDisabled] = useState(false);
@@ -227,13 +219,7 @@ const CreateEstacionamentoDialog = ({
             cnpj: "", // CNPJ vazio para vagas residenciais
             tipo: formData.tipo,
             hora_extra: parseFloat(formData.horaExtra), // Adiciona o valor da hora extra
-            // Adiciona as comodidades selecionadas
-            funcionamento_24h: comodidades.funcionamento_24h,
-            suporte_carro_eletrico: comodidades.suporte_carro_eletrico,
-            vaga_coberta: comodidades.vaga_coberta,
-            manobrista: comodidades.manobrista,
-            suporte_caminhao: comodidades.suporte_caminhao,
-            vaga_moto: comodidades.vaga_moto,
+            // Vagas residenciais não possuem comodidades
           })
           .select()
           .single();
@@ -268,14 +254,6 @@ const CreateEstacionamentoDialog = ({
         horarioFim: "",
         tipo: "residencial",
         horaExtra: "",
-      });
-      setComodidades({
-        funcionamento_24h: false,
-        suporte_carro_eletrico: false,
-        vaga_coberta: false,
-        manobrista: false,
-        suporte_caminhao: false,
-        vaga_moto: false,
       });
       setCepData(null);
       setEnderecoDisabled(false);
@@ -511,108 +489,6 @@ const CreateEstacionamentoDialog = ({
               onChange={(e) => handleInputChange("descricao", e.target.value)}
               rows={3}
             />
-          </div>
-
-          {/* Comodidades do Estacionamento */}
-          <div className="space-y-4">
-            <Label className="text-base font-semibold">Comodidades</Label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="funcionamento-24h"
-                  checked={comodidades.funcionamento_24h}
-                  onCheckedChange={(checked) =>
-                    setComodidades((prev) => ({ ...prev, funcionamento_24h: checked as boolean }))
-                  }
-                />
-                <Label
-                  htmlFor="funcionamento-24h"
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  Funcionamento 24h
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="suporte-carro-eletrico"
-                  checked={comodidades.suporte_carro_eletrico}
-                  onCheckedChange={(checked) =>
-                    setComodidades((prev) => ({ ...prev, suporte_carro_eletrico: checked as boolean }))
-                  }
-                />
-                <Label
-                  htmlFor="suporte-carro-eletrico"
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  Suporte a carro elétrico
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="vaga-coberta"
-                  checked={comodidades.vaga_coberta}
-                  onCheckedChange={(checked) =>
-                    setComodidades((prev) => ({ ...prev, vaga_coberta: checked as boolean }))
-                  }
-                />
-                <Label
-                  htmlFor="vaga-coberta"
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  Vaga coberta
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="manobrista"
-                  checked={comodidades.manobrista}
-                  onCheckedChange={(checked) =>
-                    setComodidades((prev) => ({ ...prev, manobrista: checked as boolean }))
-                  }
-                />
-                <Label
-                  htmlFor="manobrista"
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  Manobrista
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="suporte-caminhao"
-                  checked={comodidades.suporte_caminhao}
-                  onCheckedChange={(checked) =>
-                    setComodidades((prev) => ({ ...prev, suporte_caminhao: checked as boolean }))
-                  }
-                />
-                <Label
-                  htmlFor="suporte-caminhao"
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  Suporte a caminhão
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="vaga-moto"
-                  checked={comodidades.vaga_moto}
-                  onCheckedChange={(checked) =>
-                    setComodidades((prev) => ({ ...prev, vaga_moto: checked as boolean }))
-                  }
-                />
-                <Label
-                  htmlFor="vaga-moto"
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  Vaga para motos
-                </Label>
-              </div>
-            </div>
           </div>
 
           {/* Botões de Ação */}
