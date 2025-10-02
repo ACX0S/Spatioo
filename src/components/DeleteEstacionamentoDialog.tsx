@@ -73,7 +73,15 @@ const DeleteEstacionamentoDialog = ({
     setIsDeleting(true);
 
     try {
-      // Primeiro, exclui os preços associados ao estacionamento
+      // 1. Exclui as notificações associadas ao estacionamento (corrige o erro de foreign key)
+      const { error: notificationsError } = await supabase
+        .from("notifications")
+        .delete()
+        .eq("estacionamento_id", estacionamentoId);
+
+      if (notificationsError) throw notificationsError;
+
+      // 2. Exclui os preços associados ao estacionamento
       const { error: precosError } = await supabase
         .from("estacionamento_precos")
         .delete()
@@ -81,7 +89,15 @@ const DeleteEstacionamentoDialog = ({
 
       if (precosError) throw precosError;
 
-      // Depois, exclui as vagas associadas ao estacionamento
+      // 3. Exclui as reservas (bookings) associadas ao estacionamento
+      const { error: bookingsError } = await supabase
+        .from("bookings")
+        .delete()
+        .eq("estacionamento_id", estacionamentoId);
+
+      if (bookingsError) throw bookingsError;
+
+      // 4. Exclui as vagas associadas ao estacionamento
       const { error: vagasError } = await supabase
         .from("vagas")
         .delete()
@@ -89,7 +105,7 @@ const DeleteEstacionamentoDialog = ({
 
       if (vagasError) throw vagasError;
 
-      // Por fim, exclui o estacionamento
+      // 5. Por fim, exclui o estacionamento
       const { error: estacionamentoError } = await supabase
         .from("estacionamento")
         .delete()

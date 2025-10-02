@@ -61,6 +61,9 @@ const EstacionamentoDashboard = () => {
   const [filterStartDate, setFilterStartDate] = useState<string>('');
   const [filterEndDate, setFilterEndDate] = useState<string>('');
   
+  // Estado para armazenar informações dos motoristas
+  const [motoristas, setMotoristas] = useState<Record<string, string>>({});
+
   // Hooks for real data
   const { stats, refetch: refetchStats } = useVagasStats(estacionamento?.id);
   const { vagas, updateVagaStatus, deleteVaga, refetch: refetchVagas } = useVagas(estacionamento?.id);
@@ -72,6 +75,37 @@ const EstacionamentoDashboard = () => {
     { id: 'fotos', title: 'Fotos', icon: Camera },
     { id: 'vagas', title: 'Vagas', icon: Car },
   ];
+
+  // Efeito para buscar os nomes dos motoristas quando as vagas mudam
+  useEffect(() => {
+    const fetchMotoristas = async () => {
+      const userIds = vagas
+        .filter(vaga => vaga.user_id)
+        .map(vaga => vaga.user_id)
+        .filter((id): id is string => id !== null);
+
+      if (userIds.length === 0) return;
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, name')
+        .in('id', userIds);
+
+      if (error) {
+        console.error('Erro ao buscar motoristas:', error);
+        return;
+      }
+
+      const motoristasMap: Record<string, string> = {};
+      data?.forEach(profile => {
+        motoristasMap[profile.id] = profile.name || 'Sem nome';
+      });
+
+      setMotoristas(motoristasMap);
+    };
+
+    fetchMotoristas();
+  }, [vagas]);
 
   useEffect(() => {
     if (!profile?.dono_estacionamento) {
@@ -470,6 +504,16 @@ const EstacionamentoDashboard = () => {
                                 vaga.tipo_vaga === 'eletrico' ? 'Elétrico' :
                                 vaga.tipo_vaga === 'deficiente' ? 'PCD' : 'Moto'}
                         </div>
+                        
+                        {/* Mostrar o nome do motorista se a vaga estiver reservada ou ocupada */}
+                        {(vaga.status === 'reservada' || vaga.status === 'ocupada') && vaga.user_id && (
+                          <div className="text-sm bg-muted/50 p-2 rounded">
+                            <span className="font-medium">Motorista:</span>
+                            <p className="text-muted-foreground truncate">
+                              {motoristas[vaga.user_id] || 'Carregando...'}
+                            </p>
+                          </div>
+                        )}
                         
                         <div className="flex gap-2">
                           <Select value={vaga.status} onValueChange={(value) => updateVagaStatus(vaga.id, value)}>

@@ -203,8 +203,24 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
       // Calcula o horário de fim
       const endTime = new Date(bookingDate.getTime() + selectedDuration * 60 * 60 * 1000);
       
-      // Cria a reserva no banco de dados
-      const { error } = await supabase
+      // 1. Buscar uma vaga disponível
+      const { data: vagasDisponiveis, error: vagasError } = await supabase
+        .from('vagas')
+        .select('*')
+        .eq('estacionamento_id', parkingSpot.id)
+        .eq('status', 'disponivel')
+        .limit(1);
+
+      if (vagasError) throw vagasError;
+
+      if (!vagasDisponiveis || vagasDisponiveis.length === 0) {
+        throw new Error('Não há vagas disponíveis no momento. Por favor, tente novamente mais tarde.');
+      }
+
+      const vagaSelecionada = vagasDisponiveis[0];
+
+      // 2. Criar a reserva no banco de dados
+      const { data: bookingData, error: bookingError } = await supabase
         .from('bookings')
         .insert({
           user_id: user.id,
@@ -214,10 +230,24 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
           end_time: format(endTime, 'HH:mm:ss'),
           price: calculatedPrice,
           status: 'upcoming',
-          spot_number: 'A ser definido' // Será definido pelo sistema
-        });
+          spot_number: vagaSelecionada.numero_vaga
+        })
+        .select()
+        .single();
       
-      if (error) throw error;
+      if (bookingError) throw bookingError;
+
+      // 3. Atualizar a vaga para status "reservada" e associar ao usuário e booking
+      const { error: updateVagaError } = await supabase
+        .from('vagas')
+        .update({
+          status: 'reservada',
+          user_id: user.id,
+          booking_id: bookingData.id
+        })
+        .eq('id', vagaSelecionada.id);
+
+      if (updateVagaError) throw updateVagaError;
       
       toast({ 
         title: "Reserva confirmada!", 
