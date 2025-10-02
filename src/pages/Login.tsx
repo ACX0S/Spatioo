@@ -117,15 +117,6 @@ const Login = () => {
     }
   };
 
-  function setAgreeTerms(value: boolean) {
-    value ? toast({
-        title: "Termos de uso aceitos",
-        variant: "default",
-        duration: 1000
-        
-      }) : null
-  }
-
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <motion.div 
@@ -323,19 +314,6 @@ const Login = () => {
                     )}
                   </Button>
                 </div>
-              </div>
-              
-              <div className="flex items-start mt-4">
-                <input
-                  type="checkbox"
-                  id="terms"
-                  className="mr-2 mt-1"
-                  onChange={(e) => setAgreeTerms(e.target.checked)}
-                />
-                {/* Termos de uso e Política de Privacidade da Spatioo */}
-                <label htmlFor="terms" className="text-xs text-muted-foreground">
-                  Concordo com os <a href="#" className="text-spatioo-green">Termos de Uso</a> e <a href="#" className="text-spatioo-green">Política de Privacidade</a> da Spatioo.
-                </label>
               </div>
               
               <Button 
