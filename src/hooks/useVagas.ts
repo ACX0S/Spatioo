@@ -1,55 +1,36 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Database } from '@/integrations/supabase/types';
+import { useSupabaseQuery } from './useSupabaseQuery';
+import { sortByNumericField, handleSupabaseError } from '@/utils/supabaseHelpers';
 
 type VagaData = Database['public']['Tables']['vagas']['Row'];
 
+/**
+ * @hook useVagas
+ * @description Hook otimizado para gerenciar vagas de um estacionamento
+ * Agora usa useSupabaseQuery para reduzir código duplicado
+ */
 export const useVagas = (estacionamentoId: string | undefined) => {
-  const [vagas, setVagas] = useState<VagaData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const fetchVagas = async () => {
-    if (!estacionamentoId) {
-      setLoading(false);
-      return;
+  // Usa o hook genérico para buscar vagas
+  const { data: vagas, loading, error, refetch } = useSupabaseQuery<VagaData>(
+    async () => supabase
+      .from('vagas')
+      .select('*')
+      .eq('estacionamento_id', estacionamentoId!),
+    [estacionamentoId],
+    {
+      enabled: !!estacionamentoId,
+      errorMessage: 'Erro ao carregar vagas',
+      transform: (data) => sortByNumericField(data, (item) => item.numero_vaga)
     }
+  );
 
-    try {
-      setLoading(true);
-      setError(null);
-
-      const { data, error } = await supabase
-        .from('vagas')
-        .select('*')
-        .eq('estacionamento_id', estacionamentoId);
-
-      if (error) throw error;
-
-      const sorted = (data || []).slice().sort((a, b) => {
-        const getNum = (s: string) => {
-          const m = s.match(/\d+/);
-          return m ? parseInt(m[0], 10) : 0;
-        };
-        return getNum(a.numero_vaga) - getNum(b.numero_vaga);
-      });
-      setVagas(sorted);
-    } catch (err: any) {
-      console.error('Error fetching vagas:', err);
-      setError(err.message || 'Erro ao carregar vagas');
-      toast({
-        title: "Erro",
-        description: "Erro ao carregar vagas",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateVagaStatus = async (vagaId: string, newStatus: string) => {
+  // Otimizado com useCallback para evitar re-renders desnecessários
+  const updateVagaStatus = useCallback(async (vagaId: string, newStatus: string) => {
     try {
       const { error } = await supabase
         .from('vagas')
@@ -58,28 +39,23 @@ export const useVagas = (estacionamentoId: string | undefined) => {
 
       if (error) throw error;
 
-      // Update local state
-      setVagas(prevVagas => 
-        prevVagas.map(vaga => 
-          vaga.id === vagaId ? { ...vaga, status: newStatus } : vaga
-        )
-      );
+      // Refetch para garantir consistência com o banco
+      await refetch();
 
       toast({
         title: "Sucesso",
         description: "Status da vaga atualizado com sucesso",
       });
     } catch (err: any) {
-      console.error('Error updating vaga status:', err);
       toast({
         title: "Erro",
-        description: "Erro ao atualizar status da vaga",
+        description: handleSupabaseError(err, "Erro ao atualizar status da vaga"),
         variant: "destructive"
       });
     }
-  };
+  }, [refetch, toast]);
 
-  const deleteVaga = async (vagaId: string) => {
+  const deleteVaga = useCallback(async (vagaId: string) => {
     try {
       const { error } = await supabase
         .from('vagas')
@@ -88,32 +64,27 @@ export const useVagas = (estacionamentoId: string | undefined) => {
 
       if (error) throw error;
 
-      // Update local state
-      setVagas(prevVagas => prevVagas.filter(vaga => vaga.id !== vagaId));
+      // Refetch para garantir consistência com o banco
+      await refetch();
 
       toast({
         title: "Sucesso",
         description: "Vaga deletada com sucesso",
       });
     } catch (err: any) {
-      console.error('Error deleting vaga:', err);
       toast({
         title: "Erro",
-        description: "Erro ao deletar vaga",
+        description: handleSupabaseError(err, "Erro ao deletar vaga"),
         variant: "destructive"
       });
     }
-  };
-
-  useEffect(() => {
-    fetchVagas();
-  }, [estacionamentoId]);
+  }, [refetch, toast]);
 
   return {
     vagas,
     loading,
     error,
-    refetch: fetchVagas,
+    refetch,
     updateVagaStatus,
     deleteVaga
   };

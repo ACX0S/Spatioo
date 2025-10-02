@@ -27,10 +27,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Load user profile
+  // Load user profile (otimizado com menos logs)
   const loadUserProfile = async (userId: string) => {
     try {
-      console.log('Loading profile for user:', userId);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -42,11 +41,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      console.log('Profile loaded:', data);
       if (data) {
         setProfile(data as Profile);
       } else {
-        console.log('No profile found for user:', userId);
         // If no profile exists, create one with the user's metadata
         try {
           const { data: { user } } = await supabase.auth.getUser();
@@ -66,7 +63,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (insertError) {
               console.error('Error creating profile:', insertError);
             } else {
-              console.log('Profile created:', newProfile);
               setProfile(newProfile as Profile);
             }
           }
@@ -86,8 +82,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Configure auth state change listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, newSession) => {
-        console.log('Auth state changed:', event, newSession?.user?.email);
-        
         if (!mounted) return;
         
         setSession(newSession);
@@ -119,8 +113,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (!mounted) return;
       
-      console.log('Existing session check:', existingSession?.user?.email);
-      
       setSession(existingSession);
       setUser(existingSession?.user ?? null);
       
@@ -137,43 +129,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  // Login with email and password
+  // Login with email and password (otimizado com menos logs)
   const signIn = async (email: string, password: string) => {
     try {
-      console.log('Attempting to sign in with:', email);
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       
-      if (error) {
-        console.error('Sign in error:', error);
-        throw error;
-      }
+      if (error) throw error;
 
-      console.log('Sign in successful:', data);
       toast({
         title: "Login realizado com sucesso",
         description: "Bem-vindo de volta!",
-        duration : 2000
+        duration: 2000
       });
       
       navigate('/home');
     } catch (error: any) {
-      console.error('Login error:', error);
       toast({
         title: "Erro ao fazer login",
         description: error.message,
         variant: "destructive",
-        duration : 2000
-
+        duration: 2000
       });
       throw error;
     }
   };
 
-  // Sign up with email and password
+  // Sign up with email and password (otimizado com menos logs)
   const signUp = async (email: string, password: string, name: string, phone?: string) => {
     try {
-      console.log('Attempting to sign up with:', email, 'name:', name, 'phone:', phone);
-      
       // Verificar se o usuário já existe
       const { data: existingUser } = await supabase.auth.signInWithPassword({
         email,
@@ -214,11 +197,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           });
           throw new Error('Usuário já cadastrado');
         }
-        console.error('Sign up error:', error);
         throw error;
       }
-
-      console.log('Sign up successful:', data);
       
       // Verificar se o usuário já existe mas não confirmou email
       if (data.user && data.user.identities && data.user.identities.length === 0) {
@@ -246,7 +226,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         navigate('/home');
       }
     } catch (error: any) {
-      console.error('Signup error:', error);
       if (error.message !== 'Usuário já cadastrado') {
         toast({
           title: "Erro ao criar conta",
@@ -273,12 +252,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Update profile
+  // Update profile (otimizado com menos logs)
   const updateProfile = async (updatedProfile: Partial<Profile>) => {
     try {
       if (!user) throw new Error("Usuário não autenticado");
-
-      console.log('Updating profile for user:', user.id, 'with data:', updatedProfile);
 
       const { data, error } = await supabase
         .from('profiles')
@@ -287,12 +264,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .select()
         .single();
 
-      if (error) {
-        console.error('Error updating profile:', error);
-        throw error;
-      }
-
-      console.log('Profile updated successfully:', data);
+      if (error) throw error;
       
       // Update local state
       setProfile(prev => prev ? { ...prev, ...updatedProfile } : null);

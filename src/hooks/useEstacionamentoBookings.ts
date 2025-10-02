@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useMemo, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 import { Database } from '@/integrations/supabase/types';
+import { useSupabaseQuery } from './useSupabaseQuery';
 
 type BookingData = Database['public']['Tables']['bookings']['Row'] & {
   profiles?: {
@@ -9,45 +9,28 @@ type BookingData = Database['public']['Tables']['bookings']['Row'] & {
   };
 };
 
+/**
+ * @hook useEstacionamentoBookings
+ * @description Hook otimizado para gerenciar reservas de um estacionamento
+ * Agora usa useSupabaseQuery e useMemo para melhor performance
+ */
 export const useEstacionamentoBookings = (estacionamentoId: string | undefined) => {
-  const [bookings, setBookings] = useState<BookingData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
-
-  const fetchBookings = async () => {
-    if (!estacionamentoId) {
-      setLoading(false);
-      return;
+  // Usa o hook genérico para buscar bookings
+  const { data: bookings, loading, error, refetch } = useSupabaseQuery<BookingData>(
+    async () => supabase
+      .from('bookings')
+      .select('*')
+      .eq('estacionamento_id', estacionamentoId!)
+      .order('created_at', { ascending: false }),
+    [estacionamentoId],
+    {
+      enabled: !!estacionamentoId,
+      errorMessage: 'Erro ao carregar reservas'
     }
+  );
 
-    try {
-      setLoading(true);
-      setError(null);
-
-      const { data, error } = await supabase
-        .from('bookings')
-        .select('*')
-        .eq('estacionamento_id', estacionamentoId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      setBookings(data || []);
-    } catch (err: any) {
-      console.error('Error fetching bookings:', err);
-      setError(err.message || 'Erro ao carregar reservas');
-      toast({
-        title: "Erro",
-        description: "Erro ao carregar reservas",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filterBookings = (status?: string, startDate?: string, endDate?: string) => {
+  // Otimizado com useCallback para evitar re-criação da função
+  const filterBookings = useCallback((status?: string, startDate?: string, endDate?: string) => {
     let filtered = bookings;
 
     if (status && status !== 'all') {
@@ -63,17 +46,13 @@ export const useEstacionamentoBookings = (estacionamentoId: string | undefined) 
     }
 
     return filtered;
-  };
-
-  useEffect(() => {
-    fetchBookings();
-  }, [estacionamentoId]);
+  }, [bookings]);
 
   return {
     bookings,
     loading,
     error,
-    refetch: fetchBookings,
+    refetch,
     filterBookings
   };
 };
