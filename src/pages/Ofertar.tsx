@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import CreateEstacionamentoComercialDialog from "@/components/CreateEstacionamentoComercialDialog";
+import CreateEstacionamentoDialog from "@/components/CreateEstacionamentoDialog";
 import { UserParkingCard } from "@/components/UserParkingCard";
 import { useUserEstacionamentos } from "@/hooks/useUserEstacionamentos";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -29,12 +29,12 @@ const Ofertar = () => {
       {/* Header */}
       <div className="mb-6 text-center">
         <h1 className="text-2xl font-bold text-foreground mb-2">
-          {estacionamentos.length > 0 ? "Meus Estacionamentos" : "Nenhum estacionamento cadastrado"}
+          {estacionamentos.length > 0 ? "Minhas Vagas" : "Nenhuma vaga cadastrada"}
         </h1>
         <p className="text-muted-foreground">
           {estacionamentos.length > 0 
-            ? "Gerencie seus estacionamentos comerciais" 
-            : "Comece cadastrando seu primeiro estacionamento"
+            ? "Gerencie suas vagas residenciais" 
+            : "Cadastre sua primeira vaga residencial"
           }
         </p>
       </div>
@@ -46,7 +46,7 @@ const Ofertar = () => {
           className="w-full bg-spatioo-green hover:bg-spatioo-green/90 h-12"
         >
           <Plus className="h-5 w-5 mr-2" />
-          Cadastrar estacionamento
+          Ofertar vaga
         </Button>
       </div>
 
@@ -65,7 +65,7 @@ const Ofertar = () => {
       )}
 
       {/* Create Dialog */}
-      <CreateEstacionamentoComercialDialog 
+      <CreateEstacionamentoDialog 
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         onSuccess={refetch}

@@ -10,7 +10,7 @@ import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useBookings } from '@/hooks/useBookings';
 import ChangePasswordDialog from '@/components/ChangePasswordDialog';
-import CreateEstacionamentoDialog from '@/components/CreateEstacionamentoDialog';
+import CreateEstacionamentoComercialDialog from '@/components/CreateEstacionamentoComercialDialog';
 import { uploadAvatar, deleteOldAvatar } from '@/services/storageService';
 import { useCep } from '@/hooks/useCep';
 
@@ -408,7 +408,7 @@ const Profile = () => {
                       <Building2 className="h-4 w-4 mr-2" />
                       Cadastrar Estacionamento
                     </Button>
-                    <CreateEstacionamentoDialog 
+                    <CreateEstacionamentoComercialDialog 
                       open={createEstacionamentoDialogOpen}
                       onOpenChange={setCreateEstacionamentoDialogOpen}
                       onSuccess={() => window.location.reload()} 
