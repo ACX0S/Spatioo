@@ -49,9 +49,9 @@ const ParkingDetails = () => {
               {parkingSpot.fotos.map((foto, index) => (
                 <CarouselItem key={index}>
                   <div className="relative h-48 bg-muted rounded-lg overflow-hidden">
-                    <img 
+                    <img
                       src={foto}
-                      alt={`${parkingSpot.nome} - Foto ${index + 1}`} 
+                      alt={`${parkingSpot.nome} - Foto ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -70,17 +70,17 @@ const ParkingDetails = () => {
             <Car className="h-16 w-16 text-slate-500" />
           </div>
         )}
-        
-        <Button 
-          variant="ghost" 
-          size="icon" 
+
+        <Button
+          variant="ghost"
+          size="icon"
           className="absolute top-2 left-2 z-10 rounded-full bg-background/80 backdrop-blur-sm"
           onClick={() => navigate(-1)}
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
       </div>
-      
+
       {/* Basic Info */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold mb-1">{parkingSpot.nome}</h1>
@@ -88,36 +88,40 @@ const ParkingDetails = () => {
           <MapPin className="h-4 w-4 mr-1 text-spatioo-green" />
           <span className="text-sm">{parkingSpot.endereco}</span>
         </div>
-        
+
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-spatioo-green" />
             <span className="text-sm font-medium">
-              {typeof parkingSpot.horario_funcionamento === 'object' && parkingSpot.horario_funcionamento && 
-              'abertura' in parkingSpot.horario_funcionamento && 'fechamento' in parkingSpot.horario_funcionamento ? 
-                `${parkingSpot.horario_funcionamento.abertura} - ${parkingSpot.horario_funcionamento.fechamento}` : 
-                'Horário não informado'}
+              {typeof parkingSpot.horario_funcionamento === "object" &&
+              parkingSpot.horario_funcionamento &&
+              "abertura" in parkingSpot.horario_funcionamento &&
+              "fechamento" in parkingSpot.horario_funcionamento
+                ? `${parkingSpot.horario_funcionamento.abertura} - ${parkingSpot.horario_funcionamento.fechamento}`
+                : "Horário não informado"}
             </span>
           </div>
         </div>
       </div>
-      
+
       {/* Pricing Table */}
       <PricingTable parkingSpotId={parkingSpot.id} />
-      
+
       <div className="flex justify-between items-center p-2 bg-muted/30 rounded-lg mb-6">
         <div className="text-left w-full ml-2">
-          <p className="text-lg  font-bold">Vagas disponíveis :</p>
-          <p className="text-lg font-bold">{parkingSpot.numero_vagas}</p>
+          <p className="text-lg  font-bold">
+            Vagas disponíveis:{" "}
+            <span className="text-spatioo-green">{parkingSpot.numero_vagas}</span>
+          </p>
         </div>
       </div>
-      
+
       {/* Comodidades - mostrar apenas se houver alguma comodidade ativa */}
-      {(parkingSpot.funcionamento_24h || 
-        parkingSpot.suporte_carro_eletrico || 
-        parkingSpot.vaga_coberta || 
-        parkingSpot.manobrista || 
-        parkingSpot.suporte_caminhao || 
+      {(parkingSpot.funcionamento_24h ||
+        parkingSpot.suporte_carro_eletrico ||
+        parkingSpot.vaga_coberta ||
+        parkingSpot.manobrista ||
+        parkingSpot.suporte_caminhao ||
         parkingSpot.vaga_moto) && (
         <div className="mb-6">
           <h2 className="text-lg font-bold mb-2 pl-1">Comodidades</h2>
@@ -173,9 +177,9 @@ const ParkingDetails = () => {
           </div>
         </div>
       )}
-      
+
       <Separator className="my-6" />
-      
+
       {/* Booking Form */}
       <BookingForm parkingSpot={parkingSpot} />
     </div>
