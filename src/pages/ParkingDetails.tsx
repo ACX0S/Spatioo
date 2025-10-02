@@ -105,10 +105,10 @@ const ParkingDetails = () => {
       {/* Pricing Table */}
       <PricingTable parkingSpotId={parkingSpot.id} />
       
-      <div className="flex justify-between items-center pl-1 bg-muted/30 rounded-lg mb-6">
-        <div className="text-left w-full">
-          <p className="text-lg  font-bold">Total de vagas disponíveis</p>
-          <p className="text-xl font-bold">{parkingSpot.numero_vagas}</p>
+      <div className="flex justify-between items-center p-2 bg-muted/30 rounded-lg mb-6">
+        <div className="text-left w-full ml-2">
+          <p className="text-lg  font-bold">Vagas disponíveis :</p>
+          <p className="text-lg font-bold">{parkingSpot.numero_vagas}</p>
         </div>
       </div>
       
