@@ -15,17 +15,23 @@ import {
   Filter, 
   Search,
   Building2,
-  DollarSign
+  DollarSign,
+  Edit,
+  Settings,
+  Trash2
 } from 'lucide-react';
 import CreateEstacionamentoComercialDialog from "@/components/CreateEstacionamentoComercialDialog";
 import { useUserEstacionamentos } from "@/hooks/useUserEstacionamentos";
 import { useNavigate } from "react-router-dom";
 import EditEstacionamentoDialog from "@/components/EditEstacionamentoDialog";
+import DeleteEstacionamentoDialog from "@/components/DeleteEstacionamentoDialog";
 
 const ParkingOwnerDashboard = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [activeTab, setActiveTab] = useState('parking-spots');
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [editingEstacionamento, setEditingEstacionamento] = useState<string | null>(null);
+  const [deletingEstacionamento, setDeletingEstacionamento] = useState<{ id: string; nome: string } | null>(null);
   const navigate = useNavigate();
   
   // Busca os estacionamentos reais do banco de dados
@@ -162,22 +168,39 @@ const ParkingOwnerDashboard = () => {
                       </CardContent>
                       
                       <CardFooter className="flex justify-between items-center pt-2 gap-2">
-                        {/* Botão Editar */}
-                        <EditEstacionamentoDialog 
-                          estacionamento={parking}
-                          onSuccess={refetch}
-                        />
-                        
-                        {/* Botão Gerenciar */}
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={() => navigate(`/estacionamento-dashboard/${parking.id}`)}
-                          className="flex-1"
-                        >
-                          <Building2 className="h-4 w-4 mr-1" />
-                          Gerenciar
-                        </Button>
+                        {/* Botões de ação ajustados conforme referência */}
+                        <div className="flex gap-2 w-full">
+                          {/* Botões alinhados à esquerda com mesmo tamanho */}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setEditingEstacionamento(parking.id)}
+                            className="w-[110px]"
+                          >
+                            <Edit className="h-4 w-4 mr-2" />
+                            Editar
+                          </Button>
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => navigate(`/gerenciar-estacionamento?id=${parking.id}`)}
+                            className="w-[110px] bg-spatioo-green hover:bg-spatioo-green/90 text-black"
+                          >
+                            <Settings className="h-4 w-4 mr-2" />
+                            Gerenciar
+                          </Button>
+                          
+                          {/* Botão Excluir alinhado à direita */}
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => setDeletingEstacionamento({ id: parking.id, nome: parking.nome })}
+                            className="ml-auto"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Excluir
+                          </Button>
+                        </div>
                       </CardFooter>
                     </Card>
                   );
@@ -192,6 +215,31 @@ const ParkingOwnerDashboard = () => {
             onOpenChange={setShowAddDialog}
             onSuccess={refetch}
           />
+          
+          {/* Dialog de Edição */}
+          {editingEstacionamento && (
+            <EditEstacionamentoDialog
+              estacionamento={estacionamentos.find(e => e.id === editingEstacionamento)}
+              onSuccess={() => {
+                refetch();
+                setEditingEstacionamento(null);
+              }}
+            />
+          )}
+
+          {/* Dialog de Exclusão com confirmação */}
+          {deletingEstacionamento && (
+            <DeleteEstacionamentoDialog
+              open={!!deletingEstacionamento}
+              onOpenChange={(open) => !open && setDeletingEstacionamento(null)}
+              estacionamentoId={deletingEstacionamento.id}
+              estacionamentoNome={deletingEstacionamento.nome}
+              onSuccess={() => {
+                refetch();
+                setDeletingEstacionamento(null);
+              }}
+            />
+          )}
         </TabsContent>
         
         {/* Reservations Tab */}

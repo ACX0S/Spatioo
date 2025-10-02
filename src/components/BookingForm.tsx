@@ -316,22 +316,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
             </p>
           </div>
 
-          {/* Seleção de Duração */}
-          <div className="space-y-2">
-            <Label htmlFor="duration-select">Duração (horas)</Label>
-            <Select value={selectedDuration.toString()} onValueChange={(value) => setSelectedDuration(parseInt(value))}>
-              <SelectTrigger id="duration-select">
-                <SelectValue placeholder="Selecione a duração" />
-              </SelectTrigger>
-              <SelectContent>
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((hours) => (
-                  <SelectItem key={hours} value={hours.toString()}>
-                    {hours} {hours === 1 ? 'hora' : 'horas'}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Campo de duração removido - duração será calculada automaticamente */}
 
           {/* Resumo da Reserva */}
           {calculatedPrice !== null && (

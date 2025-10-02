@@ -100,21 +100,25 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header */}
+      {/* Header - Corrigido para evitar deslocamento */}
       <header className="fixed top-0 z-40 w-full bg-background/80 backdrop-blur-sm border-b border-border">
         <div className="container px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {location.pathname !== "/home" && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="rounded-full" 
-                onClick={() => navigate(-1)}
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </Button>
-            )}
-            <h1 className="text-lg font-semibold">{pageTitle}</h1>
+          {/* Mantém largura fixa no lado esquerdo para evitar deslocamento */}
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            {/* Container com largura mínima para o botão voltar */}
+            <div className="w-10 flex-shrink-0">
+              {location.pathname !== "/home" && (
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="rounded-full" 
+                  onClick={() => navigate(-1)}
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </Button>
+              )}
+            </div>
+            <h1 className="text-lg font-semibold truncate">{pageTitle}</h1>
           </div>
           
           <div className="flex items-center gap-2">
@@ -153,8 +157,8 @@ const Layout = () => {
         </AnimatePresence>
       </main>
       
-      {/* Bottom Navigation Bar */}
-      <nav className="fixed bottom-0 z-40 backdrop-blur-md border-t border-border h-16 w-full">
+      {/* Bottom Navigation Bar - Corrigido para evitar deslocamento */}
+      <nav className="fixed bottom-0 z-40 backdrop-blur-md border-t border-border h-16 w-full bg-background/80">
         <div className="max-w-5xl mx-auto h-full grid grid-cols-4">
           <Link 
             to="/home" 

@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-// Checkbox removido - não é necessário para vagas residenciais
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -82,6 +82,7 @@ const CreateEstacionamentoDialog = ({
     horarioFim: "",
     tipo: "residencial", // Tipo fixo como residencial, não mais selecionável
     horaExtra: "", // Valor para hora adicional quando não há preço específico cadastrado
+    funcionamento_24h: false, // Opção de funcionamento 24 horas
   });
 
   // Comodidades não são necessárias para vagas residenciais
@@ -165,15 +166,11 @@ const CreateEstacionamentoDialog = ({
     }
 
     // Validação de campos obrigatórios (sem campos específicos de estacionamento).
-    const requiredFields = [
-      formData.endereco,
-      formData.numero,
-      formData.cep,
-      formData.vagas,
-      formData.horarioInicio,
-      formData.horarioFim,
-      formData.horaExtra,
-    ];
+    // Se funcionamento 24h estiver ativado, horários serão definidos automaticamente
+    const requiredFields = formData.funcionamento_24h 
+      ? [formData.endereco, formData.numero, formData.cep, formData.vagas, formData.horaExtra]
+      : [formData.endereco, formData.numero, formData.cep, formData.vagas, formData.horarioInicio, formData.horarioFim, formData.horaExtra];
+    
     if (requiredFields.some((field) => !field)) {
       toast({
         title: "Erro",
@@ -200,7 +197,12 @@ const CreateEstacionamentoDialog = ({
             : `${formData.endereco}, ${formData.numero}`
           : formData.nome;
 
-      // Insere o novo estacionamento no banco de dados incluindo hora_extra e comodidades.
+      // Define horários para funcionamento 24h se a opção estiver marcada
+      const horarioFuncionamento = formData.funcionamento_24h
+        ? { abertura: "00:00", fechamento: "23:59" }
+        : { abertura: formData.horarioInicio, fechamento: formData.horarioFim };
+
+      // Insere o novo estacionamento no banco de dados incluindo hora_extra e funcionamento_24h
       const { data: estacionamentoData, error: estacionamentoError } =
         await supabase
           .from("estacionamento")
@@ -211,15 +213,13 @@ const CreateEstacionamentoDialog = ({
             descricao: formData.descricao || null,
             numero_vagas: parseInt(formData.vagas),
             preco: 0, // O preço base é 0, pois será usado a tabela de preços.
-            horario_funcionamento: {
-              abertura: formData.horarioInicio,
-              fechamento: formData.horarioFim,
-            },
+            horario_funcionamento: horarioFuncionamento,
             user_id: user.id,
             cnpj: "", // CNPJ vazio para vagas residenciais
             tipo: formData.tipo,
             hora_extra: parseFloat(formData.horaExtra), // Adiciona o valor da hora extra
-            // Vagas residenciais não possuem comodidades
+            funcionamento_24h: formData.funcionamento_24h, // Marca se funciona 24h
+            // Vagas residenciais não possuem outras comodidades
           })
           .select()
           .single();
@@ -254,6 +254,7 @@ const CreateEstacionamentoDialog = ({
         horarioFim: "",
         tipo: "residencial",
         horaExtra: "",
+        funcionamento_24h: false,
       });
       setCepData(null);
       setEnderecoDisabled(false);
@@ -449,33 +450,51 @@ const CreateEstacionamentoDialog = ({
           </div>
 
           {/* Seletores de Horário */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-4">
-              <Label className="flex items-center gap-2">
-                <Clock className="h-4 w-4" />
-                Horário de Abertura
+          <div className="space-y-4">
+            {/* Checkbox Funcionamento 24h */}
+            <div className="flex items-center space-x-3 p-3 bg-muted/30 rounded-lg">
+              <Checkbox
+                id="funcionamento-24h"
+                checked={formData.funcionamento_24h}
+                onCheckedChange={(checked) =>
+                  setFormData((prev) => ({ ...prev, funcionamento_24h: checked as boolean }))
+                }
+              />
+              <Label htmlFor="funcionamento-24h" className="cursor-pointer font-medium">
+                Funcionamento 24 horas
               </Label>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => openTimePicker("inicio")}
-                className="w-full justify-start text-left font-normal"
-              >
-                <Clock className="mr-2 h-4 w-4" />
-                {formData.horarioInicio || "Selecionar horário"}
-              </Button>
             </div>
-            <div className="space-y-2">
-              <Label>Horário de Fechamento</Label>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => openTimePicker("fim")}
-                className="w-full justify-start text-left font-normal"
-              >
-                <Clock className="mr-2 h-4 w-4" />
-                {formData.horarioFim || "Selecionar horário"}
-              </Button>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  Horário de Abertura
+                </Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => openTimePicker("inicio")}
+                  className="w-full justify-start text-left font-normal"
+                  disabled={formData.funcionamento_24h}
+                >
+                  <Clock className="mr-2 h-4 w-4" />
+                  {formData.funcionamento_24h ? "00:00" : (formData.horarioInicio || "Selecionar horário")}
+                </Button>
+              </div>
+              <div className="space-y-2">
+                <Label>Horário de Fechamento</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => openTimePicker("fim")}
+                  className="w-full justify-start text-left font-normal"
+                  disabled={formData.funcionamento_24h}
+                >
+                  <Clock className="mr-2 h-4 w-4" />
+                  {formData.funcionamento_24h ? "23:59" : (formData.horarioFim || "Selecionar horário")}
+                </Button>
+              </div>
             </div>
           </div>
 
