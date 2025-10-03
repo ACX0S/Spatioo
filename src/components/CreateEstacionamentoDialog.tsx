@@ -167,10 +167,24 @@ const CreateEstacionamentoDialog = ({
 
     // Validação de campos obrigatórios (sem campos específicos de estacionamento).
     // Se funcionamento 24h estiver ativado, horários serão definidos automaticamente
-    const requiredFields = formData.funcionamento_24h 
-      ? [formData.endereco, formData.numero, formData.cep, formData.vagas, formData.horaExtra]
-      : [formData.endereco, formData.numero, formData.cep, formData.vagas, formData.horarioInicio, formData.horarioFim, formData.horaExtra];
-    
+    const requiredFields = formData.funcionamento_24h
+      ? [
+          formData.endereco,
+          formData.numero,
+          formData.cep,
+          formData.vagas,
+          formData.horaExtra,
+        ]
+      : [
+          formData.endereco,
+          formData.numero,
+          formData.cep,
+          formData.vagas,
+          formData.horarioInicio,
+          formData.horarioFim,
+          formData.horaExtra,
+        ];
+
     if (requiredFields.some((field) => !field)) {
       toast({
         title: "Erro",
@@ -417,7 +431,7 @@ const CreateEstacionamentoDialog = ({
           {/* Tabela de Preços */}
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4" />
+              <DollarSign className="h-4 w-4 dark:text-spatioo-green" />
               Configuração de Preços *
             </Label>
             <p className="text-xs text-muted-foreground mb-2">
@@ -430,14 +444,14 @@ const CreateEstacionamentoDialog = ({
               error={pricingError}
             />
           </div>
-          
+
           {/* Campo obrigatório para Hora Extra */}
           <div>
             <Label
               htmlFor="create-hora-extra"
               className="flex items-center gap-2 mb-2"
             >
-              <DollarSign className="h-4 w-4" />
+              <DollarSign className="h-4 w-4 dark:text-spatioo-green" />
               Valor da Hora Extra *
             </Label>
             <Input
@@ -457,10 +471,16 @@ const CreateEstacionamentoDialog = ({
                 id="funcionamento-24h"
                 checked={formData.funcionamento_24h}
                 onCheckedChange={(checked) =>
-                  setFormData((prev) => ({ ...prev, funcionamento_24h: checked as boolean }))
+                  setFormData((prev) => ({
+                    ...prev,
+                    funcionamento_24h: checked as boolean,
+                  }))
                 }
               />
-              <Label htmlFor="funcionamento-24h" className="cursor-pointer font-medium">
+              <Label
+                htmlFor="funcionamento-24h"
+                className="cursor-pointer font-medium"
+              >
                 Funcionamento 24 horas
               </Label>
             </div>
@@ -468,7 +488,7 @@ const CreateEstacionamentoDialog = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
-                  <Clock className="h-4 w-4" />
+                  <Clock className="h-4 w-4 m-1 ml-0 dark:text-spatioo-green " />
                   Horário de Abertura
                 </Label>
                 <Button
@@ -478,12 +498,16 @@ const CreateEstacionamentoDialog = ({
                   className="w-full justify-start text-left font-normal"
                   disabled={formData.funcionamento_24h}
                 >
-                  <Clock className="mr-2 h-4 w-4" />
-                  {formData.funcionamento_24h ? "00:00" : (formData.horarioInicio || "Selecionar horário")}
+                  {formData.funcionamento_24h
+                    ? "00:00"
+                    : formData.horarioInicio || "Selecionar horário"}
                 </Button>
               </div>
               <div className="space-y-2">
-                <Label>Horário de Fechamento</Label>
+                <Label className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 m-1 ml-0 dark:text-spatioo-green" />
+                  Horário de Fechamento
+                </Label>
                 <Button
                   type="button"
                   variant="outline"
@@ -491,8 +515,9 @@ const CreateEstacionamentoDialog = ({
                   className="w-full justify-start text-left font-normal"
                   disabled={formData.funcionamento_24h}
                 >
-                  <Clock className="mr-2 h-4 w-4" />
-                  {formData.funcionamento_24h ? "23:59" : (formData.horarioFim || "Selecionar horário")}
+                  {formData.funcionamento_24h
+                    ? "23:59"
+                    : formData.horarioFim || "Selecionar horário"}
                 </Button>
               </div>
             </div>

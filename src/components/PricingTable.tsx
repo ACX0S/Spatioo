@@ -69,7 +69,7 @@ const PricingTable = ({ pricing, onChange, error }: PricingTableProps) => {
   return (
     <div className="space-y-4">
       <Label className="flex items-center gap-2">
-        <DollarSign className="h-4 w-4" />
+        <DollarSign className="h-4 w-4 dark:text-spatioo-green" />
         Tabela de Preços por Hora
       </Label>
       
@@ -77,11 +77,11 @@ const PricingTable = ({ pricing, onChange, error }: PricingTableProps) => {
         {/* Header */}
         <div className="grid grid-cols-3 gap-2 items-center text-sm font-medium text-muted-foreground">
           <div className="flex items-center gap-1">
-            <Clock className="h-3 w-3" />
+            <Clock className="h-3 w-3 dark:text-spatioo-green" />
             Horas
           </div>
           <div className="flex items-center gap-1">
-            <DollarSign className="h-3 w-3" />
+            <DollarSign className="h-3 w-3 dark:text-spatioo-green" />
             Preço (R$)
           </div>
           <div className="text-center">Ações</div>
