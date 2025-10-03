@@ -126,14 +126,13 @@ const Explore = () => {
         
         {/* Search Section */}
         <div className="space-y-4">
-          <div onClick={handleSearchFocus}>
-            <AutocompleteSearch
-              onSearch={handleSearch}
-              onParkingSelect={handleParkingSelect}
-              placeholder="Buscar por nome ou endereço..."
-              className="w-full"
-            />
-          </div>
+          <AutocompleteSearch
+            onSearch={handleSearch}
+            onParkingSelect={handleParkingSelect}
+            onFocus={handleSearchFocus}
+            placeholder="Buscar por nome ou endereço..."
+            className="w-full"
+          />
           
           {searchTerm && (
             <div className="flex items-center gap-2">

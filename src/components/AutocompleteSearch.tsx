@@ -10,12 +10,14 @@ import { fetchAllParkingSpots, PublicParkingData } from '@/services/parkingServi
  * @description Propriedades para o componente AutocompleteSearch.
  * @param onSearch - Função chamada quando uma busca é submetida.
  * @param onParkingSelect - Função opcional chamada quando um estacionamento específico é selecionado da lista de sugestões.
+ * @param onFocus - Função opcional chamada quando o campo de busca recebe foco.
  * @param placeholder - Texto de placeholder para o campo de busca.
  * @param className - Classes CSS adicionais para o container do componente.
  */
 interface AutocompleteSearchProps {
   onSearch: (query: string) => void;
   onParkingSelect?: (parking: PublicParkingData) => void;
+  onFocus?: () => void;
   placeholder?: string;
   className?: string;
 }
@@ -28,6 +30,7 @@ interface AutocompleteSearchProps {
 const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
   onSearch,
   onParkingSelect,
+  onFocus,
   placeholder = "Para onde você vai?",
   className = ""
 }) => {
@@ -124,7 +127,10 @@ const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
             setSearchQuery(e.target.value);
             setShowSuggestions(true);
           }}
-          onFocus={() => setShowSuggestions(true)}
+          onFocus={() => {
+            setShowSuggestions(true);
+            onFocus?.();
+          }}
         />
         <Button 
           type="submit"
