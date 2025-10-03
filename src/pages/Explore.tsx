@@ -158,7 +158,7 @@ const Explore = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col lg:flex-row overflow-hidden">
+    <div className="h-screen flex flex-col-reverse lg:flex-row overflow-hidden">
       {/* Sidebar de pesquisa - esquerda no desktop, topo no mobile */}
       <div className="w-full lg:w-[400px] bg-background border-r flex flex-col overflow-hidden">
         {/* Header */}
