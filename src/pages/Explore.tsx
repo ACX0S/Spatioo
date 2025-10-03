@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Search } from 'lucide-react';
@@ -8,13 +8,16 @@ import { useParkingData } from '@/hooks/useParkingData';
 import { PublicParkingData } from '@/services/parkingService';
 import ParkingGrid from '@/components/ParkingGrid';
 import AutocompleteSearch from '@/components/AutocompleteSearch';
+import ParkingMapView from '@/components/map/ParkingMapView';
 
 const Explore = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const initialSearch = location.state?.search || '';
   const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [sortedParkingSpots, setSortedParkingSpots] = useState<(PublicParkingData & { distance?: number })[]>([]);
+  const [showMapView, setShowMapView] = useState(false);
 
   // Use optimized data fetching
   const { 
@@ -86,8 +89,25 @@ const Explore = () => {
 
   // Handle direct navigation to spot details
   const handleParkingSelect = useCallback((spot: PublicParkingData) => {
-    window.location.href = `/parking/${spot.id}`;
+    navigate(`/parking/${spot.id}`);
+  }, [navigate]);
+
+  // Handler para abrir a view do mapa
+  const handleSearchFocus = useCallback(() => {
+    setShowMapView(true);
   }, []);
+
+  // Se está no modo mapa, mostra o ParkingMapView
+  if (showMapView) {
+    return (
+      <ParkingMapView
+        parkingSpots={sortedParkingSpots}
+        onBack={() => setShowMapView(false)}
+        onParkingSelect={handleParkingSelect}
+        userLocation={userLocation}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-spatioo-gray-light/10 to-spatioo-primary/10">
@@ -106,12 +126,14 @@ const Explore = () => {
         
         {/* Search Section */}
         <div className="space-y-4">
-          <AutocompleteSearch
-            onSearch={handleSearch}
-            onParkingSelect={handleParkingSelect}
-            placeholder="Buscar por nome ou endereço..."
-            className="w-full"
-          />
+          <div onClick={handleSearchFocus}>
+            <AutocompleteSearch
+              onSearch={handleSearch}
+              onParkingSelect={handleParkingSelect}
+              placeholder="Buscar por nome ou endereço..."
+              className="w-full"
+            />
+          </div>
           
           {searchTerm && (
             <div className="flex items-center gap-2">
