@@ -56,9 +56,9 @@ const LocationInput: React.FC<LocationInputProps> = ({
     <div className={cn("relative flex items-center", className)}>
       <div className="absolute left-3 z-10">
         {icon === 'origin' ? (
-          <Navigation className="h-5 w-5 text-primary" />
+          <Navigation className="h-5 w-5 text-spatioo-primary" />
         ) : (
-          <MapPin className="h-5 w-5 text-destructive" />
+          <MapPin className="h-5 w-5 text-spatioo-secondary" />
         )}
       </div>
       <Input
@@ -67,7 +67,7 @@ const LocationInput: React.FC<LocationInputProps> = ({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="pl-10 h-12 bg-background border-border"
+        className="pl-10 h-12 bg-background border-border text-base font-medium focus-visible:ring-spatioo-primary"
       />
     </div>
   );

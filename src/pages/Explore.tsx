@@ -158,41 +158,52 @@ const Explore = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col-reverse lg:flex-row overflow-hidden">
-      {/* Sidebar de pesquisa - esquerda no desktop, topo no mobile */}
-      <div className="w-full lg:w-[400px] bg-background border-r flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="p-4 border-b">
-          <h1 className="text-2xl font-bold">Explorar Estacionamentos</h1>
+    <div className="h-screen flex flex-col-reverse lg:flex-row overflow-hidden bg-background">
+      {/* Sidebar de pesquisa - esquerda no desktop, parte inferior no mobile */}
+      <div className="w-full lg:w-[420px] h-[45vh] lg:h-full bg-background border-t lg:border-t-0 lg:border-r border-border flex flex-col overflow-hidden shadow-lg lg:shadow-none">
+        {/* Header - oculto no mobile */}
+        <div className="hidden lg:block p-6 border-b border-border">
+          <h1 className="text-2xl font-bold text-foreground">Explorar Estacionamentos</h1>
+          <p className="text-sm text-muted-foreground mt-1">Encontre vagas próximas ao seu destino</p>
         </div>
 
         {/* Campos de pesquisa */}
-        <div className="p-4 space-y-4 border-b">
-          <LocationInput
-            value={origin}
-            onChange={setOrigin}
-            onPlaceSelect={handleOriginSelect}
-            placeholder="Local de partida"
-            icon="origin"
-          />
+        <div className="p-4 lg:p-6 space-y-3 border-b border-border bg-card">
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              Partida
+            </label>
+            <LocationInput
+              value={origin}
+              onChange={setOrigin}
+              onPlaceSelect={handleOriginSelect}
+              placeholder="Sua localização atual"
+              icon="origin"
+            />
+          </div>
           
-          <LocationInput
-            value={destination}
-            onChange={setDestination}
-            onPlaceSelect={handleDestinationSelect}
-            placeholder="Local de destino"
-            icon="destination"
-          />
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              Destino
+            </label>
+            <LocationInput
+              value={destination}
+              onChange={setDestination}
+              onPlaceSelect={handleDestinationSelect}
+              placeholder="Para onde você vai?"
+              icon="destination"
+            />
+          </div>
         </div>
 
         {/* Lista de estacionamentos próximos */}
-        <div className="flex-1 overflow-y-auto p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-muted-foreground">
-              {loading ? 'Carregando...' : `${nearbyParkingSpots.length} estacionamento(s) próximo(s)`}
+        <div className="flex-1 overflow-y-auto p-4 lg:p-6">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-sm font-bold text-foreground uppercase tracking-wide">
+              {loading ? 'Carregando...' : `${nearbyParkingSpots.length} encontrado(s)`}
             </h2>
             {destinationCoords && (
-              <p className="text-xs text-muted-foreground">Ordenado por distância</p>
+              <p className="text-xs text-spatioo-primary font-medium">Por distância</p>
             )}
           </div>
 
@@ -218,36 +229,37 @@ const Explore = () => {
             {nearbyParkingSpots.map((spot) => (
               <Card
                 key={spot.id}
-                className="p-3 cursor-pointer hover:shadow-md transition-shadow"
+                className="p-4 cursor-pointer hover:shadow-lg hover:border-spatioo-primary transition-all duration-200 bg-card"
                 onClick={() => handleParkingSelect(spot)}
               >
                 {/* Distância */}
                 {(spot as any).distance !== undefined && (
-                  <div className="flex items-center gap-1 text-spatioo-primary font-semibold text-sm mb-2">
+                  <div className="flex items-center gap-1.5 text-spatioo-primary font-bold text-sm mb-3">
                     <Navigation className="w-4 h-4" />
-                    <span>{((spot as any).distance as number).toFixed(1)} km de distância</span>
+                    <span>{((spot as any).distance as number).toFixed(1)} km</span>
                   </div>
                 )}
 
                 {/* Nome */}
-                <h3 className="font-semibold text-base mb-1">{spot.nome}</h3>
+                <h3 className="font-bold text-lg mb-2 text-foreground">{spot.nome}</h3>
 
                 {/* Endereço */}
-                <div className="flex items-start gap-2 text-sm text-muted-foreground mb-2">
-                  <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                  <span className="line-clamp-2">{spot.endereco}</span>
+                <div className="flex items-start gap-2 text-sm text-muted-foreground mb-3">
+                  <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5 text-spatioo-secondary" />
+                  <span className="line-clamp-1">{spot.endereco}</span>
                 </div>
 
-                {/* Vagas disponíveis */}
-                <div className="flex items-center gap-2 text-sm mb-2">
-                  <Car className="w-4 h-4 text-spatioo-secondary" />
-                  <span>{spot.numero_vagas} vagas disponíveis</span>
-                </div>
-
-                {/* Horário */}
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="w-4 h-4" />
-                  <span>{formatHorario(spot.horario_funcionamento)}</span>
+                {/* Info rápida */}
+                <div className="flex items-center justify-between pt-3 border-t border-border">
+                  <div className="flex items-center gap-1.5 text-sm font-medium">
+                    <Car className="w-4 h-4 text-spatioo-secondary" />
+                    <span>{spot.numero_vagas} vagas</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Clock className="w-4 h-4" />
+                    <span className="line-clamp-1">{formatHorario(spot.horario_funcionamento)}</span>
+                  </div>
                 </div>
               </Card>
             ))}
@@ -255,14 +267,21 @@ const Explore = () => {
         </div>
       </div>
 
-      {/* Mapa - direita no desktop, parte inferior no mobile */}
-      <div className="flex-1 relative">
+      {/* Mapa - direita no desktop, parte superior no mobile */}
+      <div className="flex-1 relative h-[55vh] lg:h-full">
         <GoogleMap
           center={mapCenter}
           parkingSpots={nearbyParkingSpots}
           onParkingSelect={handleParkingSelect}
           userLocation={userLocation}
         />
+        
+        {/* Badge mobile informativo */}
+        <div className="lg:hidden absolute top-4 left-1/2 transform -translate-x-1/2 bg-background/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-border">
+          <p className="text-xs font-medium text-foreground">
+            {nearbyParkingSpots.length} estacionamento(s) próximo(s)
+          </p>
+        </div>
       </div>
     </div>
   );
