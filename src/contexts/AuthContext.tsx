@@ -11,7 +11,8 @@ interface AuthContextType {
   user: User | null;
   profile: Profile | null;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, name: string, phone?: string) => Promise<void>;
+  signUp: (email: string, password: string, name: string, apelido: string, phone: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   loading: boolean;
   updateProfile: (profile: Partial<Profile>) => Promise<void>;
@@ -44,30 +45,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data) {
         setProfile(data as Profile);
       } else {
-        // If no profile exists, create one with the user's metadata
+        // Se não existe perfil, cria um com os metadados do usuário
         try {
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
-            const userName = user.user_metadata?.name || user.email?.split('@')[0] || 'Usuário';
+            const userName = user.user_metadata?.name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Usuário';
+            const userApelido = user.user_metadata?.apelido || null;
             const userPhone = user.user_metadata?.phone || null;
             const { data: newProfile, error: insertError } = await supabase
               .from('profiles')
               .insert({ 
                 id: userId, 
                 name: userName,
+                apelido: userApelido,
                 phone: userPhone
               })
               .select()
               .single();
             
             if (insertError) {
-              console.error('Error creating profile:', insertError);
+              console.error('Erro ao criar perfil:', insertError);
             } else {
               setProfile(newProfile as Profile);
             }
           }
         } catch (createError: any) {
-          console.error('Error creating profile:', createError.message);
+          console.error('Erro ao criar perfil:', createError.message);
         }
       }
     } catch (error: any) {
@@ -154,8 +157,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Sign up with email and password (otimizado com menos logs)
-  const signUp = async (email: string, password: string, name: string, phone?: string) => {
+  // Cadastro com email e senha
+  const signUp = async (email: string, password: string, name: string, apelido: string, phone: string) => {
     try {
       // Verificar se o usuário já existe
       const { data: existingUser } = await supabase.auth.signInWithPassword({
@@ -180,6 +183,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         options: {
           data: {
             name: name,
+            apelido: apelido,
             phone: phone
           },
           emailRedirectTo: `${window.location.origin}/`
@@ -234,6 +238,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           duration: 3000
         });
       }
+      throw error;
+    }
+  };
+
+  // Login com Google
+  const signInWithGoogle = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
+        }
+      });
+      
+      if (error) throw error;
+      
+    } catch (error: any) {
+      console.error('Erro no login com Google:', error);
+      toast({
+        title: "Erro ao fazer login com Google",
+        description: error.message,
+        variant: "destructive",
+        duration: 3000
+      });
       throw error;
     }
   };
@@ -316,6 +348,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     profile,
     signIn,
     signUp,
+    signInWithGoogle,
     signOut,
     loading,
     updateProfile,

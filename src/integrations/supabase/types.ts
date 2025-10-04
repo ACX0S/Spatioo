@@ -241,6 +241,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          apelido: string | null
           avatar_url: string | null
           cep: string | null
           complement: string | null
@@ -254,6 +255,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          apelido?: string | null
           avatar_url?: string | null
           cep?: string | null
           complement?: string | null
@@ -267,6 +269,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          apelido?: string | null
           avatar_url?: string | null
           cep?: string | null
           complement?: string | null
