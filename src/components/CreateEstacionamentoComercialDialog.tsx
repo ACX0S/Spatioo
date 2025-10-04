@@ -281,11 +281,16 @@ const CreateEstacionamentoComercialDialog = ({
   };
 
   const handleHoraExtraChange = (value: string) => {
-    const numericValue = value.replace(/[^0-9.,]/g, "").replace(",", ".");
-    const parts = numericValue.split(".");
-    if (parts.length > 2) parts.length = 2;
-    if (parts[1] && parts[1].length > 2) parts[1] = parts[1].substring(0, 2);
-    const formattedValue = parts.join(".");
+    const numericValue = value.replace(/\D/g, "");
+    if (numericValue === "") {
+    handleInputChange("horaExtra", "");
+    return;
+    }
+    const cents = Number.parseInt(numericValue, 10) / 100;
+    const formattedValue = cents.toLocaleString('pt-BR', {
+      style: "currency",
+      currency: "BRL",
+    });
     handleInputChange("horaExtra", formattedValue);
   };
 
@@ -440,7 +445,7 @@ const CreateEstacionamentoComercialDialog = ({
             {/* Valor da Hora Extra */}
             <div className="space-y-2">
               <Label htmlFor="comercial-hora-extra" className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4" />
+                <DollarSign className="h-4 w-4 text-spatioo-green" />
                 Valor da Hora Extra (R$) *
               </Label>
               <Input
@@ -470,8 +475,7 @@ const CreateEstacionamentoComercialDialog = ({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
+                  <Label className="flex items-center gap-2 ml-1">
                     Horário de Abertura *
                   </Label>
                   <Button
@@ -481,12 +485,12 @@ const CreateEstacionamentoComercialDialog = ({
                     className="w-full justify-start text-left font-normal"
                     disabled={comodidades.funcionamento_24h}
                   >
-                    <Clock className="mr-2 h-4 w-4" />
+                    <Clock className="mr-2 h-4 w-4 text-spatioo-green" />
                     {comodidades.funcionamento_24h ? "00:00" : (formData.horarioInicio || "Selecionar horário")}
                   </Button>
                 </div>
                 <div className="space-y-2">
-                  <Label>Horário de Fechamento *</Label>
+                  <Label className="flex items-center gap-2 ml-1">Horário de Fechamento *</Label>
                   <Button
                     type="button"
                     variant="outline"
@@ -494,7 +498,7 @@ const CreateEstacionamentoComercialDialog = ({
                     className="w-full justify-start text-left font-normal"
                     disabled={comodidades.funcionamento_24h}
                   >
-                    <Clock className="mr-2 h-4 w-4" />
+                    <Clock className="mr-2 h-4 w-4 text-spatioo-green" />
                     {comodidades.funcionamento_24h ? "23:59" : (formData.horarioFim || "Selecionar horário")}
                   </Button>
                 </div>
