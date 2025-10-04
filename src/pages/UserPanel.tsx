@@ -10,19 +10,14 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUserEstacionamentos } from '@/hooks/useUserEstacionamentos';
 import CreateEstacionamentoConfirmDialog from '@/components/CreateEstacionamentoConfirmDialog';
 import CreateEstacionamentoComercialDialog from '@/components/CreateEstacionamentoComercialDialog';
 
 const UserPanel = () => {
   const navigate = useNavigate();
   const { profile } = useAuth();
-  const { estacionamentos, loading } = useUserEstacionamentos();
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [comercialDialogOpen, setComercialDialogOpen] = useState(false);
-
-  // Verifica se o usuário tem estacionamentos
-  const hasEstacionamentos = estacionamentos && estacionamentos.length > 0;
 
   // Lista de opções do painel, com o menu "Estacionamento" condicionado ao status de proprietário
   const panelOptions = [
@@ -110,8 +105,8 @@ const UserPanel = () => {
           </Card>
         ))}
 
-        {/* Botão para criar estacionamento (visível apenas se o usuário não tiver estacionamentos) */}
-        {!loading && !hasEstacionamentos && (
+        {/* Botão para criar estacionamento (visível apenas se o usuário não for dono de estacionamento) */}
+        {!profile?.dono_estacionamento && (
           <div className="flex justify-center pt-4">
             <Button
               variant="ghost"

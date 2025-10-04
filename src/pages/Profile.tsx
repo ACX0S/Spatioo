@@ -4,13 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, Mail, Phone, Camera, ChevronLeft, CreditCard, Shield, Bell, LogOut, MapPin, Home, Building2, Check, KeyRound } from 'lucide-react';
+import { User, Mail, Phone, Camera, ChevronLeft, CreditCard, Shield, Bell, LogOut, MapPin, Home, KeyRound } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useBookings } from '@/hooks/useBookings';
 import ChangePasswordDialog from '@/components/ChangePasswordDialog';
-import CreateEstacionamentoComercialDialog from '@/components/CreateEstacionamentoComercialDialog';
 import { uploadAvatar, deleteOldAvatar } from '@/services/storageService';
 import { useCep } from '@/hooks/useCep';
 
@@ -29,7 +28,6 @@ const Profile = () => {
   const [neighborhood, setNeighborhood] = useState(profile?.neighborhood || '');
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [createEstacionamentoDialogOpen, setCreateEstacionamentoDialogOpen] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -392,48 +390,6 @@ const Profile = () => {
               </CardContent>
             </Card>
             
-            {/* Configurações de Negócio */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Configurações de Negócio</CardTitle>
-                <CardDescription>Gerencie suas opções empresariais</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {!profile?.dono_estacionamento ? (
-                  <div>
-                    <Button 
-                      onClick={() => setCreateEstacionamentoDialogOpen(true)}
-                      className="w-full bg-spatioo-green hover:bg-spatioo-green/90"
-                    >
-                      <Building2 className="h-4 w-4 mr-2" />
-                      Cadastrar Estacionamento
-                    </Button>
-                    <CreateEstacionamentoComercialDialog 
-                      open={createEstacionamentoDialogOpen}
-                      onOpenChange={setCreateEstacionamentoDialogOpen}
-                      onSuccess={() => window.location.reload()} 
-                    />
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-between space-x-3">
-                    <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-spatioo-green/20 rounded-lg">
-                        <Building2 className="h-5 w-5 text-spatioo-green" />
-                      </div>  
-                      <div>
-                        <p className="font-medium text-spatioo-green/90">Estacionamento Cadastrado</p>
-                        <p className="text-sm text-muted-foreground">
-                          Você pode gerenciar seu estacionamento na página Painel.
-                        </p>
-                      </div>
-                    </div>
-                    <div className="">
-                      <span className="text-spatioo-green"><Check/></span>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
 
             {/* Segurança */}
             <Card>
