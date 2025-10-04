@@ -71,7 +71,7 @@ export type Database = {
           endereco: string
           fotos: string[] | null
           funcionamento_24h: boolean | null
-          hora_extra: number
+          hora_extra: number | null
           horario_funcionamento: Json
           id: string
           latitude: number | null
@@ -97,7 +97,7 @@ export type Database = {
           endereco: string
           fotos?: string[] | null
           funcionamento_24h?: boolean | null
-          hora_extra?: number
+          hora_extra?: number | null
           horario_funcionamento: Json
           id?: string
           latitude?: number | null
@@ -123,7 +123,7 @@ export type Database = {
           endereco?: string
           fotos?: string[] | null
           funcionamento_24h?: boolean | null
-          hora_extra?: number
+          hora_extra?: number | null
           horario_funcionamento?: Json
           id?: string
           latitude?: number | null

@@ -25,6 +25,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import TimePickerDialog from "@/components/TimePickerDialog";
 import PricingTable, { PricingRow } from "@/components/PricingTable";
+import { uploadEstacionamentoPhoto } from "@/services/storageService";
+import { Upload, X, Image as ImageIcon } from "lucide-react";
 
 /**
  * @interface CreateEstacionamentoDialogProps
@@ -82,8 +84,14 @@ const CreateEstacionamentoDialog = ({
     horarioFim: "",
     tipo: "residencial", // Tipo fixo como residencial, não mais selecionável
     horaExtra: "", // Valor para hora adicional quando não há preço específico cadastrado
+    horaExtraNumeric: 0, // Valor numérico para salvar no banco
     funcionamento_24h: false, // Opção de funcionamento 24 horas
   });
+
+  // Estado para upload de fotos
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [photosPreviews, setPhotosPreviews] = useState<string[]>([]);
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
 
   // Comodidades não são necessárias para vagas residenciais
 
@@ -111,12 +119,6 @@ const CreateEstacionamentoDialog = ({
       setPricingError(
         "É obrigatório ter pelo menos um valor configurado para 1 hora de estacionamento."
       );
-      return false;
-    }
-
-    // Verifica se o campo hora extra está preenchido
-    if (!formData.horaExtra || parseFloat(formData.horaExtra) <= 0) {
-      setPricingError("É obrigatório definir o valor da hora extra.");
       return false;
     }
 
@@ -173,7 +175,6 @@ const CreateEstacionamentoDialog = ({
           formData.numero,
           formData.cep,
           formData.vagas,
-          formData.horaExtra,
         ]
       : [
           formData.endereco,
@@ -182,14 +183,23 @@ const CreateEstacionamentoDialog = ({
           formData.vagas,
           formData.horarioInicio,
           formData.horarioFim,
-          formData.horaExtra,
         ];
 
     if (requiredFields.some((field) => !field)) {
       toast({
         title: "Erro",
         description:
-          "Por favor, preencha todos os campos obrigatórios, incluindo o valor da hora extra.",
+          "Por favor, preencha todos os campos obrigatórios.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validação de fotos (obrigatório pelo menos 1)
+    if (photos.length === 0) {
+      toast({
+        title: "Erro",
+        description: "Adicione pelo menos uma foto da vaga.",
         variant: "destructive",
       });
       return;
@@ -203,6 +213,28 @@ const CreateEstacionamentoDialog = ({
     setIsSubmitting(true);
 
     try {
+      // Upload das fotos primeiro
+      setUploadingPhotos(true);
+      const uploadedPhotoUrls: string[] = [];
+      
+      for (const photo of photos) {
+        try {
+          const url = await uploadEstacionamentoPhoto(photo, user.id);
+          uploadedPhotoUrls.push(url);
+        } catch (error) {
+          console.error("Erro ao fazer upload da foto:", error);
+          toast({
+            title: "Erro no upload",
+            description: "Erro ao fazer upload de uma das fotos.",
+            variant: "destructive",
+          });
+          setUploadingPhotos(false);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+      setUploadingPhotos(false);
+
       // Gera o nome do estacionamento com base no tipo.
       const nomeToSave =
         formData.tipo === "residencial"
@@ -231,7 +263,8 @@ const CreateEstacionamentoDialog = ({
             user_id: user.id,
             cnpj: "", // CNPJ vazio para vagas residenciais
             tipo: formData.tipo,
-            hora_extra: parseFloat(formData.horaExtra), // Adiciona o valor da hora extra
+            fotos: uploadedPhotoUrls,
+            hora_extra: formData.horaExtraNumeric > 0 ? formData.horaExtraNumeric : null,
             funcionamento_24h: formData.funcionamento_24h, // Marca se funciona 24h
             // Vagas residenciais não possuem outras comodidades
           })
@@ -268,8 +301,11 @@ const CreateEstacionamentoDialog = ({
         horarioFim: "",
         tipo: "residencial",
         horaExtra: "",
+        horaExtraNumeric: 0,
         funcionamento_24h: false,
       });
+      setPhotos([]);
+      setPhotosPreviews([]);
       setCepData(null);
       setEnderecoDisabled(false);
       setPricing([]);
@@ -296,21 +332,75 @@ const CreateEstacionamentoDialog = ({
 
   /**
    * @function handleHoraExtraChange
-   * @description Permite apenas valores numéricos com até 2 casas decimais para hora extra.
+   * @description Formata o valor da hora extra como moeda brasileira e armazena o valor numérico
    */
   const handleHoraExtraChange = (value: string) => {
-    // Permite apenas números e ponto decimal
-    const numericValue = value.replace(/[^0-9.,]/g, "").replace(",", ".");
-    // Limita a 2 casas decimais
-    const parts = numericValue.split(".");
-    if (parts.length > 2) {
-      parts.length = 2;
+    const numericValue = value.replace(/\D/g, "");
+    if (numericValue === "") {
+      handleInputChange("horaExtra", "");
+      setFormData((prev) => ({ ...prev, horaExtraNumeric: 0 }));
+      return;
     }
-    if (parts[1] && parts[1].length > 2) {
-      parts[1] = parts[1].substring(0, 2);
-    }
-    const formattedValue = parts.join(".");
+    const cents = Number.parseInt(numericValue, 10) / 100;
+    const formattedValue = cents.toLocaleString('pt-BR', {
+      style: "currency",
+      currency: "BRL",
+    });
     handleInputChange("horaExtra", formattedValue);
+    setFormData((prev) => ({ ...prev, horaExtraNumeric: cents }));
+  };
+
+  /**
+   * @function handlePhotoSelect
+   * @description Manipula a seleção de fotos para upload
+   */
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const newFiles = Array.from(files);
+    
+    // Validação de tamanho (máx 5MB por foto)
+    const oversizedFiles = newFiles.filter(file => file.size > 5 * 1024 * 1024);
+    if (oversizedFiles.length > 0) {
+      toast({
+        title: "Erro",
+        description: "Cada foto deve ter no máximo 5MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Limitar a 10 fotos no total
+    if (photos.length + newFiles.length > 10) {
+      toast({
+        title: "Erro",
+        description: "Você pode adicionar no máximo 10 fotos.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Adiciona as novas fotos
+    setPhotos(prev => [...prev, ...newFiles]);
+
+    // Cria previews
+    newFiles.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotosPreviews(prev => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  /**
+   * @function removePhoto
+   * @description Remove uma foto da lista
+   */
+  const removePhoto = (index: number) => {
+    setPhotos(prev => prev.filter((_, i) => i !== index));
+    setPhotosPreviews(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleCepChange = async (value: string) => {
@@ -445,22 +535,79 @@ const CreateEstacionamentoDialog = ({
             />
           </div>
 
-          {/* Campo obrigatório para Hora Extra */}
+          {/* Campo opcional para Hora Extra */}
           <div>
             <Label
               htmlFor="create-hora-extra"
               className="flex items-center gap-2 mb-2"
             >
               <DollarSign className="h-4 w-4 dark:text-spatioo-green" />
-              Valor da Hora Extra *
+              Valor da Hora Extra
             </Label>
             <Input
               id="create-hora-extra"
               placeholder="Ex: 5.00"
               value={formData.horaExtra}
               onChange={(e) => handleHoraExtraChange(e.target.value)}
-              required
             />
+            <p className="text-xs text-muted-foreground mt-1">
+              Opcional. Valor cobrado por hora adicional quando não há preço específico cadastrado.
+            </p>
+          </div>
+
+          {/* Upload de Fotos */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <ImageIcon className="h-4 w-4 text-spatioo-green" />
+              Fotos da Vaga *
+            </Label>
+            <div className="space-y-3">
+              <div className="flex items-center justify-center w-full">
+                <label htmlFor="residencial-photo-upload" className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-muted/30 hover:bg-muted/50 transition-colors">
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <Upload className="w-8 h-8 mb-2 text-muted-foreground" />
+                    <p className="mb-1 text-sm text-muted-foreground">
+                      <span className="font-semibold">Clique para adicionar</span> ou arraste as fotos
+                    </p>
+                    <p className="text-xs text-muted-foreground">PNG, JPG até 5MB (máx. 10 fotos)</p>
+                  </div>
+                  <input
+                    id="residencial-photo-upload"
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    multiple
+                    onChange={handlePhotoSelect}
+                  />
+                </label>
+              </div>
+
+              {/* Preview das fotos */}
+              {photosPreviews.length > 0 && (
+                <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
+                  {photosPreviews.map((preview, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={preview}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-24 object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removePhoto(index)}
+                        className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {photos.length === 0 && (
+                <p className="text-sm text-destructive">* Adicione pelo menos uma foto da vaga</p>
+              )}
+            </div>
           </div>
 
           {/* Seletores de Horário */}
@@ -548,9 +695,9 @@ const CreateEstacionamentoDialog = ({
             <Button
               type="submit"
               className="flex-1 bg-spatioo-green hover:bg-spatioo-green/90"
-              disabled={isSubmitting}
+              disabled={isSubmitting || uploadingPhotos}
             >
-              {isSubmitting ? "Registrando..." : "Registrar Vaga"}
+              {uploadingPhotos ? "Fazendo upload das fotos..." : isSubmitting ? "Registrando..." : "Registrar Vaga"}
             </Button>
           </div>
         </form>
