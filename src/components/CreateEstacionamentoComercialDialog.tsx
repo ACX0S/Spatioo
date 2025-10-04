@@ -263,6 +263,16 @@ const CreateEstacionamentoComercialDialog = ({
         }
       }
 
+      // Atualiza o perfil do usuário para marcar como dono de estacionamento
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({ dono_estacionamento: true })
+        .eq("id", user.id);
+
+      if (profileError) {
+        console.error("Erro ao atualizar perfil:", profileError);
+      }
+
       toast({
         title: "Estacionamento cadastrado!",
         description: "Seu estacionamento comercial foi registrado com sucesso.",

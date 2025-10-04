@@ -1,16 +1,28 @@
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { 
   Car, 
   Calendar, 
-  Building 
+  Building,
+  CirclePlus
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserEstacionamentos } from '@/hooks/useUserEstacionamentos';
+import CreateEstacionamentoConfirmDialog from '@/components/CreateEstacionamentoConfirmDialog';
+import CreateEstacionamentoComercialDialog from '@/components/CreateEstacionamentoComercialDialog';
 
 const UserPanel = () => {
   const navigate = useNavigate();
   const { profile } = useAuth();
+  const { estacionamentos, loading } = useUserEstacionamentos();
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [comercialDialogOpen, setComercialDialogOpen] = useState(false);
+
+  // Verifica se o usuário tem estacionamentos
+  const hasEstacionamentos = estacionamentos && estacionamentos.length > 0;
 
   // Lista de opções do painel, com o menu "Estacionamento" condicionado ao status de proprietário
   const panelOptions = [
@@ -43,6 +55,23 @@ const UserPanel = () => {
 
   const handleOptionClick = (route: string) => {
     navigate(route);
+  };
+
+  /**
+   * @function handleConfirmCreateEstacionamento
+   * @description Abre o formulário de criação de estacionamento após confirmação
+   */
+  const handleConfirmCreateEstacionamento = () => {
+    setConfirmDialogOpen(false);
+    setComercialDialogOpen(true);
+  };
+
+  /**
+   * @function handleSuccessCreateEstacionamento
+   * @description Callback após criar estacionamento com sucesso - recarrega a página
+   */
+  const handleSuccessCreateEstacionamento = () => {
+    window.location.reload();
   };
 
   return (
@@ -80,7 +109,37 @@ const UserPanel = () => {
             </CardContent>
           </Card>
         ))}
+
+        {/* Botão para criar estacionamento (visível apenas se o usuário não tiver estacionamentos) */}
+        {!loading && !hasEstacionamentos && (
+          <div className="flex justify-center pt-4">
+            <Button
+              variant="ghost"
+              size="lg"
+              onClick={() => setConfirmDialogOpen(true)}
+              className="flex flex-col items-center gap-2 h-auto py-6 hover:bg-spatioo-green/10 transition-colors"
+            >
+              <CirclePlus className="h-12 w-12 text-spatioo-green dark:text-spatioo-green" />
+              <span className="text-sm font-medium text-muted-foreground">
+                Cadastrar Estacionamento
+              </span>
+            </Button>
+          </div>
+        )}
       </div>
+
+      {/* Diálogos */}
+      <CreateEstacionamentoConfirmDialog
+        open={confirmDialogOpen}
+        onOpenChange={setConfirmDialogOpen}
+        onConfirm={handleConfirmCreateEstacionamento}
+      />
+      
+      <CreateEstacionamentoComercialDialog
+        open={comercialDialogOpen}
+        onOpenChange={setComercialDialogOpen}
+        onSuccess={handleSuccessCreateEstacionamento}
+      />
     </div>
   );
 };
