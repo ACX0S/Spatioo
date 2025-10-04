@@ -5,6 +5,50 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { Session, User } from '@supabase/supabase-js';
 import { Profile } from '@/types/profile';
+import { z } from 'zod';
+
+// Schema de validação de senha conforme Supabase
+const passwordSchema = z.string()
+  .min(8, 'A senha deve ter no mínimo 8 caracteres')
+  .regex(/[a-z]/, 'A senha deve conter pelo menos uma letra minúscula')
+  .regex(/[A-Z]/, 'A senha deve conter pelo menos uma letra maiúscula')
+  .regex(/[0-9]/, 'A senha deve conter pelo menos um dígito')
+  .regex(/[^a-zA-Z0-9]/, 'A senha deve conter pelo menos um símbolo');
+
+// Tradução de erros do Supabase
+const translateSupabaseError = (error: any): string => {
+  const message = error.message.toLowerCase();
+  
+  if (message.includes('invalid login credentials') || message.includes('invalid email or password')) {
+    return 'Email ou senha incorretos';
+  }
+  if (message.includes('email not confirmed')) {
+    return 'Email não confirmado. Verifique sua caixa de entrada';
+  }
+  if (message.includes('user already registered') || message.includes('already registered')) {
+    return 'Este email já está cadastrado';
+  }
+  if (message.includes('password should be at least')) {
+    return 'A senha deve ter no mínimo 8 caracteres';
+  }
+  if (message.includes('password must contain')) {
+    return 'A senha não atende aos requisitos de segurança';
+  }
+  if (message.includes('invalid email')) {
+    return 'Email inválido';
+  }
+  if (message.includes('email rate limit exceeded')) {
+    return 'Muitas tentativas. Aguarde alguns minutos';
+  }
+  if (message.includes('network')) {
+    return 'Erro de conexão. Verifique sua internet';
+  }
+  if (message.includes('too many requests')) {
+    return 'Muitas tentativas. Tente novamente mais tarde';
+  }
+  
+  return error.message;
+};
 
 interface AuthContextType {
   session: Session | null;
@@ -135,6 +179,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Login with email and password (otimizado com menos logs)
   const signIn = async (email: string, password: string) => {
     try {
+      // Validar senha antes de enviar
+      const passwordValidation = passwordSchema.safeParse(password);
+      if (!passwordValidation.success) {
+        throw new Error(passwordValidation.error.errors[0].message);
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       
       if (error) throw error;
@@ -147,11 +197,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       navigate('/home');
     } catch (error: any) {
+      const errorMessage = translateSupabaseError(error);
       toast({
         title: "Erro ao fazer login",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
-        duration: 2000
+        duration: 3000
       });
       throw error;
     }
@@ -160,6 +211,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Cadastro com email e senha
   const signUp = async (email: string, password: string, name: string, apelido: string, phone: string) => {
     try {
+      // Validar senha antes de criar conta
+      const passwordValidation = passwordSchema.safeParse(password);
+      if (!passwordValidation.success) {
+        throw new Error(passwordValidation.error.errors[0].message);
+      }
+
       // Verificar se o usuário já existe
       const { data: existingUser } = await supabase.auth.signInWithPassword({
         email,
@@ -191,16 +248,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       
       if (error) {
-        // Verificar se é erro de usuário já existente
-        if (error.message.includes('already') || error.message.includes('User already registered')) {
-          toast({
-            title: "Conta já existe",
-            description: "Este email já está cadastrado. Por favor, faça login ou recupere sua senha.",
-            variant: "destructive",
-            duration: 4000
-          });
-          throw new Error('Usuário já cadastrado');
-        }
         throw error;
       }
       
@@ -230,14 +277,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         navigate('/home');
       }
     } catch (error: any) {
-      if (error.message !== 'Usuário já cadastrado') {
-        toast({
-          title: "Erro ao criar conta",
-          description: error.message,
-          variant: "destructive",
-          duration: 3000
-        });
-      }
+      const errorMessage = translateSupabaseError(error);
+      toast({
+        title: "Erro ao criar conta",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 3000
+      });
       throw error;
     }
   };
@@ -255,10 +301,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) throw error;
       
     } catch (error: any) {
-      console.error('Erro no login com Google:', error);
+      const errorMessage = translateSupabaseError(error);
       toast({
         title: "Erro ao fazer login com Google",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
         duration: 3000
       });
@@ -314,6 +360,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Change password
   const changePassword = async (newPassword: string) => {
     try {
+      // Validar nova senha
+      const passwordValidation = passwordSchema.safeParse(newPassword);
+      if (!passwordValidation.success) {
+        throw new Error(passwordValidation.error.errors[0].message);
+      }
+
       const { error } = await supabase.auth.updateUser({ 
         password: newPassword 
       });
@@ -328,10 +380,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       
     } catch (error: any) {
-      console.error('Error changing password:', error);
+      const errorMessage = translateSupabaseError(error);
       toast({
         title: "Erro ao atualizar senha",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
       throw error;

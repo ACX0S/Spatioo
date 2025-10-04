@@ -352,6 +352,9 @@ const Login = () => {
                     )}
                   </Button>
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  Mínimo 8 caracteres, com letra maiúscula, minúscula, número e símbolo
+                </p>
               </div>
 
               <div className="space-y-2">
