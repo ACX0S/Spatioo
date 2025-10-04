@@ -2,12 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { 
-  Car, 
-  Calendar, 
-  Building,
-  CirclePlus
-} from 'lucide-react';
+import { Car, Calendar, Building, CirclePlus} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import CreateEstacionamentoConfirmDialog from '@/components/CreateEstacionamentoConfirmDialog';
@@ -23,18 +18,18 @@ const UserPanel = () => {
   const panelOptions = [
     {
       title: "Minhas vagas",
-      description: "Gerenciar vagas atuais e cadastrar novas",
+      description: "Gerenciar e cadastrar vagas",
       icon: Car,
       route: "/ofertar",
-      color: "text-spatioo-green",
+      color: "dark:text-spatioo-green light: text-spatioo-primary",
       bgColor: "bg-spatioo-green/10"
     },
     {
       title: "Reservas",
-      description: "Visualizar suas reservas via chat e seu histórico pessoal",
+      description: "Visualizar suas reservas e seu histórico",
       icon: Calendar,
       route: "/dashboard/reservas",
-      color: "text-spatioo-green",
+      color: "dark:text-spatioo-green light: text-spatioo-primary",
       bgColor: "bg-spatioo-green/10"
     },
     // Menu "Estacionamento" só aparece para proprietários (dono_estacionamento = true)
@@ -43,7 +38,7 @@ const UserPanel = () => {
       description: "Gerenciar sua empresa, vagas e ver seus dashboards",
       icon: Building,
       route: "/admin",
-      color: "text-spatioo-green",
+      color: "dark:text-spatioo-green light: text-spatioo-primary",
       bgColor: "bg-spatioo-green/10"
     }] : [])
   ];
@@ -72,26 +67,30 @@ const UserPanel = () => {
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-foreground mb-2">Painel do usuário</h1>
+        <h1 className="text-2xl font-bold text-foreground mb-2">
+          Painel do usuário
+        </h1>
         <p className="text-muted-foreground">Suas opções disponíveis</p>
       </div>
 
       <div className="space-y-4">
         {panelOptions.map((option, index) => (
-          <Card 
+          <Card
             key={index}
             className="cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-[1.02] border-border"
             onClick={() => handleOptionClick(option.route)}
           >
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <div className={cn(
-                  "w-12 h-12 rounded-lg flex items-center justify-center",
-                  option.bgColor
-                )}>
+                <div
+                  className={cn(
+                    "w-12 h-12 rounded-lg flex items-center justify-center",
+                    option.bgColor
+                  )}
+                >
                   <option.icon className={cn("h-6 w-6", option.color)} />
                 </div>
-                
+
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-foreground mb-1">
                     {option.title}
@@ -108,16 +107,15 @@ const UserPanel = () => {
         {/* Botão para criar estacionamento (visível apenas se o usuário não for dono de estacionamento) */}
         {!profile?.dono_estacionamento && (
           <div className="flex justify-center pt-4">
+            {/* 1. Adicione a prop asChild ao Button */}
             <Button
+              asChild
               variant="ghost"
-              size="lg"
+              size='icon'
               onClick={() => setConfirmDialogOpen(true)}
-              className="flex flex-col items-center gap-2 h-auto py-6 hover:bg-spatioo-green/10 transition-colors"
+              className="hover:bg-spatioo-green/10 transition-colors rounded-full dark:hover:text-spatioo-green hover:text-spatioo-primary" 
             >
-              <CirclePlus className="h-12 w-12 text-spatioo-green dark:text-spatioo-green" />
-              <span className="text-sm font-medium text-muted-foreground">
-                Cadastrar Estacionamento
-              </span>
+              <CirclePlus className=" dark:text-spatioo-green text-spatioo-primary"/>
             </Button>
           </div>
         )}
@@ -129,7 +127,7 @@ const UserPanel = () => {
         onOpenChange={setConfirmDialogOpen}
         onConfirm={handleConfirmCreateEstacionamento}
       />
-      
+
       <CreateEstacionamentoComercialDialog
         open={comercialDialogOpen}
         onOpenChange={setComercialDialogOpen}

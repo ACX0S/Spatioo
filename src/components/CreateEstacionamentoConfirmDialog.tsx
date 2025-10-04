@@ -3,7 +3,6 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -30,15 +29,12 @@ const CreateEstacionamentoConfirmDialog = ({
 }: CreateEstacionamentoConfirmDialogProps) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
+      <AlertDialogContent className="grid grid-cols-1 md:grid-cols-1 gap-4 max-w-sm">
         <AlertDialogHeader>
-          <AlertDialogTitle>Deseja cadastrar um Estacionamento Comercial?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Você será redirecionado para o formulário de cadastro de estacionamento comercial.
-          </AlertDialogDescription>
+          <AlertDialogTitle className="text-spatioo-gray-dark dark:text-spatioo-white">Deseja cadastrar um Estacionamento Comercial?</AlertDialogTitle>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogCancel className="text-red-800 border-red-800 hover:bg-transparent hover:text-red-600 hover:border-red-600">Cancelar</AlertDialogCancel>
           <AlertDialogAction onClick={onConfirm}>Sim</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
