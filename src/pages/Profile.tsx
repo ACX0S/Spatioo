@@ -442,7 +442,7 @@ const Profile = () => {
             {/* Sair da conta */}
             <Button 
               variant="outline"
-              className="w-full border-destructive text-destructive hover:bg-destructive/10"
+              className="w-full border-destructive text-destructive hover:bg-destructive/10 hover:text-foreground"
               onClick={signOut}
             >
               <LogOut className="mr-2 h-4 w-4" />
