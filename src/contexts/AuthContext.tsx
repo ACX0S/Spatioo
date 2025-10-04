@@ -219,7 +219,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         toast({
           title: "Cadastro realizado com sucesso",
           description: "Verifique seu email para confirmar a conta.",
-          duration: 4000
+          duration: 5000
         });
       } else if (data.session) {
         toast({

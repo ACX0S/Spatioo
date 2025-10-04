@@ -209,7 +209,7 @@ const Login = () => {
               
               <Button 
                 type="submit" 
-                className="w-full h-12 rounded-lg bg-spatioo-green hover:bg-spatioo-green-dark text-black font-medium mt-6"
+                className="w-full h-12 rounded-lg bg-spatioo-green hover:bg-spatioo-green/80 transition-all duration-500 text-black font-medium mt-6"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? 'Entrando...' : 'Entrar'}
@@ -230,7 +230,7 @@ const Login = () => {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full h-12 rounded-lg"
+                className="w-full h-12 rounded-lg hover:scale-[1.02] hover:text-white hover:duration-500 transition-all hover:bg-transparent hover:border-spatioo-green"
                 onClick={handleGoogleSignIn}
                 disabled={isSubmitting}
               >
@@ -386,7 +386,7 @@ const Login = () => {
               
               <Button 
                 type="submit" 
-                className="w-full h-12 rounded-lg bg-spatioo-green hover:bg-spatioo-green-dark text-black font-medium mt-6"
+                className="w-full h-12 rounded-lg bg-spatioo-green hover:bg-spatioo-green/80 transition-all duration-500 text-black font-medium mt-6"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? 'Processando...' : 'Criar conta'}
@@ -405,7 +405,7 @@ const Login = () => {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full h-12 rounded-lg"
+                className="w-full h-12 rounded-lg hover:scale-[1.02] hover:text-white hover:duration-500 transition-all hover:bg-transparent hover:border-spatioo-green"
                 onClick={handleGoogleSignIn}
                 disabled={isSubmitting}
               >
