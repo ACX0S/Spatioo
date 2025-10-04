@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { FaCar } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Navigation, Car, Clock } from 'lucide-react';
+import { MapPin, Navigation, Clock } from 'lucide-react';
 import { useParkingData } from '@/hooks/useParkingData';
 import { PublicParkingData } from '@/services/parkingService';
 import { useGoogleMaps } from '@/hooks/useGoogleMaps';
@@ -252,7 +253,7 @@ const Explore = () => {
                 {/* Info rápida */}
                 <div className="flex items-center justify-between pt-3 border-t border-border">
                   <div className="flex items-center gap-1.5 text-sm font-medium">
-                    <Car className="w-4 h-4 text-spatioo-secondary" />
+                    <FaCar className="w-4 h-4 text-spatioo-secondary" />
                     <span>{spot.numero_vagas} vagas</span>
                   </div>
                   

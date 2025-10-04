@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
-import { MapPin, Navigation } from 'lucide-react';
+import { MapPinned, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface LocationInputProps {
@@ -56,9 +56,9 @@ const LocationInput: React.FC<LocationInputProps> = ({
     <div className={cn("relative flex items-center", className)}>
       <div className="absolute left-3 z-10">
         {icon === 'origin' ? (
-          <Navigation className="h-5 w-5 text-spatioo-primary" />
+          <MapPin className="h-5 w-5 text-spatioo-primary dark:text-spatioo-secondary" />
         ) : (
-          <MapPin className="h-5 w-5 text-spatioo-secondary" />
+          <MapPinned className="h-5 w-5 text-spatioo-primary dark:text-spatioo-secondary" />
         )}
       </div>
       <Input
