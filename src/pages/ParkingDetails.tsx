@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { useParkingDetail } from '@/hooks/useParkingDetail';
-import { Car, MapPin, Star, Clock, ArrowLeft } from 'lucide-react';
+import { MapPin, Clock, ArrowLeft } from 'lucide-react';
+import { FaCar } from 'react-icons/fa';
 import BookingForm from '@/components/BookingForm';
 import PricingTable from '@/components/PricingDisplay';
 
@@ -25,7 +26,7 @@ const ParkingDetails = () => {
   if (error || !parkingSpot) {
     return (
       <div className="container p-4 max-w-md mx-auto text-center py-10">
-        <Car className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+        <FaCar className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
         <h2 className="text-xl font-bold mb-2">Estacionamento não encontrado</h2>
         <p className="text-muted-foreground mb-6">Não foi possível encontrar os detalhes deste estacionamento.</p>
         <Button 
@@ -67,7 +68,7 @@ const ParkingDetails = () => {
           </Carousel>
         ) : (
           <div className="h-48 w-full flex items-center justify-center bg-gradient-to-r from-slate-800 to-slate-900 rounded-lg">
-            <Car className="h-16 w-16 text-slate-500" />
+            <FaCar className="h-16 w-16 text-slate-500" />
           </div>
         )}
 
@@ -137,7 +138,7 @@ const ParkingDetails = () => {
             {parkingSpot.suporte_carro_eletrico && (
               <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-md">
                 <div className="bg-spatioo-green/20 p-1 rounded-md">
-                  <Car className="h-4 w-4 text-spatioo-green" />
+                  <FaCar className="h-4 w-4 text-spatioo-green" />
                 </div>
                 <span className="text-sm">Suporte a carro elétrico</span>
               </div>
@@ -145,7 +146,7 @@ const ParkingDetails = () => {
             {parkingSpot.vaga_coberta && (
               <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-md">
                 <div className="bg-spatioo-green/20 p-1 rounded-md">
-                  <Car className="h-4 w-4 text-spatioo-green" />
+                  <FaCar className="h-4 w-4 text-spatioo-green" />
                 </div>
                 <span className="text-sm">Vaga coberta</span>
               </div>
@@ -153,7 +154,7 @@ const ParkingDetails = () => {
             {parkingSpot.manobrista && (
               <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-md">
                 <div className="bg-spatioo-green/20 p-1 rounded-md">
-                  <Car className="h-4 w-4 text-spatioo-green" />
+                  <FaCar className="h-4 w-4 text-spatioo-green" />
                 </div>
                 <span className="text-sm">Manobrista</span>
               </div>
@@ -161,7 +162,7 @@ const ParkingDetails = () => {
             {parkingSpot.suporte_caminhao && (
               <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-md">
                 <div className="bg-spatioo-green/20 p-1 rounded-md">
-                  <Car className="h-4 w-4 text-spatioo-green" />
+                  <FaCar className="h-4 w-4 text-spatioo-green" />
                 </div>
                 <span className="text-sm">Suporte a caminhão</span>
               </div>
@@ -169,7 +170,7 @@ const ParkingDetails = () => {
             {parkingSpot.vaga_moto && (
               <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-md">
                 <div className="bg-spatioo-green/20 p-1 rounded-md">
-                  <Car className="h-4 w-4 text-spatioo-green" />
+                  <FaCar className="h-4 w-4 text-spatioo-green" />
                 </div>
                 <span className="text-sm">Vaga para motos</span>
               </div>

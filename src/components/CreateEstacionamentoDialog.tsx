@@ -18,7 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MapPin, Clock, DollarSign, Car } from "lucide-react";
+import { MapPin, Clock, DollarSign} from "lucide-react";
+import { FaCar } from 'react-icons/fa';
 import { useToast } from "@/hooks/use-toast";
 import { useCep } from "@/hooks/useCep";
 import { useAuth } from "@/contexts/AuthContext";
@@ -456,7 +457,7 @@ const CreateEstacionamentoDialog = ({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Car className="h-5 w-5 text-spatioo-green" />
+            <FaCar className="h-5 w-5 text-spatioo-green" />
             Registrar Nova Vaga
           </DialogTitle>
           <DialogDescription>

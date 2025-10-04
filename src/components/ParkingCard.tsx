@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Car, MapPin, Clock, Star } from 'lucide-react';
+import { MapPin, Clock, Star } from 'lucide-react';
+import { FaCar } from 'react-icons/fa';
 import { PublicParkingData } from '@/services/parkingService';
 
 interface ParkingCardProps {
@@ -61,7 +62,7 @@ const ParkingCard = memo(({
 
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center text-muted-foreground">
-              <Car className="w-3.5 h-3.5 mr-1 text-spatioo-green-dark" />
+              <FaCar className="w-3.5 h-3.5 mr-1 text-spatioo-green-dark" />
               <span>{parkingSpot.numero_vagas} vagas disponíveis</span>
             </div>
 

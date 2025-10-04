@@ -4,7 +4,8 @@ import { Booking } from '@/types/booking';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/utils';
-import { Calendar, Clock, MapPin, Car, Tag } from 'lucide-react';
+import { Calendar, Clock, MapPin, Tag } from 'lucide-react';
+import { FaCar } from 'react-icons/fa';
 
 /**
  * @interface BookingDetailsDialogProps
@@ -96,7 +97,7 @@ const BookingDetailsDialog = ({ booking, open, onOpenChange, trigger }: BookingD
           
           {/* Número da vaga */}
           <div className="flex items-center gap-3">
-            <Car className="w-5 h-5 text-muted-foreground" />
+            <FaCar className="w-5 h-5 text-muted-foreground" />
             <div>
               <p className="text-sm font-medium">Vaga</p>
               <p>{booking.spot_number}</p>

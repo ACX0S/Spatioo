@@ -24,7 +24,6 @@ import {
   LayoutDashboard, 
   Edit, 
   Camera, 
-  Car, 
   DollarSign, 
   TrendingUp, 
   Users, 
@@ -34,6 +33,7 @@ import {
   Building2,
   Clock
 } from "lucide-react";
+import { FaCar } from 'react-icons/fa';
 import { uploadEstacionamentoPhoto, deleteEstacionamentoPhotos } from "@/services/storageService";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -73,7 +73,7 @@ const EstacionamentoDashboard = () => {
     { id: 'dashboard', title: 'Dashboard', icon: LayoutDashboard },
     { id: 'editar', title: 'Editar', icon: Edit },
     { id: 'fotos', title: 'Fotos', icon: Camera },
-    { id: 'vagas', title: 'Vagas', icon: Car },
+    { id: 'vagas', title: 'Vagas', icon: FaCar },
   ];
 
   // Efeito para buscar os nomes dos motoristas quando as vagas mudam
@@ -228,7 +228,7 @@ const EstacionamentoDashboard = () => {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Total de Vagas</CardTitle>
-                  <Car className="h-4 w-4 text-muted-foreground" />
+                  <FaCar className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{estacionamento.numero_vagas}</div>
@@ -423,7 +423,7 @@ const EstacionamentoDashboard = () => {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Total</CardTitle>
-                  <Car className="h-4 w-4 text-muted-foreground" />
+                  <FaCar className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{stats?.total_vagas || 0}</div>
@@ -542,7 +542,7 @@ const EstacionamentoDashboard = () => {
                   </div>
                 ) : (
                   <div className="text-center py-8 text-muted-foreground">
-                    <Car className="h-12 w-12 mx-auto mb-4" />
+                    <FaCar className="h-12 w-12 mx-auto mb-4" />
                     <p>Nenhuma vaga encontrada</p>
                   </div>
                 )}

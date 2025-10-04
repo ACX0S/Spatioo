@@ -11,7 +11,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Estacionamento, EstacionamentoInsert, EstacionamentoUpdate } from "@/types/estacionamento";
-import { Plus, Edit2, Trash2, Building2, Clock, DollarSign, Car, Upload, X } from "lucide-react";
+import { Plus, Trash2, Building2, Clock, DollarSign, Upload, X } from "lucide-react";
+import { FaCar } from 'react-icons/fa';
 import EditEstacionamentoDialog from "@/components/EditEstacionamentoDialog";
 import { uploadEstacionamentoPhoto, deleteEstacionamentoPhotos } from "@/services/storageService";
 import {
@@ -424,7 +425,7 @@ const GerenciarEstacionamento = () => {
                 
                 <div>
                   <h3 className="font-semibold mb-2 flex items-center gap-2">
-                    <Car className="h-4 w-4" />
+                    <FaCar className="h-4 w-4" />
                     Vagas Disponíveis
                   </h3>
                   <Badge variant="secondary" className="text-lg">

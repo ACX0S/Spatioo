@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { GoogleMap as GoogleMapComponent, Marker, InfoWindow } from '@react-google-maps/api';
 import { PublicParkingData } from '@/services/parkingService';
 import { Button } from '@/components/ui/button';
-import { Car } from 'lucide-react';
+import { FaCar } from 'react-icons/fa';
 
 interface GoogleMapProps {
   center: google.maps.LatLngLiteral;
@@ -130,7 +130,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
             <h3 className="font-bold text-base mb-2 text-spatioo-primary">{selectedSpot.nome}</h3>
             <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{selectedSpot.endereco}</p>
             <div className="flex items-center gap-2 mb-3">
-              <Car className="w-4 h-4 text-spatioo-secondary" />
+              <FaCar className="w-4 h-4 text-spatioo-secondary" />
               <span className="text-sm font-medium">{selectedSpot.numero_vagas} vagas disponíveis</span>
             </div>
             <Button
