@@ -2,7 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Car, Calendar, Building, CirclePlus} from 'lucide-react';
+import { Calendar, Building, CirclePlus} from 'lucide-react';
+import { FaCar } from 'react-icons/fa';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import CreateEstacionamentoConfirmDialog from '@/components/CreateEstacionamentoConfirmDialog';
@@ -19,7 +20,7 @@ const UserPanel = () => {
     {
       title: "Minhas vagas",
       description: "Gerenciar e cadastrar vagas",
-      icon: Car,
+      icon: FaCar,
       route: "/ofertar",
       color: "dark:text-spatioo-green light: text-spatioo-primary",
       bgColor: "bg-spatioo-green/10"

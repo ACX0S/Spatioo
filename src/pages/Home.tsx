@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Car, MapPin, Clock, Navigation, Star, Compass, TrendingUp, History } from 'lucide-react';
+import { MapPin,  Compass, TrendingUp, History } from 'lucide-react';
+import { FaCar } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { useParkingData } from '@/hooks/useParkingData';
@@ -245,7 +246,7 @@ const Home = () => {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="text-center py-12"
         >
-          <Car className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+          <FaCar className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-lg font-semibold mb-2">Nenhum estacionamento encontrado</h3>
           <p className="text-muted-foreground mb-4">
             Não encontramos estacionamentos na sua região ainda.
