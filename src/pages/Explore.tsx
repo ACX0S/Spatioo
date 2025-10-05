@@ -13,7 +13,6 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { toast } from 'sonner';
-import Layout from '@/components/Layout';
 
 /**
  * Página Explore - Busca e visualização de estacionamentos
@@ -199,34 +198,39 @@ const Explore = () => {
     return 'Não informado';
   };
 
+  // Helper para converter coordenadas para LatLngLiteral
+  const getLatLng = (coords: google.maps.LatLngLiteral | [number, number] | null): { lat: number; lng: number } | null => {
+    if (!coords) return null;
+    if (Array.isArray(coords)) {
+      return { lat: coords[0], lng: coords[1] };
+    }
+    return coords;
+  };
+
   if (loadError) {
     return (
-      <Layout>
-        <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] gap-4">
-          <p className="text-destructive text-lg font-medium">Erro ao carregar o mapa</p>
-          <p className="text-muted-foreground text-sm">Verifique sua conexão com a internet</p>
-          <Button onClick={() => window.location.reload()} variant="outline">
-            Tentar novamente
-          </Button>
-        </div>
-      </Layout>
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+        <p className="text-destructive text-lg font-medium">Erro ao carregar o mapa</p>
+        <p className="text-muted-foreground text-sm">Verifique sua conexão com a internet</p>
+        <Button onClick={() => window.location.reload()} variant="outline">
+          Tentar novamente
+        </Button>
+      </div>
     );
   }
 
   if (!isLoaded) {
     return (
-      <Layout>
-        <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] gap-4">
-          <Loader2 className="h-12 w-12 animate-spin text-primary" />
-          <p className="text-muted-foreground animate-pulse">Carregando mapa...</p>
-        </div>
-      </Layout>
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <p className="text-muted-foreground animate-pulse">Carregando mapa...</p>
+      </div>
     );
   }
 
   return (
-    <Layout>
-      <div className="h-[calc(100vh-4rem)] overflow-hidden">
+    <div className="min-h-screen bg-background">
+      <div className="h-screen overflow-hidden">
         {/* Layout Desktop - duas colunas lado a lado */}
         <div className="hidden lg:flex h-full">
           <div className="w-[420px] bg-background border-r border-border flex flex-col overflow-hidden shadow-lg">
@@ -331,10 +335,11 @@ const Explore = () => {
                 ) : (
                   <>
                     {visibleParkingSpots.map((spot, index) => {
-                      const distance = (destinationCoords || userLocation) && spot.latitude && spot.longitude
+                      const refCoords = getLatLng(destinationCoords || (userLocation ? { lat: userLocation[0], lng: userLocation[1] } : null));
+                      const distance = refCoords && spot.latitude && spot.longitude
                         ? calculateDistance(
-                            (destinationCoords || userLocation)!.lat,
-                            (destinationCoords || userLocation)!.lng,
+                            refCoords.lat,
+                            refCoords.lng,
                             spot.latitude,
                             spot.longitude
                           )
@@ -402,7 +407,7 @@ const Explore = () => {
                               </div>
                               <div className="text-right flex-shrink-0">
                                 <p className="text-xl font-bold text-primary">
-                                  {spot.preco_hora?.toLocaleString('pt-BR', {
+                                  {(spot.preco_fixo_1h || spot.preco)?.toLocaleString('pt-BR', {
                                     style: 'currency',
                                     currency: 'BRL'
                                   })}
@@ -554,10 +559,11 @@ const Explore = () => {
                   ) : (
                     <>
                       {visibleParkingSpots.map((spot, index) => {
-                        const distance = (destinationCoords || userLocation) && spot.latitude && spot.longitude
+                        const refCoords = getLatLng(destinationCoords || (userLocation ? { lat: userLocation[0], lng: userLocation[1] } : null));
+                        const distance = refCoords && spot.latitude && spot.longitude
                           ? calculateDistance(
-                              (destinationCoords || userLocation)!.lat,
-                              (destinationCoords || userLocation)!.lng,
+                              refCoords.lat,
+                              refCoords.lng,
                               spot.latitude,
                               spot.longitude
                             )
@@ -620,7 +626,7 @@ const Explore = () => {
                                 </div>
                                 <div className="text-right flex-shrink-0">
                                   <p className="text-base font-bold text-primary">
-                                    {spot.preco_hora?.toLocaleString('pt-BR', {
+                                    {(spot.preco_fixo_1h || spot.preco)?.toLocaleString('pt-BR', {
                                       style: 'currency',
                                       currency: 'BRL'
                                     })}
@@ -651,7 +657,7 @@ const Explore = () => {
           </ResizablePanelGroup>
         </div>
       </div>
-    </Layout>
+    </div>
   );
 };
 
