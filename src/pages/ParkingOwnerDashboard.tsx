@@ -21,7 +21,6 @@ import EditEstacionamentoDialog from "@/components/EditEstacionamentoDialog";
 import DeleteEstacionamentoDialog from "@/components/DeleteEstacionamentoDialog";
 
 const ParkingOwnerDashboard = () => {
-  const [date, setDate] = useState<Date | undefined>(new Date());
   const [activeTab, setActiveTab] = useState('parking-spots');
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editingEstacionamento, setEditingEstacionamento] = useState<string | null>(null);
@@ -73,7 +72,7 @@ const ParkingOwnerDashboard = () => {
               onClick={() => setShowAddDialog(true)}
             >
               <Plus className="mr-2 h-4 w-4" />
-              Adicionar novo
+              Adicionar Estacionamento
             </Button>
           </div>
           
