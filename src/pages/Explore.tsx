@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { FaCar } from 'react-icons/fa';
+import { FaCar, FaWarehouse, FaHouseUser } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Navigation, Clock, Locate, Loader2 } from 'lucide-react';
 import { useParkingData } from '@/hooks/useParkingData';
@@ -357,40 +357,46 @@ const Explore = () => {
                         >
                           <div className="p-4">
                             <div className="flex items-start justify-between gap-3">
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-2 flex-wrap">
-                                  <h3 className="font-semibold text-base line-clamp-1 flex-1 min-w-0">
-                                    {spot.nome}
-                                  </h3>
-                                  {spot.tipo && (
-                                    <Badge 
-                                      variant="outline" 
-                                      className={`flex-shrink-0 ${
-                                        spot.tipo === 'residencial' 
-                                          ? 'bg-blue-50 text-blue-700 border-blue-300' 
-                                          : 'bg-green-50 text-green-700 border-green-300'
-                                      }`}
-                                    >
-                                      {spot.tipo === 'residencial' ? '🏠' : '🏢'}
-                                    </Badge>
-                                  )}
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                    {distance !== null ? (
+                                      <h3 className="font-bold text-lg text-primary flex-1 min-w-0">
+                                        {distance < 1 
+                                          ? `${(distance * 1000).toFixed(0)} m` 
+                                          : `${distance.toFixed(2)} km`}
+                                      </h3>
+                                    ) : (
+                                      <h3 className="font-semibold text-base line-clamp-1 flex-1 min-w-0">
+                                        {spot.nome}
+                                      </h3>
+                                    )}
+                                    {spot.tipo && (
+                                      <Badge 
+                                        variant="outline" 
+                                        className={`flex-shrink-0 flex items-center gap-1 ${
+                                          spot.tipo === 'residencial' 
+                                            ? 'bg-blue-50 text-blue-700 border-blue-300' 
+                                            : 'bg-green-50 text-green-700 border-green-300'
+                                        }`}
+                                      >
+                                        {spot.tipo === 'residencial' ? <FaHouseUser className="h-3 w-3" /> : <FaWarehouse className="h-3 w-3" />}
+                                        <span>{spot.tipo === 'residencial' ? 'Residencial' : 'Estacionamento'}</span>
+                                      </Badge>
+                                    )}
                                   {isNearby && (
                                     <Badge className="bg-primary text-primary-foreground flex-shrink-0">
                                       Próximo
                                     </Badge>
                                   )}
                                 </div>
-                                <div className="space-y-1.5 text-sm">
-                                  <div className="flex items-start gap-2 text-muted-foreground">
-                                    <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0 text-primary" />
-                                    <span className="line-clamp-2">{spot.endereco}</span>
-                                  </div>
-                                  {distance !== null && (
-                                    <div className="flex items-center gap-2 text-primary font-semibold">
-                                      <Navigation className="h-4 w-4 flex-shrink-0" />
-                                      {distance.toFixed(1)} km
+                                  <div className="space-y-1.5 text-sm">
+                                    <div className="flex items-start gap-2 text-muted-foreground">
+                                      <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0 text-primary" />
+                                      <span className="line-clamp-2 font-medium">{spot.nome}</span>
                                     </div>
-                                  )}
+                                    <div className="flex items-start gap-2 text-muted-foreground text-xs">
+                                      <span className="line-clamp-1">{spot.endereco}</span>
+                                    </div>
                                   <div className="flex items-center gap-4 mt-2 flex-wrap">
                                     <div className="flex items-center gap-1.5 text-muted-foreground">
                                       <FaCar className="h-4 w-4 text-secondary" />
@@ -583,33 +589,38 @@ const Explore = () => {
                               <div className="flex items-start justify-between gap-2">
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
-                                    <h3 className="font-semibold text-sm line-clamp-1 flex-1 min-w-0">
-                                      {spot.nome}
-                                    </h3>
+                                    {distance !== null ? (
+                                      <h3 className="font-bold text-base text-primary">
+                                        {distance < 1 
+                                          ? `${(distance * 1000).toFixed(0)} m` 
+                                          : `${distance.toFixed(2)} km`}
+                                      </h3>
+                                    ) : (
+                                      <h3 className="font-semibold text-sm line-clamp-1 flex-1 min-w-0">
+                                        {spot.nome}
+                                      </h3>
+                                    )}
                                     {spot.tipo && (
                                       <Badge 
                                         variant="outline" 
-                                        className={`text-xs px-1.5 py-0 h-5 ${
+                                        className={`text-xs px-1.5 py-0 h-5 flex items-center gap-1 ${
                                           spot.tipo === 'residencial' 
                                             ? 'bg-blue-50 text-blue-700 border-blue-300' 
                                             : 'bg-green-50 text-green-700 border-green-300'
                                         }`}
                                       >
-                                        {spot.tipo === 'residencial' ? '🏠' : '🏢'}
+                                        {spot.tipo === 'residencial' ? <FaHouseUser className="h-3 w-3" /> : <FaWarehouse className="h-3 w-3" />}
                                       </Badge>
                                     )}
                                   </div>
                                   <div className="space-y-1 text-xs">
                                     <div className="flex items-start gap-1.5 text-muted-foreground">
-                                      <MapPin className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-primary" />
-                                      <span className="line-clamp-1">{spot.endereco}</span>
+                                      <span className="font-medium line-clamp-1">{spot.nome}</span>
                                     </div>
-                                    {distance !== null && (
-                                      <div className="flex items-center gap-1.5 text-primary font-semibold">
-                                        <Navigation className="h-3.5 w-3.5" />
-                                        {distance.toFixed(1)} km
-                                      </div>
-                                    )}
+                                    <div className="flex items-start gap-1.5 text-muted-foreground">
+                                      <MapPin className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-primary" />
+                                      <span className="line-clamp-1 text-xs">{spot.endereco}</span>
+                                    </div>
                                     <div className="flex items-center gap-3">
                                       <div className="flex items-center gap-1 text-muted-foreground">
                                         <FaCar className="h-3.5 w-3.5 text-secondary" />

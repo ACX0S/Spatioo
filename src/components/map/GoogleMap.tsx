@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { GoogleMap as GoogleMapComponent, Marker, InfoWindow } from '@react-google-maps/api';
 import { PublicParkingData } from '@/services/parkingService';
 import { Button } from '@/components/ui/button';
-import { FaCar } from 'react-icons/fa';
+import { FaCar, FaWarehouse, FaHouseUser } from 'react-icons/fa';
 
 interface GoogleMapProps {
   center: google.maps.LatLngLiteral;
@@ -69,22 +69,25 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
    * @returns Configuração do ícone do Google Maps
    */
   const getMarkerIcon = (tipo: string | undefined, isSelected: boolean = false) => {
-    const baseSize = 32;
+    const baseSize = 36;
     const zoomFactor = Math.min(Math.max((currentZoom - 12) * 0.3 + 1, 0.6), 1.8);
     const size = baseSize * zoomFactor;
     
     const isResidencial = tipo === 'residencial';
     const color = isResidencial ? '#3B82F6' : '#10B981';
-    const icon = isResidencial ? '🏠' : '🏢';
     const scale = isSelected ? 1.4 : 1;
     const finalSize = size * scale;
     const strokeWidth = isSelected ? 3 : 2;
+    
+    // Ícones FontAwesome como SVG paths
+    const housePath = 'M12 3l-8 8v10h6v-6h4v6h6V11L12 3z'; // Simplificado
+    const warehousePath = 'M4 6h16v12H4V6zm2 2v8h12V8H6z'; // Simplificado
 
     const svg = `
       <svg width="${finalSize}" height="${finalSize * 1.2}" viewBox="0 0 24 29" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <filter id="shadow${isSelected ? '-selected' : ''}">
-            <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.3"/>
+            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.4"/>
           </filter>
         </defs>
         <path d="M12 0C7.58 0 4 3.58 4 8c0 5.25 8 16 8 16s8-10.75 8-16c0-4.42-3.58-8-8-8z" 
@@ -93,11 +96,10 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
               stroke-width="${strokeWidth}"
               filter="url(#shadow${isSelected ? '-selected' : ''})"
         />
-        <text x="12" y="11" 
-              font-size="${isSelected ? '10' : '8'}" 
-              text-anchor="middle" 
-              dominant-baseline="middle"
-        >${icon}</text>
+        <circle cx="12" cy="8" r="5" fill="white" opacity="0.95"/>
+        <g transform="translate(9.5, 5.5) scale(${isSelected ? 0.22 : 0.18})">
+          <path d="${isResidencial ? housePath : warehousePath}" fill="${color}" />
+        </g>
       </svg>
     `;
 
