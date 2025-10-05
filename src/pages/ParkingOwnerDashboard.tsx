@@ -53,16 +53,16 @@ const ParkingOwnerDashboard = () => {
         
         {/* Parking Spots Tab */}
         <TabsContent value="parking-spots" className="space-y-4">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center gap-4">
-              <div className="relative">
+          <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 mb-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
+              <div className="relative w-full sm:w-[300px]">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Buscar estacionamentos..."
-                  className="pl-9 pr-4 w-[300px]"
+                  className="pl-9 pr-4"
                 />
               </div>
-              <Button variant="outline" size="sm" className="gap-1">
+              <Button variant="outline" size="sm" className="gap-1 w-full sm:w-auto">
                 <Filter className="h-4 w-4" />
                 Filtros
               </Button>
@@ -70,7 +70,7 @@ const ParkingOwnerDashboard = () => {
             
             {/* Botão para abrir o formulário de estacionamento comercial com CNPJ e comodidades */}
             <Button 
-              className="bg-spatioo-green hover:bg-spatioo-green-dark text-black font-medium"
+              className="bg-spatioo-green hover:bg-spatioo-green-dark text-black font-medium w-full sm:w-auto"
               onClick={() => setShowAddDialog(true)}
             >
               <Plus className="mr-2 h-4 w-4" />
@@ -134,68 +134,61 @@ const ParkingOwnerDashboard = () => {
                       </CardHeader>
                       
                       <CardContent className="pb-2">
-                        <div className="grid grid-cols-4 gap-4 mt-2">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-2">
                           <div>
                             <p className="text-xs text-muted-foreground mb-1">Total de vagas</p>
-                            <p className="font-bold">{parking.numero_vagas}</p>
+                            <p className="text-lg sm:text-xl font-bold">{parking.numero_vagas}</p>
                           </div>
                           
                           <div>
-                            <p className="text-xs text-muted-foreground mb-1">Vagas disponíveis</p>
-                            <p className="font-bold text-spatioo-green">{availableSpots}</p>
+                            <p className="text-xs text-muted-foreground mb-1">Disponíveis</p>
+                            <p className="text-lg sm:text-xl font-bold text-spatioo-green">{availableSpots}</p>
                           </div>
                           
                           <div>
-                            <p className="text-xs text-muted-foreground mb-1">Taxa de ocupação</p>
-                            <p className="font-bold">{occupancyRate}%</p>
+                            <p className="text-xs text-muted-foreground mb-1">Taxa ocupação</p>
+                            <p className="text-lg sm:text-xl font-bold">{occupancyRate}%</p>
                           </div>
                           
                           <div>
                             <p className="text-xs text-muted-foreground mb-1">Hora extra</p>
-                            <p className="font-bold">R$ {parking.hora_extra?.toFixed(2) || '0.00'}</p>
+                            <p className="text-lg sm:text-xl font-bold">R$ {parking.hora_extra?.toFixed(2) || '0.00'}</p>
                           </div>
                         </div>
                         
                         {/* Exibe comodidades se existirem */}
-                        <div className="flex flex-wrap gap-2 mt-4">
-                          {parking.funcionamento_24h && <Badge variant="outline" className="bg-background">Funcionamento 24h</Badge>}
-                          {parking.suporte_carro_eletrico && <Badge variant="outline" className="bg-background">Carro elétrico</Badge>}
-                          {parking.vaga_coberta && <Badge variant="outline" className="bg-background">Coberto</Badge>}
-                          {parking.manobrista && <Badge variant="outline" className="bg-background">Manobrista</Badge>}
-                          {parking.suporte_caminhao && <Badge variant="outline" className="bg-background">Caminhão</Badge>}
-                          {parking.vaga_moto && <Badge variant="outline" className="bg-background">Moto</Badge>}
-                        </div>
+                        {(parking.funcionamento_24h || parking.suporte_carro_eletrico || parking.vaga_coberta || 
+                          parking.manobrista || parking.suporte_caminhao || parking.vaga_moto) && (
+                          <div className="flex flex-wrap gap-1.5 mt-4">
+                            {parking.funcionamento_24h && <Badge variant="outline" className="text-xs">24h</Badge>}
+                            {parking.vaga_coberta && <Badge variant="outline" className="text-xs">Coberto</Badge>}
+                            {parking.manobrista && <Badge variant="outline" className="text-xs">Manobrista</Badge>}
+                            {parking.suporte_carro_eletrico && <Badge variant="outline" className="text-xs">Elétrico</Badge>}
+                            {parking.suporte_caminhao && <Badge variant="outline" className="text-xs">Caminhão</Badge>}
+                            {parking.vaga_moto && <Badge variant="outline" className="text-xs">Moto</Badge>}
+                          </div>
+                        )}
                       </CardContent>
                       
-                      <CardFooter className="flex justify-between items-center pt-2 gap-2">
-                        {/* Botões de ação ajustados conforme referência */}
-                        <div className="flex gap-2 w-full">
-                          {/* Botões alinhados à esquerda com mesmo tamanho */}
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setEditingEstacionamento(parking.id)}
-                            className="w-[110px]"
-                          >
-                            <Edit className="h-4 w-4 mr-2" />
-                            Editar
-                          </Button>
+                      <CardFooter className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center pt-2 gap-2">
+                        <div className="flex flex-col sm:flex-row gap-2 w-full">
+                          {/* Botão Gerenciar - destaque em verde */}
                           <Button
                             variant="default"
                             size="sm"
                             onClick={() => navigate(`/gerenciar-estacionamento?id=${parking.id}`)}
-                            className="w-[110px] bg-spatioo-green hover:bg-spatioo-green/90 text-black"
+                            className="flex-1 sm:flex-initial sm:min-w-[130px] bg-spatioo-green hover:bg-spatioo-green/90 text-black font-medium"
                           >
                             <Settings className="h-4 w-4 mr-2" />
                             Gerenciar
                           </Button>
                           
-                          {/* Botão Excluir alinhado à direita */}
+                          {/* Botão Excluir */}
                           <Button
                             variant="destructive"
                             size="sm"
                             onClick={() => setDeletingEstacionamento({ id: parking.id, nome: parking.nome })}
-                            className="ml-auto"
+                            className="flex-1 sm:flex-initial sm:ml-auto"
                           >
                             <Trash2 className="h-4 w-4 mr-2" />
                             Excluir

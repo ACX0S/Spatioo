@@ -68,7 +68,7 @@ const CreateEstacionamentoDialog = ({
   } = useCep();
 
   // Hook para geocodificação automática
-  const { geocodeCep, loading: geocodingLoading } = useGeocoding();
+  const { geocodeCep, geocodeAddress, loading: geocodingLoading } = useGeocoding();
 
   // Estados para controle de componentes internos e dados do formulário.
   const [timePickerOpen, setTimePickerOpen] = useState(false);
@@ -253,11 +253,23 @@ const CreateEstacionamentoDialog = ({
         ? { abertura: "00:00", fechamento: "23:59" }
         : { abertura: formData.horarioInicio, fechamento: formData.horarioFim };
 
-      // Geocodifica o endereço para obter coordenadas
+      // Geocodifica o endereço completo (CEP + número) para obter coordenadas precisas
       let coordinates = null;
       try {
-        coordinates = await geocodeCep(formData.cep);
+        const fullAddress = cepData 
+          ? `${cepData.logradouro}, ${formData.numero}, ${cepData.bairro}, ${cepData.localidade}, ${cepData.uf}, Brasil`
+          : `${formData.endereco}, ${formData.numero}, Brasil`;
+        
+        coordinates = await geocodeAddress(fullAddress);
+        
         if (!coordinates) {
+          console.warn('Tentando geocodificar apenas com CEP...');
+          coordinates = await geocodeCep(formData.cep);
+        }
+        
+        if (coordinates) {
+          console.log('Coordenadas obtidas:', coordinates);
+        } else {
           console.warn('Não foi possível geocodificar o endereço. Continuando sem coordenadas.');
         }
       } catch (error) {

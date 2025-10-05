@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +40,9 @@ const GerenciarEstacionamento = () => {
   const { profile, updateProfile } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const estacionamentoId = searchParams.get('id');
+  
   const [estacionamento, setEstacionamento] = useState<Estacionamento | null>(null);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -65,15 +68,22 @@ const GerenciarEstacionamento = () => {
       return;
     }
     fetchEstacionamento();
-  }, [profile]);
+  }, [profile, estacionamentoId]);
 
   const fetchEstacionamento = async () => {
     try {
-      const { data, error } = await supabase
+      // Se tiver ID na URL, busca esse estacionamento específico
+      // Caso contrário, busca o primeiro estacionamento do usuário
+      const query = supabase
         .from('estacionamento')
         .select('*')
-        .eq('user_id', profile?.id)
-        .maybeSingle();
+        .eq('user_id', profile?.id);
+      
+      if (estacionamentoId) {
+        query.eq('id', estacionamentoId);
+      }
+      
+      const { data, error } = await query.maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
         throw error;
