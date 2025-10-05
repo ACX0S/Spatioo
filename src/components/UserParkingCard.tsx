@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Edit3, MapPin, Trash2 } from "lucide-react";
+import { MapPin, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Database } from '@/integrations/supabase/types';
 import { useState } from "react";
