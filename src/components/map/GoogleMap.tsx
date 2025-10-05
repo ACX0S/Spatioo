@@ -136,18 +136,21 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
       )}
 
       {/* Marcadores dos estacionamentos com ícone customizado responsivo */}
-      {parkingSpots
-        .filter(spot => spot.latitude && spot.longitude)
-        .map((spot) => (
-          <Marker
-            key={spot.id}
-            position={{ lat: Number(spot.latitude), lng: Number(spot.longitude) }}
-            onClick={() => handleMarkerClick(spot)}
-            title={`${spot.nome} - ${spot.tipo === 'residencial' ? 'Residencial' : 'Comercial'}`}
-            icon={getMarkerIcon(spot, currentZoom)}
-            animation={google.maps.Animation.DROP}
-          />
-        ))}
+      {parkingSpots.map((spot) => {
+        // Se o estacionamento não tem coordenadas, não renderizar o marcador
+        if (!spot.latitude || !spot.longitude) return null;
+        
+        return (
+        <Marker
+          key={spot.id}
+          position={{ lat: Number(spot.latitude), lng: Number(spot.longitude) }}
+          onClick={() => handleMarkerClick(spot)}
+          title={`${spot.nome} - ${spot.tipo === 'residencial' ? 'Residencial' : 'Comercial'}`}
+          icon={getMarkerIcon(spot, currentZoom)}
+          animation={google.maps.Animation.DROP}
+        />
+        );
+      })}
 
       {/* InfoWindow para o estacionamento selecionado */}
       {selectedSpot && selectedSpot.latitude && selectedSpot.longitude && (

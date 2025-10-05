@@ -118,12 +118,17 @@ const Explore = () => {
     // Usar destino ou localização do usuário como referência
     const refCoords = destinationCoords || (userLocation ? { lat: userLocation[0], lng: userLocation[1] } : null);
     
-    // Se não houver referência, retornar os primeiros 5 estacionamentos
-    if (!refCoords) return parkingSpots.slice(0, 5);
+    // Se não houver referência, retornar todos os estacionamentos
+    if (!refCoords) {
+      return parkingSpots;
+    }
 
-    // Calcular distância para cada estacionamento e ordenar
-    const spotsWithDistance = parkingSpots
-      .filter(spot => spot.latitude && spot.longitude)
+    // Separar estacionamentos com e sem coordenadas
+    const spotsWithCoords = parkingSpots.filter(spot => spot.latitude && spot.longitude);
+    const spotsWithoutCoords = parkingSpots.filter(spot => !spot.latitude || !spot.longitude);
+
+    // Calcular distância para estacionamentos com coordenadas e ordenar
+    const spotsWithDistance = spotsWithCoords
       .map(spot => ({
         ...spot,
         distance: calculateDistance(
@@ -135,8 +140,8 @@ const Explore = () => {
       }))
       .sort((a, b) => (a.distance || 0) - (b.distance || 0));
 
-    // Sempre retornar pelo menos os 5 mais próximos (ou todos se houver menos de 5)
-    return spotsWithDistance;
+    // Retornar estacionamentos com coordenadas primeiro, depois os sem coordenadas
+    return [...spotsWithDistance, ...spotsWithoutCoords];
   }, [parkingSpots, destinationCoords, userLocation, calculateDistance]);
 
   // Estacionamentos visíveis na lista (limitados por visibleCount)
@@ -216,9 +221,10 @@ const Explore = () => {
           </div>
 
           {/* Campos de pesquisa */}
-          <div className="p-6 space-y-3 border-b border-border bg-card">
+          <div className="p-6 space-y-4 border-b border-border bg-gradient-to-br from-primary/5 to-secondary/5">
             <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              <label className="text-xs font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                 Partida
               </label>
               <div className="flex gap-2">
@@ -226,10 +232,10 @@ const Explore = () => {
                   variant="outline"
                   size="icon"
                   onClick={handleUseCurrentLocation}
-                  className="flex-shrink-0 h-12 w-12 border-spatioo-primary/20 hover:bg-spatioo-primary/10"
+                  className="flex-shrink-0 h-12 w-12 border-2 border-primary/30 hover:border-primary hover:bg-primary/10 hover:scale-105 transition-all duration-200 shadow-sm"
                   title="Usar localização atual"
                 >
-                  <Locate className="h-5 w-5 text-spatioo-primary" />
+                  <Locate className="h-5 w-5 text-primary" />
                 </Button>
                 <LocationInput
                   value={origin}
@@ -243,7 +249,8 @@ const Explore = () => {
             </div>
             
             <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              <label className="text-xs font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-secondary" />
                 Destino
               </label>
               <LocationInput
@@ -257,14 +264,23 @@ const Explore = () => {
           </div>
 
           {/* Lista de estacionamentos próximos */}
-          <div className="flex-1 overflow-y-auto p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-sm font-bold text-foreground uppercase tracking-wide">
-                {loading ? 'Carregando...' : `${nearbyParkingSpots.length} encontrado(s)`}
-              </h2>
-              {(destinationCoords || userLocation) && nearbyParkingSpots.length > 0 && (
-                <p className="text-xs text-spatioo-primary font-medium">Ordenado por distância</p>
-              )}
+          <div className="flex-1 overflow-y-auto p-6 bg-gradient-to-b from-background to-muted/10">
+            <div className="mb-6 p-4 bg-card border border-border rounded-lg shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <FaCar className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-bold text-foreground">
+                      {loading ? 'Carregando...' : `${nearbyParkingSpots.length} encontrado(s)`}
+                    </h2>
+                    {(destinationCoords || userLocation) && nearbyParkingSpots.length > 0 && (
+                      <p className="text-xs text-primary font-medium">Ordenado por distância</p>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
 
             {loading && (
@@ -285,31 +301,47 @@ const Explore = () => {
               </div>
             )}
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               {visibleParkingSpots.map((spot) => (
                 <Card
                   key={spot.id}
-                  className="p-4 cursor-pointer hover:shadow-lg hover:border-spatioo-primary transition-all duration-200 bg-card"
+                  className="group p-5 cursor-pointer hover:shadow-xl hover:border-primary hover:-translate-y-1 transition-all duration-300 bg-card border-2 border-border active:scale-[0.98]"
                   onClick={() => handleParkingSelect(spot)}
                 >
-                  {(spot as any).distance !== undefined && (
-                    <div className="flex items-center gap-1.5 text-spatioo-primary font-bold text-sm mb-3">
-                      <Navigation className="w-4 h-4" />
-                      <span>{((spot as any).distance as number).toFixed(1)} km</span>
+                  <div className="flex items-start gap-3 mb-3">
+                    {/* Badge do tipo de estacionamento */}
+                    <div className={`px-3 py-1 rounded-full text-xs font-bold ${
+                      spot.tipo === 'residencial' 
+                        ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' 
+                        : 'bg-green-500/10 text-green-600 dark:text-green-400'
+                    }`}>
+                      {spot.tipo === 'residencial' ? '🏠 Residencial' : '🏢 Comercial'}
                     </div>
-                  )}
-                  <h3 className="font-bold text-lg mb-2 text-foreground">{spot.nome}</h3>
-                  <div className="flex items-start gap-2 text-sm text-muted-foreground mb-3">
-                    <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5 text-spatioo-secondary" />
-                    <span className="line-clamp-1">{spot.endereco}</span>
+                    
+                    {(spot as any).distance !== undefined && (
+                      <div className="flex items-center gap-1.5 text-primary font-bold text-xs bg-primary/10 px-3 py-1 rounded-full">
+                        <Navigation className="w-3 h-3" />
+                        <span>{((spot as any).distance as number).toFixed(1)} km</span>
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-center justify-between pt-3 border-t border-border">
-                    <div className="flex items-center gap-1.5 text-sm font-medium">
-                      <FaCar className="w-4 h-4 text-spatioo-secondary" />
+                  
+                  <h3 className="font-bold text-xl mb-3 text-foreground group-hover:text-primary transition-colors">{spot.nome}</h3>
+                  
+                  <div className="flex items-start gap-2 text-sm text-muted-foreground mb-4">
+                    <MapPin className="w-5 h-5 flex-shrink-0 mt-0.5 text-primary" />
+                    <span className="line-clamp-2">{spot.endereco}</span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between pt-4 border-t border-border/50">
+                    <div className="flex items-center gap-2 text-base font-semibold text-foreground">
+                      <div className="p-2 bg-secondary/10 rounded-lg">
+                        <FaCar className="w-5 h-5 text-secondary" />
+                      </div>
                       <span>{spot.numero_vagas} vagas</span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <Clock className="w-4 h-4" />
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Clock className="w-4 h-4 text-primary" />
                       <span className="line-clamp-1">{formatHorario(spot.horario_funcionamento)}</span>
                     </div>
                   </div>
@@ -356,10 +388,15 @@ const Explore = () => {
             />
             
             {/* Badge informativo */}
-            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-background/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-border z-10">
-              <p className="text-xs font-medium text-foreground">
-                {nearbyParkingSpots.length} estacionamento(s) próximo(s)
-              </p>
+            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-card/95 backdrop-blur-md px-5 py-3 rounded-full shadow-xl border-2 border-primary/20 z-10">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-primary/20 rounded-full">
+                  <FaCar className="w-4 h-4 text-primary" />
+                </div>
+                <p className="text-sm font-bold text-foreground">
+                  {nearbyParkingSpots.length} {nearbyParkingSpots.length === 1 ? 'estacionamento' : 'estacionamentos'}
+                </p>
+              </div>
             </div>
           </div>
         </ResizablePanel>
@@ -375,9 +412,10 @@ const Explore = () => {
         <ResizablePanel defaultSize={40} minSize={20} maxSize={70}>
           <div className="h-full bg-background border-t border-border flex flex-col overflow-hidden">
             {/* Campos de pesquisa */}
-            <div className="p-4 space-y-3 border-b border-border bg-card flex-shrink-0">
+            <div className="p-4 space-y-4 border-b border-border bg-gradient-to-br from-primary/5 to-secondary/5 flex-shrink-0">
               <div className="space-y-2">
-                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                <label className="text-xs font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                   Partida
                 </label>
                 <div className="flex gap-2">
@@ -385,10 +423,10 @@ const Explore = () => {
                     variant="outline"
                     size="icon"
                     onClick={handleUseCurrentLocation}
-                    className="flex-shrink-0 h-12 w-12 border-spatioo-primary/20 hover:bg-spatioo-primary/10"
+                    className="flex-shrink-0 h-12 w-12 border-2 border-primary/30 hover:border-primary hover:bg-primary/10 hover:scale-105 transition-all duration-200 shadow-sm active:scale-95"
                     title="Usar localização atual"
                   >
-                    <Locate className="h-5 w-5 text-spatioo-primary" />
+                    <Locate className="h-5 w-5 text-primary" />
                   </Button>
                   <LocationInput
                     value={origin}
@@ -402,7 +440,8 @@ const Explore = () => {
               </div>
               
               <div className="space-y-2">
-                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                <label className="text-xs font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-secondary" />
                   Destino
                 </label>
                 <LocationInput
@@ -416,14 +455,21 @@ const Explore = () => {
             </div>
 
             {/* Lista de estacionamentos */}
-            <div className="flex-1 overflow-y-auto p-4">
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-sm font-bold text-foreground uppercase tracking-wide">
-                  {loading ? 'Carregando...' : `${nearbyParkingSpots.length} encontrado(s)`}
-                </h2>
-                {(destinationCoords || userLocation) && nearbyParkingSpots.length > 0 && (
-                  <p className="text-xs text-spatioo-primary font-medium">Ordenado por distância</p>
-                )}
+            <div className="flex-1 overflow-y-auto p-4 bg-gradient-to-b from-background to-muted/10">
+              <div className="mb-4 p-4 bg-card border border-border rounded-lg shadow-sm">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <FaCar className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-bold text-foreground">
+                      {loading ? 'Carregando...' : `${nearbyParkingSpots.length} encontrado(s)`}
+                    </h2>
+                    {(destinationCoords || userLocation) && nearbyParkingSpots.length > 0 && (
+                      <p className="text-xs text-primary font-medium">Ordenado por distância</p>
+                    )}
+                  </div>
+                </div>
               </div>
 
               {loading && (
@@ -444,31 +490,47 @@ const Explore = () => {
                 </div>
               )}
 
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {visibleParkingSpots.map((spot) => (
                   <Card
                     key={spot.id}
-                    className="p-4 cursor-pointer hover:shadow-lg hover:border-spatioo-primary transition-all duration-200 bg-card"
+                    className="group p-5 cursor-pointer hover:shadow-xl hover:border-primary hover:-translate-y-1 transition-all duration-300 bg-card border-2 border-border active:scale-[0.98]"
                     onClick={() => handleParkingSelect(spot)}
                   >
-                    {(spot as any).distance !== undefined && (
-                      <div className="flex items-center gap-1.5 text-spatioo-primary font-bold text-sm mb-3">
-                        <Navigation className="w-4 h-4" />
-                        <span>{((spot as any).distance as number).toFixed(1)} km</span>
+                    <div className="flex items-start gap-2 mb-3 flex-wrap">
+                      {/* Badge do tipo de estacionamento */}
+                      <div className={`px-3 py-1 rounded-full text-xs font-bold ${
+                        spot.tipo === 'residencial' 
+                          ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' 
+                          : 'bg-green-500/10 text-green-600 dark:text-green-400'
+                      }`}>
+                        {spot.tipo === 'residencial' ? '🏠 Residencial' : '🏢 Comercial'}
                       </div>
-                    )}
-                    <h3 className="font-bold text-lg mb-2 text-foreground">{spot.nome}</h3>
-                    <div className="flex items-start gap-2 text-sm text-muted-foreground mb-3">
-                      <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5 text-spatioo-secondary" />
-                      <span className="line-clamp-1">{spot.endereco}</span>
+                      
+                      {(spot as any).distance !== undefined && (
+                        <div className="flex items-center gap-1.5 text-primary font-bold text-xs bg-primary/10 px-3 py-1 rounded-full">
+                          <Navigation className="w-3 h-3" />
+                          <span>{((spot as any).distance as number).toFixed(1)} km</span>
+                        </div>
+                      )}
                     </div>
-                    <div className="flex items-center justify-between pt-3 border-t border-border">
-                      <div className="flex items-center gap-1.5 text-sm font-medium">
-                        <FaCar className="w-4 h-4 text-spatioo-secondary" />
+                    
+                    <h3 className="font-bold text-lg mb-3 text-foreground group-hover:text-primary transition-colors">{spot.nome}</h3>
+                    
+                    <div className="flex items-start gap-2 text-sm text-muted-foreground mb-4">
+                      <MapPin className="w-5 h-5 flex-shrink-0 mt-0.5 text-primary" />
+                      <span className="line-clamp-2">{spot.endereco}</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between pt-4 border-t border-border/50">
+                      <div className="flex items-center gap-2 text-base font-semibold text-foreground">
+                        <div className="p-2 bg-secondary/10 rounded-lg">
+                          <FaCar className="w-4 h-4 text-secondary" />
+                        </div>
                         <span>{spot.numero_vagas} vagas</span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                        <Clock className="w-4 h-4" />
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Clock className="w-4 h-4 text-primary" />
                         <span className="line-clamp-1">{formatHorario(spot.horario_funcionamento)}</span>
                       </div>
                     </div>

@@ -54,11 +54,11 @@ const LocationInput: React.FC<LocationInputProps> = ({
 
   return (
     <div className={cn("relative", className)}>
-      <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
         {icon === 'origin' ? (
-          <MapPin className="h-5 w-5 text-spatioo-primary dark:text-spatioo-secondary" />
+          <MapPin className="h-5 w-5 text-primary" />
         ) : (
-          <MapPinned className="h-5 w-5 text-spatioo-primary dark:text-spatioo-secondary" />
+          <MapPinned className="h-5 w-5 text-secondary" />
         )}
       </div>
       <Input
@@ -67,7 +67,7 @@ const LocationInput: React.FC<LocationInputProps> = ({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="pl-10 h-12 bg-background border-border text-base font-medium focus-visible:ring-spatioo-primary w-full"
+        className="pl-12 h-12 bg-background border-2 text-base font-medium focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary w-full transition-all duration-200 hover:border-primary/50"
       />
     </div>
   );
