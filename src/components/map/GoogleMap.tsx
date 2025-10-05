@@ -48,6 +48,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
 }) => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [selectedSpot, setSelectedSpot] = useState<PublicParkingData | null>(null);
+  const [currentZoom, setCurrentZoom] = useState<number>(14);
 
   const onLoad = useCallback((map: google.maps.Map) => {
     setMap(map);
@@ -61,6 +62,47 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
     setSelectedSpot(spot);
   }, []);
 
+  /**
+   * Gera ícone SVG customizado para o marcador
+   * Diferencia visualmente entre estacionamento comercial e residencial
+   */
+  const getMarkerIcon = useCallback((spot: PublicParkingData, zoom: number) => {
+    const isResidencial = spot.tipo === 'residencial';
+    const color = isResidencial ? '#0ea5e9' : '#10B981';
+    const label = isResidencial ? 'R' : 'P';
+    
+    // Escala do pin baseada no zoom do mapa
+    const baseSize = 36;
+    const scale = Math.max(0.6, Math.min(1.2, zoom / 14));
+    const scaledSize = baseSize * scale;
+    
+    return {
+      url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+        <svg width="${baseSize}" height="${baseSize * 4/3}" viewBox="0 0 36 48" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="shadow-${spot.id}" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+              <feOffset dx="0" dy="2" result="offsetblur"/>
+              <feComponentTransfer>
+                <feFuncA type="linear" slope="0.3"/>
+              </feComponentTransfer>
+              <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <path d="M18 0C8.059 0 0 8.059 0 18c0 10.59 18 30 18 30s18-19.41 18-30c0-9.941-8.059-18-18-18z" 
+                fill="${color}" filter="url(#shadow-${spot.id})"/>
+          <circle cx="18" cy="18" r="8" fill="white"/>
+          <text x="18" y="23" font-size="14" text-anchor="middle" fill="${color}" font-weight="bold" font-family="Arial">${label}</text>
+        </svg>
+      `),
+      scaledSize: new google.maps.Size(scaledSize, scaledSize * 4/3),
+      anchor: new google.maps.Point(scaledSize / 2, scaledSize * 4/3),
+    };
+  }, []);
+
   return (
     <GoogleMapComponent
       mapContainerStyle={containerStyle}
@@ -69,6 +111,12 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
       onLoad={onLoad}
       onUnmount={onUnmount}
       options={mapOptions}
+      onZoomChanged={() => {
+        if (map) {
+          const zoom = map.getZoom();
+          if (zoom) setCurrentZoom(zoom);
+        }
+      }}
     >
       {/* Marcador da localização do usuário */}
       {userLocation && (
@@ -87,7 +135,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
         />
       )}
 
-      {/* Marcadores dos estacionamentos com ícone customizado */}
+      {/* Marcadores dos estacionamentos com ícone customizado responsivo */}
       {parkingSpots
         .filter(spot => spot.latitude && spot.longitude)
         .map((spot) => (
@@ -95,32 +143,8 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
             key={spot.id}
             position={{ lat: Number(spot.latitude), lng: Number(spot.longitude) }}
             onClick={() => handleMarkerClick(spot)}
-            title={spot.nome}
-            icon={{
-              url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                <svg width="36" height="48" viewBox="0 0 36 48" xmlns="http://www.w3.org/2000/svg">
-                  <defs>
-                    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-                      <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
-                      <feOffset dx="0" dy="2" result="offsetblur"/>
-                      <feComponentTransfer>
-                        <feFuncA type="linear" slope="0.3"/>
-                      </feComponentTransfer>
-                      <feMerge>
-                        <feMergeNode/>
-                        <feMergeNode in="SourceGraphic"/>
-                      </feMerge>
-                    </filter>
-                  </defs>
-                  <path d="M18 0C8.059 0 0 8.059 0 18c0 10.59 18 30 18 30s18-19.41 18-30c0-9.941-8.059-18-18-18z" 
-                        fill="#10B981" filter="url(#shadow)"/>
-                  <circle cx="18" cy="18" r="8" fill="white"/>
-                  <text x="18" y="23" font-size="14" text-anchor="middle" fill="#10B981" font-weight="bold" font-family="Arial">P</text>
-                </svg>
-              `),
-              scaledSize: new google.maps.Size(36, 48),
-              anchor: new google.maps.Point(18, 48),
-            }}
+            title={`${spot.nome} - ${spot.tipo === 'residencial' ? 'Residencial' : 'Comercial'}`}
+            icon={getMarkerIcon(spot, currentZoom)}
             animation={google.maps.Animation.DROP}
           />
         ))}

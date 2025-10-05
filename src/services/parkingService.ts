@@ -15,6 +15,7 @@ export type PublicParkingData = {
   created_at: string;
   latitude: number | null;
   longitude: number | null;
+  tipo?: string; // 'residencial' ou 'comercial'
   // Comodidades do estacionamento
   funcionamento_24h?: boolean;
   suporte_carro_eletrico?: boolean;
@@ -71,7 +72,7 @@ export const fetchAllParkingSpots = async (): Promise<PublicParkingData[]> => {
     const { data, error } = await supabase
       .from('estacionamento')
       .select(`
-        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude,
+        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude, tipo,
         estacionamento_precos!inner(preco)
       `)
       .eq('ativo', true)
@@ -95,7 +96,8 @@ export const fetchAllParkingSpots = async (): Promise<PublicParkingData[]> => {
       fotos: item.fotos,
       created_at: item.created_at,
       latitude: item.latitude,
-      longitude: item.longitude
+      longitude: item.longitude,
+      tipo: item.tipo
     }));
     
     return transformedData;
@@ -112,7 +114,7 @@ export const fetchParkingSpotById = async (id: string): Promise<PublicParkingDat
     const { data, error } = await supabase
       .from('estacionamento')
       .select(`
-        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude,
+        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude, tipo,
         funcionamento_24h, suporte_carro_eletrico, vaga_coberta, manobrista, suporte_caminhao, vaga_moto,
         estacionamento_precos(preco, horas)
       `)
@@ -142,6 +144,7 @@ export const fetchParkingSpotById = async (id: string): Promise<PublicParkingDat
       created_at: data.created_at,
       latitude: data.latitude,
       longitude: data.longitude,
+      tipo: data.tipo,
       funcionamento_24h: data.funcionamento_24h,
       suporte_carro_eletrico: data.suporte_carro_eletrico,
       vaga_coberta: data.vaga_coberta,
@@ -162,7 +165,7 @@ export const fetchNearbyParkingSpots = async (): Promise<PublicParkingData[]> =>
     const { data, error } = await supabase
       .from('estacionamento')
       .select(`
-        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude,
+        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude, tipo,
         estacionamento_precos!inner(preco)
       `)
       .eq('ativo', true)
@@ -186,7 +189,8 @@ export const fetchNearbyParkingSpots = async (): Promise<PublicParkingData[]> =>
       fotos: item.fotos,
       created_at: item.created_at,
       latitude: item.latitude,
-      longitude: item.longitude
+      longitude: item.longitude,
+      tipo: item.tipo
     }));
     
     return transformedData;
@@ -203,7 +207,7 @@ export const fetchPopularParkingSpots = async (limit: number = 4): Promise<Publi
     const { data, error } = await supabase
       .from('estacionamento')
       .select(`
-        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude,
+        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude, tipo,
         estacionamento_precos!inner(preco)
       `)
       .eq('ativo', true)
@@ -228,7 +232,8 @@ export const fetchPopularParkingSpots = async (limit: number = 4): Promise<Publi
       fotos: item.fotos,
       created_at: item.created_at,
       latitude: item.latitude,
-      longitude: item.longitude
+      longitude: item.longitude,
+      tipo: item.tipo
     }));
     
     return transformedData;
@@ -245,7 +250,7 @@ export const searchParkingSpots = async (searchTerm: string): Promise<PublicPark
     const { data, error } = await supabase
       .from('estacionamento')
       .select(`
-        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude,
+        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude, tipo,
         estacionamento_precos!inner(preco)
       `)
       .eq('ativo', true)
@@ -270,7 +275,8 @@ export const searchParkingSpots = async (searchTerm: string): Promise<PublicPark
       fotos: item.fotos,
       created_at: item.created_at,
       latitude: item.latitude,
-      longitude: item.longitude
+      longitude: item.longitude,
+      tipo: item.tipo
     }));
     
     return transformedData;

@@ -36,6 +36,9 @@ const Explore = () => {
   
   // Localização do usuário
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  
+  // Controle de quantos estacionamentos mostrar na lista
+  const [visibleCount, setVisibleCount] = useState(5);
 
   // Buscar todos os estacionamentos
   const { 
@@ -115,9 +118,10 @@ const Explore = () => {
     // Usar destino ou localização do usuário como referência
     const refCoords = destinationCoords || (userLocation ? { lat: userLocation[0], lng: userLocation[1] } : null);
     
-    if (!refCoords) return parkingSpots.slice(0, 10);
+    // Se não houver referência, retornar os primeiros 5 estacionamentos
+    if (!refCoords) return parkingSpots.slice(0, 5);
 
-    // Calcular distância para cada estacionamento
+    // Calcular distância para cada estacionamento e ordenar
     const spotsWithDistance = parkingSpots
       .filter(spot => spot.latitude && spot.longitude)
       .map(spot => ({
@@ -129,11 +133,24 @@ const Explore = () => {
           Number(spot.longitude)
         )
       }))
-      .sort((a, b) => (a.distance || 0) - (b.distance || 0))
-      .slice(0, 10); // Mostrar apenas os 10 mais próximos
+      .sort((a, b) => (a.distance || 0) - (b.distance || 0));
 
+    // Sempre retornar pelo menos os 5 mais próximos (ou todos se houver menos de 5)
     return spotsWithDistance;
   }, [parkingSpots, destinationCoords, userLocation, calculateDistance]);
+
+  // Estacionamentos visíveis na lista (limitados por visibleCount)
+  const visibleParkingSpots = useMemo(() => {
+    return nearbyParkingSpots.slice(0, visibleCount);
+  }, [nearbyParkingSpots, visibleCount]);
+
+  // Verificar se há mais estacionamentos para mostrar
+  const hasMoreSpots = nearbyParkingSpots.length > visibleCount;
+
+  // Handler para "Ver mais estacionamentos"
+  const handleShowMore = useCallback(() => {
+    setVisibleCount(prev => Math.min(prev + 5, nearbyParkingSpots.length));
+  }, [nearbyParkingSpots.length]);
 
   // Handler para quando o usuário seleciona um lugar na origem
   const handleOriginSelect = useCallback((place: google.maps.places.PlaceResult) => {
@@ -245,8 +262,8 @@ const Explore = () => {
               <h2 className="text-sm font-bold text-foreground uppercase tracking-wide">
                 {loading ? 'Carregando...' : `${nearbyParkingSpots.length} encontrado(s)`}
               </h2>
-              {destinationCoords && (
-                <p className="text-xs text-spatioo-primary font-medium">Por distância</p>
+              {(destinationCoords || userLocation) && nearbyParkingSpots.length > 0 && (
+                <p className="text-xs text-spatioo-primary font-medium">Ordenado por distância</p>
               )}
             </div>
 
@@ -269,7 +286,7 @@ const Explore = () => {
             )}
 
             <div className="space-y-3">
-              {nearbyParkingSpots.map((spot) => (
+              {visibleParkingSpots.map((spot) => (
                 <Card
                   key={spot.id}
                   className="p-4 cursor-pointer hover:shadow-lg hover:border-spatioo-primary transition-all duration-200 bg-card"
@@ -299,6 +316,19 @@ const Explore = () => {
                 </Card>
               ))}
             </div>
+
+            {/* Botão "Ver mais estacionamentos" */}
+            {!loading && hasMoreSpots && (
+              <div className="mt-6 flex justify-center">
+                <Button
+                  variant="outline"
+                  onClick={handleShowMore}
+                  className="w-full max-w-xs border-spatioo-primary text-spatioo-primary hover:bg-spatioo-primary hover:text-white transition-colors"
+                >
+                  Ver mais estacionamentos
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -391,8 +421,8 @@ const Explore = () => {
                 <h2 className="text-sm font-bold text-foreground uppercase tracking-wide">
                   {loading ? 'Carregando...' : `${nearbyParkingSpots.length} encontrado(s)`}
                 </h2>
-                {destinationCoords && (
-                  <p className="text-xs text-spatioo-primary font-medium">Por distância</p>
+                {(destinationCoords || userLocation) && nearbyParkingSpots.length > 0 && (
+                  <p className="text-xs text-spatioo-primary font-medium">Ordenado por distância</p>
                 )}
               </div>
 
@@ -415,7 +445,7 @@ const Explore = () => {
               )}
 
               <div className="space-y-3">
-                {nearbyParkingSpots.map((spot) => (
+                {visibleParkingSpots.map((spot) => (
                   <Card
                     key={spot.id}
                     className="p-4 cursor-pointer hover:shadow-lg hover:border-spatioo-primary transition-all duration-200 bg-card"
@@ -445,6 +475,19 @@ const Explore = () => {
                   </Card>
                 ))}
               </div>
+
+              {/* Botão "Ver mais estacionamentos" para mobile */}
+              {!loading && hasMoreSpots && (
+                <div className="mt-6 flex justify-center pb-4">
+                  <Button
+                    variant="outline"
+                    onClick={handleShowMore}
+                    className="w-full max-w-xs border-spatioo-primary text-spatioo-primary hover:bg-spatioo-primary hover:text-white transition-colors"
+                  >
+                    Ver mais estacionamentos
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </ResizablePanel>
