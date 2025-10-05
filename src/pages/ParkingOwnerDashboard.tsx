@@ -4,19 +4,13 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
 import { 
   Calendar as CalendarIcon, 
   MapPin, 
   Plus, 
-  Filter, 
   Search,
   Building2,
   DollarSign,
-  Edit,
   Settings,
   Trash2
 } from 'lucide-react';
@@ -33,7 +27,6 @@ const ParkingOwnerDashboard = () => {
   const [editingEstacionamento, setEditingEstacionamento] = useState<string | null>(null);
   const [deletingEstacionamento, setDeletingEstacionamento] = useState<{ id: string; nome: string } | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
   
   // Busca os estacionamentos reais do banco de dados
@@ -72,15 +65,6 @@ const ParkingOwnerDashboard = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="gap-1 w-full sm:w-auto"
-                onClick={() => setShowFilters(!showFilters)}
-              >
-                <Filter className="h-4 w-4" />
-                Filtros
-              </Button>
             </div>
             
             {/* Botão para abrir o formulário de estacionamento comercial com CNPJ e comodidades */}
@@ -185,14 +169,14 @@ const ParkingOwnerDashboard = () => {
                         )}
                       </CardContent>
                       
-                      <CardFooter className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center pt-2 gap-2">
-                        <div className="flex flex-col sm:flex-row gap-2 w-full">
+                      <CardFooter className="sm:flex-row justify-between items-stretch sm:items-center pt-2 gap-2">
+                        <div className="flex flex-row sm:flex-row gap-2 w-full">
                           {/* Botão Gerenciar - destaque em verde */}
                           <Button
                             variant="default"
                             size="sm"
                             onClick={() => navigate(`/estacionamento-dashboard/${parking.id}`)}
-                            className="flex-1 sm:flex-initial sm:min-w-[130px] bg-spatioo-green hover:bg-spatioo-green/90 text-black font-medium"
+                            className="sm:flex-initial sm:min-w-[130px] bg-spatioo-green hover:bg-spatioo-green/90 text-black font-medium"
                           >
                             <Settings className="h-4 w-4 mr-2" />
                             Gerenciar
@@ -203,7 +187,7 @@ const ParkingOwnerDashboard = () => {
                             variant="destructive"
                             size="sm"
                             onClick={() => setDeletingEstacionamento({ id: parking.id, nome: parking.nome })}
-                            className="flex-1 sm:flex-initial sm:ml-auto"
+                            className="sm:flex-initial"
                           >
                             <Trash2 className="h-4 w-4 mr-2" />
                             Excluir
