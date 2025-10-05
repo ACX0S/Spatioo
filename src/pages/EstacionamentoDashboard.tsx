@@ -7,6 +7,7 @@ import { Estacionamento } from "@/types/estacionamento";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   SidebarProvider, 
   Sidebar, 
@@ -18,11 +19,9 @@ import {
   SidebarMenuButton, 
   SidebarMenuItem,
   SidebarTrigger,
-  useSidebar
 } from "@/components/ui/sidebar";
 import { 
   LayoutDashboard, 
-  Edit, 
   Camera, 
   DollarSign, 
   TrendingUp, 
@@ -31,22 +30,21 @@ import {
   Upload,
   X,
   Building2,
-  Clock
+  Clock,
+  ArrowLeft
 } from "lucide-react";
 import { FaCar } from 'react-icons/fa';
 import { uploadEstacionamentoPhoto, deleteEstacionamentoPhotos } from "@/services/storageService";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import EditEstacionamentoDialog from "@/components/EditEstacionamentoDialog";
 import { useVagasStats } from "@/hooks/useVagasStats";
 import { useVagas } from "@/hooks/useVagas";
 import { useEstacionamentoBookings } from "@/hooks/useEstacionamentoBookings";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, Settings, Plus, Filter } from "lucide-react";
+import { Trash2, Settings } from "lucide-react";
 import { format } from "date-fns";
+import { useIsMobile } from "@/hooks/use-mobile";
 
-type SidebarOption = 'dashboard' | 'editar' | 'fotos' | 'vagas';
+type SidebarOption = 'dashboard' | 'fotos' | 'vagas';
 
 const EstacionamentoDashboard = () => {
   const { id } = useParams<{ id: string }>();
@@ -69,9 +67,10 @@ const EstacionamentoDashboard = () => {
   const { vagas, updateVagaStatus, deleteVaga, refetch: refetchVagas } = useVagas(estacionamento?.id);
   const { bookings, filterBookings } = useEstacionamentoBookings(estacionamento?.id);
 
+  const isMobile = useIsMobile();
+
   const sidebarItems = [
     { id: 'dashboard', title: 'Dashboard', icon: LayoutDashboard },
-    { id: 'editar', title: 'Editar', icon: Edit },
     { id: 'fotos', title: 'Fotos', icon: Camera },
     { id: 'vagas', title: 'Vagas', icon: FaCar },
   ];
@@ -328,25 +327,6 @@ const EstacionamentoDashboard = () => {
           </div>
         );
 
-      case 'editar':
-        return (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Editar Estacionamento</CardTitle>
-                <CardDescription>
-                  Atualize as informações do seu estacionamento
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <EditEstacionamentoDialog 
-                  estacionamento={estacionamento} 
-                  onSuccess={fetchEstacionamento}
-                />
-              </CardContent>
-            </Card>
-          </div>
-        );
 
       case 'fotos':
         return (
@@ -634,16 +614,80 @@ const EstacionamentoDashboard = () => {
     return <div className="flex justify-center items-center h-64">Estacionamento não encontrado</div>;
   }
 
+  // Mobile Layout com Tabs
+  if (isMobile) {
+    return (
+      <div className="min-h-screen bg-background">
+        {/* Header Mobile */}
+        <div className="sticky top-0 z-10 bg-background border-b">
+          <div className="flex items-center gap-3 p-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/admin')}
+              className="h-9 w-9"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div className="flex-1">
+              <h1 className="text-lg font-bold truncate">{estacionamento.nome}</h1>
+              <p className="text-xs text-muted-foreground truncate">{estacionamento.endereco}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs Navigation Mobile */}
+        <Tabs value={activeSection} onValueChange={(value) => setActiveSection(value as SidebarOption)} className="w-full">
+          <TabsList className="w-full rounded-none border-b h-12 bg-background justify-start overflow-x-auto">
+            {sidebarItems.map((item) => (
+              <TabsTrigger 
+                key={item.id} 
+                value={item.id}
+                className="flex-1 min-w-[100px] data-[state=active]:bg-spatioo-green data-[state=active]:text-black"
+              >
+                <item.icon className="h-4 w-4 mr-2" />
+                {item.title}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          <div className="p-4">
+            <TabsContent value="dashboard" className="mt-0">
+              {renderDashboardContent()}
+            </TabsContent>
+            <TabsContent value="fotos" className="mt-0">
+              {renderDashboardContent()}
+            </TabsContent>
+            <TabsContent value="vagas" className="mt-0">
+              {renderDashboardContent()}
+            </TabsContent>
+          </div>
+        </Tabs>
+      </div>
+    );
+  }
+
+  // Desktop Layout com Sidebar
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
         <Sidebar collapsible="icon" className="border-r">
-          <div className="p-4 border-b">
+          <div className="p-4 border-b flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/admin')}
+              className="h-8 w-8"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
             <SidebarTrigger />
           </div>
           <SidebarContent>
             <SidebarGroup>
-              <SidebarGroupLabel>{estacionamento.nome}</SidebarGroupLabel>
+              <SidebarGroupLabel className="px-2">
+                <div className="truncate">{estacionamento.nome}</div>
+              </SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   {sidebarItems.map((item) => (
@@ -664,11 +708,11 @@ const EstacionamentoDashboard = () => {
           </SidebarContent>
         </Sidebar>
 
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 overflow-auto">
           <div className="max-w-7xl mx-auto">
             <div className="mb-6">
               <h1 className="text-3xl font-bold capitalize">{activeSection}</h1>
-              <p className="text-muted-foreground">{estacionamento.nome}</p>
+              <p className="text-muted-foreground">{estacionamento.endereco}</p>
             </div>
             {renderDashboardContent()}
           </div>
