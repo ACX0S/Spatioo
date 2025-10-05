@@ -21,7 +21,6 @@ import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout";
 import { AuthProvider } from "./contexts/AuthContext"; // Provider para gerenciamento de autenticação.
 import Profile from "./pages/Profile";
-import GerenciarEstacionamento from "./pages/GerenciarEstacionamento";
 import EstacionamentoDashboard from "./pages/EstacionamentoDashboard";
 import Ofertar from "./pages/Ofertar";
 import RequireAuth from "./components/RequireAuth"; // Componente para proteger rotas que exigem autenticação.
@@ -64,7 +63,6 @@ const App = () => {
                   <Route path="dashboard/reservas" element={<Dashboard />} />
                   <Route path="admin" element={<ParkingOwnerDashboard />} />
                   <Route path="profile" element={<Profile />} />
-                  <Route path="gerenciar-estacionamento" element={<GerenciarEstacionamento />} />
                   <Route path="estacionamento-dashboard/:id" element={<EstacionamentoDashboard />} />
                   <Route path="ofertar" element={<Ofertar />} />
                   

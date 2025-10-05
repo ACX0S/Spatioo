@@ -32,10 +32,18 @@ const ParkingOwnerDashboard = () => {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editingEstacionamento, setEditingEstacionamento] = useState<string | null>(null);
   const [deletingEstacionamento, setDeletingEstacionamento] = useState<{ id: string; nome: string } | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
   
   // Busca os estacionamentos reais do banco de dados
   const { estacionamentos, loading, error, refetch } = useUserEstacionamentos();
+  
+  // Filtra estacionamentos baseado na busca
+  const filteredEstacionamentos = estacionamentos.filter(est => 
+    est.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    est.endereco.toLowerCase().includes(searchQuery.toLowerCase())
+  );
   
   return (
     <div className="container p-4 max-w-6xl mx-auto">
@@ -60,9 +68,16 @@ const ParkingOwnerDashboard = () => {
                 <Input
                   placeholder="Buscar estacionamentos..."
                   className="pl-9 pr-4"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <Button variant="outline" size="sm" className="gap-1 w-full sm:w-auto">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-1 w-full sm:w-auto"
+                onClick={() => setShowFilters(!showFilters)}
+              >
                 <Filter className="h-4 w-4" />
                 Filtros
               </Button>
@@ -112,7 +127,7 @@ const ParkingOwnerDashboard = () => {
                   </CardContent>
                 </Card>
               ) : (
-                estacionamentos.map((parking) => {
+                filteredEstacionamentos.map((parking) => {
                   const availableSpots = parking.numero_vagas; // Pode ser calculado dinamicamente futuramente
                   const occupancyRate = 0; // Pode ser calculado dinamicamente futuramente
                   
@@ -176,7 +191,7 @@ const ParkingOwnerDashboard = () => {
                           <Button
                             variant="default"
                             size="sm"
-                            onClick={() => navigate(`/gerenciar-estacionamento?id=${parking.id}`)}
+                            onClick={() => navigate(`/estacionamento-dashboard/${parking.id}`)}
                             className="flex-1 sm:flex-initial sm:min-w-[130px] bg-spatioo-green hover:bg-spatioo-green/90 text-black font-medium"
                           >
                             <Settings className="h-4 w-4 mr-2" />
