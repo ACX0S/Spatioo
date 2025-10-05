@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCep } from "@/hooks/useCep";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useGeocoding } from "@/hooks/useGeocoding";
 import TimePickerDialog from "@/components/TimePickerDialog";
 import PricingTable, { PricingRow } from "@/components/PricingTable";
 import { uploadEstacionamentoPhoto } from "@/services/storageService";
@@ -48,6 +49,9 @@ const CreateEstacionamentoComercialDialog = ({
     loading: cepLoading,
     error: cepError,
   } = useCep();
+
+  // Hook para geocodificação automática
+  const { geocodeCep, loading: geocodingLoading } = useGeocoding();
 
   const [timePickerOpen, setTimePickerOpen] = useState(false);
   const [timePickerType, setTimePickerType] = useState<"inicio" | "fim">("inicio");
@@ -223,6 +227,17 @@ const CreateEstacionamentoComercialDialog = ({
         ? { abertura: "00:00", fechamento: "23:59" }
         : { abertura: formData.horarioInicio, fechamento: formData.horarioFim };
 
+      // Geocodifica o endereço para obter coordenadas
+      let coordinates = null;
+      try {
+        coordinates = await geocodeCep(formData.cep);
+        if (!coordinates) {
+          console.warn('Não foi possível geocodificar o endereço. Continuando sem coordenadas.');
+        }
+      } catch (error) {
+        console.error('Erro ao geocodificar:', error);
+      }
+
       // Insere o novo estacionamento comercial no banco de dados
       const { data: estacionamentoData, error: estacionamentoError } = await supabase
         .from("estacionamento")
@@ -239,6 +254,8 @@ const CreateEstacionamentoComercialDialog = ({
           tipo: "comercial",
           fotos: uploadedPhotoUrls,
           hora_extra: formData.horaExtraNumeric > 0 ? formData.horaExtraNumeric : null,
+          latitude: coordinates?.latitude || null,
+          longitude: coordinates?.longitude || null,
           // Comodidades do estacionamento comercial
           funcionamento_24h: comodidades.funcionamento_24h,
           suporte_carro_eletrico: comodidades.suporte_carro_eletrico,

@@ -24,6 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCep } from "@/hooks/useCep";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useGeocoding } from "@/hooks/useGeocoding";
 import TimePickerDialog from "@/components/TimePickerDialog";
 import PricingTable, { PricingRow } from "@/components/PricingTable";
 import { uploadEstacionamentoPhoto } from "@/services/storageService";
@@ -65,6 +66,9 @@ const CreateEstacionamentoDialog = ({
     loading: cepLoading,
     error: cepError,
   } = useCep();
+
+  // Hook para geocodificação automática
+  const { geocodeCep, loading: geocodingLoading } = useGeocoding();
 
   // Estados para controle de componentes internos e dados do formulário.
   const [timePickerOpen, setTimePickerOpen] = useState(false);
@@ -249,7 +253,18 @@ const CreateEstacionamentoDialog = ({
         ? { abertura: "00:00", fechamento: "23:59" }
         : { abertura: formData.horarioInicio, fechamento: formData.horarioFim };
 
-      // Insere o novo estacionamento no banco de dados incluindo hora_extra e funcionamento_24h
+      // Geocodifica o endereço para obter coordenadas
+      let coordinates = null;
+      try {
+        coordinates = await geocodeCep(formData.cep);
+        if (!coordinates) {
+          console.warn('Não foi possível geocodificar o endereço. Continuando sem coordenadas.');
+        }
+      } catch (error) {
+        console.error('Erro ao geocodificar:', error);
+      }
+
+      // Insere o novo estacionamento no banco de dados incluindo hora_extra, funcionamento_24h e coordenadas
       const { data: estacionamentoData, error: estacionamentoError } =
         await supabase
           .from("estacionamento")
@@ -267,6 +282,8 @@ const CreateEstacionamentoDialog = ({
             fotos: uploadedPhotoUrls,
             hora_extra: formData.horaExtraNumeric > 0 ? formData.horaExtraNumeric : null,
             funcionamento_24h: formData.funcionamento_24h, // Marca se funciona 24h
+            latitude: coordinates?.latitude || null,
+            longitude: coordinates?.longitude || null,
             // Vagas residenciais não possuem outras comodidades
           })
           .select()

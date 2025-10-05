@@ -63,45 +63,50 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   }, []);
 
   /**
-   * Gera ícone SVG customizado para o marcador
-   * Diferencia visualmente entre estacionamento comercial e residencial
+   * Gera um ícone SVG personalizado e otimizado para os marcadores no mapa
+   * @param tipo - Tipo do estacionamento ('residencial' ou 'comercial')
+   * @param isSelected - Se o marcador está selecionado
+   * @returns Configuração do ícone do Google Maps
    */
-  const getMarkerIcon = useCallback((spot: PublicParkingData, zoom: number) => {
-    const isResidencial = spot.tipo === 'residencial';
-    const color = isResidencial ? '#0ea5e9' : '#10B981';
-    const label = isResidencial ? 'R' : 'P';
+  const getMarkerIcon = (tipo: string | undefined, isSelected: boolean = false) => {
+    const baseSize = 32;
+    const zoomFactor = Math.min(Math.max((currentZoom - 12) * 0.3 + 1, 0.6), 1.8);
+    const size = baseSize * zoomFactor;
     
-    // Escala do pin baseada no zoom do mapa
-    const baseSize = 36;
-    const scale = Math.max(0.6, Math.min(1.2, zoom / 14));
-    const scaledSize = baseSize * scale;
-    
+    const isResidencial = tipo === 'residencial';
+    const color = isResidencial ? '#3B82F6' : '#10B981';
+    const icon = isResidencial ? '🏠' : '🏢';
+    const scale = isSelected ? 1.4 : 1;
+    const finalSize = size * scale;
+    const strokeWidth = isSelected ? 3 : 2;
+
+    const svg = `
+      <svg width="${finalSize}" height="${finalSize * 1.2}" viewBox="0 0 24 29" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="shadow${isSelected ? '-selected' : ''}">
+            <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.3"/>
+          </filter>
+        </defs>
+        <path d="M12 0C7.58 0 4 3.58 4 8c0 5.25 8 16 8 16s8-10.75 8-16c0-4.42-3.58-8-8-8z" 
+              fill="${color}" 
+              stroke="white" 
+              stroke-width="${strokeWidth}"
+              filter="url(#shadow${isSelected ? '-selected' : ''})"
+        />
+        <text x="12" y="11" 
+              font-size="${isSelected ? '10' : '8'}" 
+              text-anchor="middle" 
+              dominant-baseline="middle"
+        >${icon}</text>
+      </svg>
+    `;
+
     return {
-      url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-        <svg width="${baseSize}" height="${baseSize * 4/3}" viewBox="0 0 36 48" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <filter id="shadow-${spot.id}" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
-              <feOffset dx="0" dy="2" result="offsetblur"/>
-              <feComponentTransfer>
-                <feFuncA type="linear" slope="0.3"/>
-              </feComponentTransfer>
-              <feMerge>
-                <feMergeNode/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-            </filter>
-          </defs>
-          <path d="M18 0C8.059 0 0 8.059 0 18c0 10.59 18 30 18 30s18-19.41 18-30c0-9.941-8.059-18-18-18z" 
-                fill="${color}" filter="url(#shadow-${spot.id})"/>
-          <circle cx="18" cy="18" r="8" fill="white"/>
-          <text x="18" y="23" font-size="14" text-anchor="middle" fill="${color}" font-weight="bold" font-family="Arial">${label}</text>
-        </svg>
-      `),
-      scaledSize: new google.maps.Size(scaledSize, scaledSize * 4/3),
-      anchor: new google.maps.Point(scaledSize / 2, scaledSize * 4/3),
+      url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
+      scaledSize: new google.maps.Size(finalSize, finalSize * 1.2),
+      anchor: new google.maps.Point(finalSize / 2, finalSize * 1.2),
     };
-  }, []);
+  };
 
   return (
     <GoogleMapComponent
@@ -118,39 +123,53 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
         }
       }}
     >
-      {/* Marcador da localização do usuário */}
-      {userLocation && (
-        <Marker
-          position={{ lat: userLocation[0], lng: userLocation[1] }}
-          icon={{
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 10,
-            fillColor: '#0ea5e9',
-            fillOpacity: 1,
-            strokeColor: '#ffffff',
-            strokeWeight: 3,
-          }}
-          title="Sua localização"
-          zIndex={1000}
-        />
-      )}
-
-      {/* Marcadores dos estacionamentos com ícone customizado responsivo */}
+      {/* Renderiza os marcadores de estacionamento no mapa com animação */}
       {parkingSpots.map((spot) => {
-        // Se o estacionamento não tem coordenadas, não renderizar o marcador
         if (!spot.latitude || !spot.longitude) return null;
         
         return (
-        <Marker
-          key={spot.id}
-          position={{ lat: Number(spot.latitude), lng: Number(spot.longitude) }}
-          onClick={() => handleMarkerClick(spot)}
-          title={`${spot.nome} - ${spot.tipo === 'residencial' ? 'Residencial' : 'Comercial'}`}
-          icon={getMarkerIcon(spot, currentZoom)}
-          animation={google.maps.Animation.DROP}
-        />
+          <Marker
+            key={spot.id}
+            position={{ lat: spot.latitude, lng: spot.longitude }}
+            onClick={() => handleMarkerClick(spot)}
+            icon={getMarkerIcon(spot.tipo, selectedSpot?.id === spot.id)}
+            animation={selectedSpot?.id === spot.id ? google.maps.Animation.BOUNCE : undefined}
+            title={spot.nome}
+          />
         );
       })}
+
+      {/* Renderiza marcador da localização do usuário com animação */}
+      {userLocation && (
+        <>
+          <Marker
+            position={{ lat: userLocation[0], lng: userLocation[1] }}
+            icon={{
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 10,
+              fillColor: '#4285F4',
+              fillOpacity: 1,
+              strokeColor: '#ffffff',
+              strokeWeight: 3,
+            }}
+            title="Você está aqui"
+            animation={google.maps.Animation.DROP}
+          />
+          {/* Círculo de precisão ao redor da localização do usuário */}
+          <Marker
+            position={{ lat: userLocation[0], lng: userLocation[1] }}
+            icon={{
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 30,
+              fillColor: '#4285F4',
+              fillOpacity: 0.1,
+              strokeColor: '#4285F4',
+              strokeWeight: 1,
+              strokeOpacity: 0.3,
+            }}
+          />
+        </>
+      )}
 
       {/* InfoWindow para o estacionamento selecionado */}
       {selectedSpot && selectedSpot.latitude && selectedSpot.longitude && (
@@ -159,10 +178,10 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
           onCloseClick={() => setSelectedSpot(null)}
         >
           <div className="p-3 min-w-[220px]">
-            <h3 className="font-bold text-base mb-2 text-spatioo-primary">{selectedSpot.nome}</h3>
+            <h3 className="font-bold text-base mb-2 text-primary">{selectedSpot.nome}</h3>
             <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{selectedSpot.endereco}</p>
             <div className="flex items-center gap-2 mb-3">
-              <FaCar className="w-4 h-4 text-spatioo-secondary" />
+              <FaCar className="w-4 h-4 text-secondary" />
               <span className="text-sm font-medium">{selectedSpot.numero_vagas} vagas disponíveis</span>
             </div>
             <Button
@@ -171,7 +190,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
                 onParkingSelect(selectedSpot);
                 setSelectedSpot(null);
               }}
-              className="w-full bg-spatioo-primary hover:bg-spatioo-primary/90"
+              className="w-full bg-primary hover:bg-primary/90"
             >
               Ver Detalhes
             </Button>

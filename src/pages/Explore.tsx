@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { FaCar } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Navigation, Clock, Locate, GripVertical } from 'lucide-react';
+import { MapPin, Navigation, Clock, Locate, Loader2 } from 'lucide-react';
 import { useParkingData } from '@/hooks/useParkingData';
 import { PublicParkingData } from '@/services/parkingService';
 import { useGoogleMaps } from '@/hooks/useGoogleMaps';
@@ -9,14 +9,15 @@ import LocationInput from '@/components/map/LocationInput';
 import GoogleMap from '@/components/map/GoogleMap';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import LoadingSpinner from '@/components/LoadingSpinner';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { toast } from 'sonner';
+import Layout from '@/components/Layout';
 
 /**
- * Página Explore
- * Layout estilo Uber: sidebar com campos de pesquisa à esquerda, mapa à direita
- * Lista de estacionamentos próximos embaixo da sidebar
+ * Página Explore - Busca e visualização de estacionamentos
+ * Layout responsivo com sidebar (desktop) e painel redimensionável (mobile)
  */
 const Explore = () => {
   const navigate = useNavigate();
@@ -44,7 +45,8 @@ const Explore = () => {
   const { 
     data: parkingSpots, 
     loading, 
-    error
+    error,
+    refetch
   } = useParkingData({ 
     type: 'all',
     autoLoad: true 
@@ -118,36 +120,40 @@ const Explore = () => {
     // Usar destino ou localização do usuário como referência
     const refCoords = destinationCoords || (userLocation ? { lat: userLocation[0], lng: userLocation[1] } : null);
     
-    // Se não houver referência, retornar todos os estacionamentos
-    if (!refCoords) {
-      return parkingSpots;
-    }
-
     // Separar estacionamentos com e sem coordenadas
     const spotsWithCoords = parkingSpots.filter(spot => spot.latitude && spot.longitude);
     const spotsWithoutCoords = parkingSpots.filter(spot => !spot.latitude || !spot.longitude);
 
-    // Calcular distância para estacionamentos com coordenadas e ordenar
-    const spotsWithDistance = spotsWithCoords
-      .map(spot => ({
-        ...spot,
-        distance: calculateDistance(
-          refCoords.lat,
-          refCoords.lng,
-          Number(spot.latitude),
-          Number(spot.longitude)
-        )
-      }))
-      .sort((a, b) => (a.distance || 0) - (b.distance || 0));
+    // Se houver referência, ordenar por distância
+    if (refCoords && spotsWithCoords.length > 0) {
+      const spotsWithDistance = spotsWithCoords
+        .map(spot => ({
+          ...spot,
+          distance: calculateDistance(
+            refCoords.lat,
+            refCoords.lng,
+            Number(spot.latitude),
+            Number(spot.longitude)
+          )
+        }))
+        .sort((a, b) => (a.distance || 0) - (b.distance || 0));
 
-    // Retornar estacionamentos com coordenadas primeiro, depois os sem coordenadas
-    return [...spotsWithDistance, ...spotsWithoutCoords];
+      return [...spotsWithDistance, ...spotsWithoutCoords];
+    }
+    
+    // Se não houver referência, retornar com coordenadas primeiro
+    return [...spotsWithCoords, ...spotsWithoutCoords];
   }, [parkingSpots, destinationCoords, userLocation, calculateDistance]);
 
   // Estacionamentos visíveis na lista (limitados por visibleCount)
   const visibleParkingSpots = useMemo(() => {
     return nearbyParkingSpots.slice(0, visibleCount);
   }, [nearbyParkingSpots, visibleCount]);
+
+  // Reseta o contador quando a lista muda
+  useEffect(() => {
+    setVisibleCount(5);
+  }, [nearbyParkingSpots]);
 
   // Verificar se há mais estacionamentos para mostrar
   const hasMoreSpots = nearbyParkingSpots.length > visibleCount;
@@ -195,224 +201,43 @@ const Explore = () => {
 
   if (loadError) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-destructive">Erro ao carregar o Google Maps</p>
-      </div>
+      <Layout>
+        <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] gap-4">
+          <p className="text-destructive text-lg font-medium">Erro ao carregar o mapa</p>
+          <p className="text-muted-foreground text-sm">Verifique sua conexão com a internet</p>
+          <Button onClick={() => window.location.reload()} variant="outline">
+            Tentar novamente
+          </Button>
+        </div>
+      </Layout>
     );
   }
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner />
-      </div>
+      <Layout>
+        <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] gap-4">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <p className="text-muted-foreground animate-pulse">Carregando mapa...</p>
+        </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="h-screen overflow-hidden bg-background">
-      {/* Layout Desktop - duas colunas lado a lado */}
-      <div className="hidden lg:flex h-full">
-        <div className="w-[420px] bg-background border-r border-border flex flex-col overflow-hidden shadow-lg">
-          {/* Header */}
-          <div className="p-6 border-b border-border">
-            <h1 className="text-2xl font-bold text-foreground">Explorar Estacionamentos</h1>
-            <p className="text-sm text-muted-foreground mt-1">Encontre vagas próximas ao seu destino</p>
-          </div>
-
-          {/* Campos de pesquisa */}
-          <div className="p-6 space-y-4 border-b border-border bg-gradient-to-br from-primary/5 to-secondary/5">
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                Partida
-              </label>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handleUseCurrentLocation}
-                  className="flex-shrink-0 h-12 w-12 border-2 border-primary/30 hover:border-primary hover:bg-primary/10 hover:scale-105 transition-all duration-200 shadow-sm"
-                  title="Usar localização atual"
-                >
-                  <Locate className="h-5 w-5 text-primary" />
-                </Button>
-                <LocationInput
-                  value={origin}
-                  onChange={setOrigin}
-                  onPlaceSelect={handleOriginSelect}
-                  placeholder="Digite o endereço de partida"
-                  icon="origin"
-                  className="flex-1"
-                />
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-secondary" />
-                Destino
-              </label>
-              <LocationInput
-                value={destination}
-                onChange={setDestination}
-                onPlaceSelect={handleDestinationSelect}
-                placeholder="Para onde você vai?"
-                icon="destination"
-              />
-            </div>
-          </div>
-
-          {/* Lista de estacionamentos próximos */}
-          <div className="flex-1 overflow-y-auto p-6 bg-gradient-to-b from-background to-muted/10">
-            <div className="mb-6 p-4 bg-card border border-border rounded-lg shadow-sm">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <FaCar className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h2 className="text-base font-bold text-foreground">
-                      {loading ? 'Carregando...' : `${nearbyParkingSpots.length} encontrado(s)`}
-                    </h2>
-                    {(destinationCoords || userLocation) && nearbyParkingSpots.length > 0 && (
-                      <p className="text-xs text-primary font-medium">Ordenado por distância</p>
-                    )}
-                  </div>
-                </div>
-              </div>
+    <Layout>
+      <div className="h-[calc(100vh-4rem)] overflow-hidden">
+        {/* Layout Desktop - duas colunas lado a lado */}
+        <div className="hidden lg:flex h-full">
+          <div className="w-[420px] bg-background border-r border-border flex flex-col overflow-hidden shadow-lg">
+            {/* Header */}
+            <div className="p-6 border-b border-border bg-gradient-to-r from-primary/5 to-secondary/5">
+              <h1 className="text-2xl font-bold text-foreground">Explorar Estacionamentos</h1>
+              <p className="text-sm text-muted-foreground mt-1">Encontre vagas próximas ao seu destino</p>
             </div>
 
-            {loading && (
-              <div className="flex justify-center py-8">
-                <LoadingSpinner />
-              </div>
-            )}
-
-            {error && (
-              <div className="text-center py-8 text-destructive">
-                <p>{error}</p>
-              </div>
-            )}
-
-            {!loading && !error && nearbyParkingSpots.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
-                <p>Nenhum estacionamento encontrado</p>
-              </div>
-            )}
-
-            <div className="space-y-4">
-              {visibleParkingSpots.map((spot) => (
-                <Card
-                  key={spot.id}
-                  className="group p-5 cursor-pointer hover:shadow-xl hover:border-primary hover:-translate-y-1 transition-all duration-300 bg-card border-2 border-border active:scale-[0.98]"
-                  onClick={() => handleParkingSelect(spot)}
-                >
-                  <div className="flex items-start gap-3 mb-3">
-                    {/* Badge do tipo de estacionamento */}
-                    <div className={`px-3 py-1 rounded-full text-xs font-bold ${
-                      spot.tipo === 'residencial' 
-                        ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' 
-                        : 'bg-green-500/10 text-green-600 dark:text-green-400'
-                    }`}>
-                      {spot.tipo === 'residencial' ? '🏠 Residencial' : '🏢 Comercial'}
-                    </div>
-                    
-                    {(spot as any).distance !== undefined && (
-                      <div className="flex items-center gap-1.5 text-primary font-bold text-xs bg-primary/10 px-3 py-1 rounded-full">
-                        <Navigation className="w-3 h-3" />
-                        <span>{((spot as any).distance as number).toFixed(1)} km</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <h3 className="font-bold text-xl mb-3 text-foreground group-hover:text-primary transition-colors">{spot.nome}</h3>
-                  
-                  <div className="flex items-start gap-2 text-sm text-muted-foreground mb-4">
-                    <MapPin className="w-5 h-5 flex-shrink-0 mt-0.5 text-primary" />
-                    <span className="line-clamp-2">{spot.endereco}</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between pt-4 border-t border-border/50">
-                    <div className="flex items-center gap-2 text-base font-semibold text-foreground">
-                      <div className="p-2 bg-secondary/10 rounded-lg">
-                        <FaCar className="w-5 h-5 text-secondary" />
-                      </div>
-                      <span>{spot.numero_vagas} vagas</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Clock className="w-4 h-4 text-primary" />
-                      <span className="line-clamp-1">{formatHorario(spot.horario_funcionamento)}</span>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-
-            {/* Botão "Ver mais estacionamentos" */}
-            {!loading && hasMoreSpots && (
-              <div className="mt-6 flex justify-center">
-                <Button
-                  variant="outline"
-                  onClick={handleShowMore}
-                  className="w-full max-w-xs border-spatioo-primary text-spatioo-primary hover:bg-spatioo-primary hover:text-white transition-colors"
-                >
-                  Ver mais estacionamentos
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Mapa Desktop */}
-        <div className="flex-1 relative">
-          <GoogleMap
-            center={mapCenter}
-            parkingSpots={nearbyParkingSpots}
-            onParkingSelect={handleParkingSelect}
-            userLocation={userLocation}
-          />
-        </div>
-      </div>
-
-      {/* Layout Mobile - painel redimensionável estilo Uber */}
-      <ResizablePanelGroup direction="vertical" className="lg:hidden h-full">
-        {/* Painel do Mapa - superior */}
-        <ResizablePanel defaultSize={60} minSize={30} maxSize={80}>
-          <div className="relative h-full">
-            <GoogleMap
-              center={mapCenter}
-              parkingSpots={nearbyParkingSpots}
-              onParkingSelect={handleParkingSelect}
-              userLocation={userLocation}
-            />
-            
-            {/* Badge informativo */}
-            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-card/95 backdrop-blur-md px-5 py-3 rounded-full shadow-xl border-2 border-primary/20 z-10">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-primary/20 rounded-full">
-                  <FaCar className="w-4 h-4 text-primary" />
-                </div>
-                <p className="text-sm font-bold text-foreground">
-                  {nearbyParkingSpots.length} {nearbyParkingSpots.length === 1 ? 'estacionamento' : 'estacionamentos'}
-                </p>
-              </div>
-            </div>
-          </div>
-        </ResizablePanel>
-
-        {/* Handle de redimensionamento com visual de arrastar */}
-        <ResizableHandle className="bg-border hover:bg-primary/20 transition-colors relative group">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-12 h-1 bg-muted-foreground/30 rounded-full group-hover:bg-primary/40 transition-colors" />
-          </div>
-        </ResizableHandle>
-
-        {/* Painel da Lista - inferior */}
-        <ResizablePanel defaultSize={40} minSize={20} maxSize={70}>
-          <div className="h-full bg-background border-t border-border flex flex-col overflow-hidden">
             {/* Campos de pesquisa */}
-            <div className="p-4 space-y-4 border-b border-border bg-gradient-to-br from-primary/5 to-secondary/5 flex-shrink-0">
+            <div className="p-6 space-y-4 border-b border-border bg-gradient-to-br from-primary/5 to-secondary/5">
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
@@ -423,7 +248,7 @@ const Explore = () => {
                     variant="outline"
                     size="icon"
                     onClick={handleUseCurrentLocation}
-                    className="flex-shrink-0 h-12 w-12 border-2 border-primary/30 hover:border-primary hover:bg-primary/10 hover:scale-105 transition-all duration-200 shadow-sm active:scale-95"
+                    className="flex-shrink-0 h-12 w-12 border-2 border-primary/30 hover:border-primary hover:bg-primary/10 hover:scale-105 active:scale-95 transition-all duration-200 shadow-sm"
                     title="Usar localização atual"
                   >
                     <Locate className="h-5 w-5 text-primary" />
@@ -454,107 +279,379 @@ const Explore = () => {
               </div>
             </div>
 
-            {/* Lista de estacionamentos */}
-            <div className="flex-1 overflow-y-auto p-4 bg-gradient-to-b from-background to-muted/10">
-              <div className="mb-4 p-4 bg-card border border-border rounded-lg shadow-sm">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <FaCar className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h2 className="text-base font-bold text-foreground">
-                      {loading ? 'Carregando...' : `${nearbyParkingSpots.length} encontrado(s)`}
-                    </h2>
-                    {(destinationCoords || userLocation) && nearbyParkingSpots.length > 0 && (
-                      <p className="text-xs text-primary font-medium">Ordenado por distância</p>
-                    )}
-                  </div>
-                </div>
+            {/* Lista de estacionamentos próximos */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="flex items-center justify-between mb-4">
+                <Badge 
+                  variant="secondary" 
+                  className="flex items-center gap-2 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-colors"
+                >
+                  <FaCar className="h-4 w-4" />
+                  <span className="font-semibold">{nearbyParkingSpots.length}</span> 
+                  {nearbyParkingSpots.length === 1 ? 'estacionamento' : 'estacionamentos'}
+                  {(destinationCoords || userLocation) && ' • Por distância'}
+                </Badge>
               </div>
 
-              {loading && (
-                <div className="flex justify-center py-8">
-                  <LoadingSpinner />
-                </div>
-              )}
-
-              {error && (
-                <div className="text-center py-8 text-destructive">
-                  <p>{error}</p>
-                </div>
-              )}
-
-              {!loading && !error && nearbyParkingSpots.length === 0 && (
-                <div className="text-center py-8 text-muted-foreground">
-                  <p>Nenhum estacionamento encontrado</p>
-                </div>
-              )}
-
-              <div className="space-y-4">
-                {visibleParkingSpots.map((spot) => (
-                  <Card
-                    key={spot.id}
-                    className="group p-5 cursor-pointer hover:shadow-xl hover:border-primary hover:-translate-y-1 transition-all duration-300 bg-card border-2 border-border active:scale-[0.98]"
-                    onClick={() => handleParkingSelect(spot)}
-                  >
-                    <div className="flex items-start gap-2 mb-3 flex-wrap">
-                      {/* Badge do tipo de estacionamento */}
-                      <div className={`px-3 py-1 rounded-full text-xs font-bold ${
-                        spot.tipo === 'residencial' 
-                          ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' 
-                          : 'bg-green-500/10 text-green-600 dark:text-green-400'
-                      }`}>
-                        {spot.tipo === 'residencial' ? '🏠 Residencial' : '🏢 Comercial'}
-                      </div>
-                      
-                      {(spot as any).distance !== undefined && (
-                        <div className="flex items-center gap-1.5 text-primary font-bold text-xs bg-primary/10 px-3 py-1 rounded-full">
-                          <Navigation className="w-3 h-3" />
-                          <span>{((spot as any).distance as number).toFixed(1)} km</span>
+              {/* Lista de estacionamentos */}
+              <div className="space-y-3">
+                {loading ? (
+                  // Loading skeletons
+                  <div className="space-y-3">
+                    {[1, 2, 3].map((i) => (
+                      <Card key={i} className="overflow-hidden">
+                        <div className="p-4">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 space-y-2">
+                              <Skeleton className="h-5 w-3/4" />
+                              <Skeleton className="h-4 w-full" />
+                              <Skeleton className="h-4 w-1/2" />
+                            </div>
+                            <Skeleton className="h-8 w-20" />
+                          </div>
                         </div>
-                      )}
-                    </div>
-                    
-                    <h3 className="font-bold text-lg mb-3 text-foreground group-hover:text-primary transition-colors">{spot.nome}</h3>
-                    
-                    <div className="flex items-start gap-2 text-sm text-muted-foreground mb-4">
-                      <MapPin className="w-5 h-5 flex-shrink-0 mt-0.5 text-primary" />
-                      <span className="line-clamp-2">{spot.endereco}</span>
-                    </div>
-                    
-                    <div className="flex items-center justify-between pt-4 border-t border-border/50">
-                      <div className="flex items-center gap-2 text-base font-semibold text-foreground">
-                        <div className="p-2 bg-secondary/10 rounded-lg">
-                          <FaCar className="w-4 h-4 text-secondary" />
-                        </div>
-                        <span>{spot.numero_vagas} vagas</span>
+                      </Card>
+                    ))}
+                  </div>
+                ) : visibleParkingSpots.length === 0 ? (
+                  <Card className="border-dashed border-2">
+                    <div className="p-8 text-center">
+                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
+                        <MapPin className="h-8 w-8 text-muted-foreground" />
                       </div>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Clock className="w-4 h-4 text-primary" />
-                        <span className="line-clamp-1">{formatHorario(spot.horario_funcionamento)}</span>
-                      </div>
+                      <h3 className="font-semibold text-lg mb-2">Nenhum estacionamento encontrado</h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Tente ajustar sua localização ou ampliar a área de busca
+                      </p>
+                      <Button onClick={refetch} variant="outline" size="sm">
+                        Atualizar lista
+                      </Button>
                     </div>
                   </Card>
-                ))}
-              </div>
+                ) : (
+                  <>
+                    {visibleParkingSpots.map((spot, index) => {
+                      const distance = (destinationCoords || userLocation) && spot.latitude && spot.longitude
+                        ? calculateDistance(
+                            (destinationCoords || userLocation)!.lat,
+                            (destinationCoords || userLocation)!.lng,
+                            spot.latitude,
+                            spot.longitude
+                          )
+                        : null;
 
-              {/* Botão "Ver mais estacionamentos" para mobile */}
-              {!loading && hasMoreSpots && (
-                <div className="mt-6 flex justify-center pb-4">
-                  <Button
-                    variant="outline"
-                    onClick={handleShowMore}
-                    className="w-full max-w-xs border-spatioo-primary text-spatioo-primary hover:bg-spatioo-primary hover:text-white transition-colors"
-                  >
-                    Ver mais estacionamentos
-                  </Button>
-                </div>
-              )}
+                      const isNearby = index < 5 && distance !== null;
+
+                      return (
+                        <Card
+                          key={spot.id}
+                          className={`cursor-pointer transition-all duration-200 hover:shadow-xl hover:border-primary hover:-translate-y-1 ${
+                            isNearby ? 'border-primary/30 bg-primary/5' : ''
+                          }`}
+                          onClick={() => handleParkingSelect(spot)}
+                        >
+                          <div className="p-4">
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                  <h3 className="font-semibold text-base line-clamp-1 flex-1 min-w-0">
+                                    {spot.nome}
+                                  </h3>
+                                  {spot.tipo && (
+                                    <Badge 
+                                      variant="outline" 
+                                      className={`flex-shrink-0 ${
+                                        spot.tipo === 'residencial' 
+                                          ? 'bg-blue-50 text-blue-700 border-blue-300' 
+                                          : 'bg-green-50 text-green-700 border-green-300'
+                                      }`}
+                                    >
+                                      {spot.tipo === 'residencial' ? '🏠' : '🏢'}
+                                    </Badge>
+                                  )}
+                                  {isNearby && (
+                                    <Badge className="bg-primary text-primary-foreground flex-shrink-0">
+                                      Próximo
+                                    </Badge>
+                                  )}
+                                </div>
+                                <div className="space-y-1.5 text-sm">
+                                  <div className="flex items-start gap-2 text-muted-foreground">
+                                    <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0 text-primary" />
+                                    <span className="line-clamp-2">{spot.endereco}</span>
+                                  </div>
+                                  {distance !== null && (
+                                    <div className="flex items-center gap-2 text-primary font-semibold">
+                                      <Navigation className="h-4 w-4 flex-shrink-0" />
+                                      {distance.toFixed(1)} km
+                                    </div>
+                                  )}
+                                  <div className="flex items-center gap-4 mt-2 flex-wrap">
+                                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                                      <FaCar className="h-4 w-4 text-secondary" />
+                                      <span className="font-medium">{spot.numero_vagas} vagas</span>
+                                    </div>
+                                    {spot.horario_funcionamento && (
+                                      <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
+                                        <Clock className="h-3.5 w-3.5" />
+                                        {formatHorario(spot.horario_funcionamento)}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="text-right flex-shrink-0">
+                                <p className="text-xl font-bold text-primary">
+                                  {spot.preco_hora?.toLocaleString('pt-BR', {
+                                    style: 'currency',
+                                    currency: 'BRL'
+                                  })}
+                                </p>
+                                <p className="text-xs text-muted-foreground">por hora</p>
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      );
+                    })}
+
+                    {/* Botão "Ver mais" */}
+                    {hasMoreSpots && (
+                      <Button 
+                        variant="outline" 
+                        className="w-full hover:bg-primary hover:text-primary-foreground transition-colors"
+                        onClick={handleShowMore}
+                      >
+                        Ver mais estacionamentos
+                        <Badge variant="secondary" className="ml-2">
+                          +{nearbyParkingSpots.length - visibleCount}
+                        </Badge>
+                      </Button>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           </div>
-        </ResizablePanel>
-      </ResizablePanelGroup>
-    </div>
+
+          {/* Mapa Desktop */}
+          <div className="flex-1 relative">
+            <GoogleMap
+              center={mapCenter}
+              parkingSpots={parkingSpots.filter(s => s.latitude && s.longitude)}
+              onParkingSelect={handleParkingSelect}
+              userLocation={userLocation}
+            />
+          </div>
+        </div>
+
+        {/* Layout Mobile com ResizablePanel */}
+        <div className="lg:hidden h-full">
+          <ResizablePanelGroup direction="vertical">
+            {/* Painel do Mapa */}
+            <ResizablePanel defaultSize={60} minSize={30} maxSize={80}>
+              <div className="relative h-full">
+                <GoogleMap
+                  center={mapCenter}
+                  parkingSpots={parkingSpots.filter(spot => spot.latitude && spot.longitude)}
+                  onParkingSelect={handleParkingSelect}
+                  userLocation={userLocation}
+                />
+                
+                {/* Badge de informações sobreposto ao mapa */}
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+                  <Badge 
+                    variant="secondary" 
+                    className="shadow-lg backdrop-blur-sm bg-background/95 border-2 border-primary/20 px-4 py-2"
+                  >
+                    <FaCar className="h-4 w-4 mr-2 text-primary" />
+                    <span className="font-semibold">{parkingSpots.filter(s => s.latitude && s.longitude).length}</span> no mapa
+                  </Badge>
+                </div>
+              </div>
+            </ResizablePanel>
+            
+            <ResizableHandle withHandle className="bg-primary/10 hover:bg-primary/20 active:bg-primary/30 transition-colors" />
+            
+            {/* Painel de Busca e Lista */}
+            <ResizablePanel defaultSize={40} minSize={20} maxSize={70}>
+              <div className="h-full flex flex-col bg-background p-4 overflow-hidden">
+                {/* Inputs de localização - Design melhorado */}
+                <div className="space-y-3 mb-4">
+                  <div className="relative">
+                    <LocationInput
+                      placeholder="De onde você está saindo?"
+                      icon="origin"
+                      value={origin}
+                      onChange={setOrigin}
+                      onPlaceSelect={handleOriginSelect}
+                    />
+                  </div>
+                  
+                  <div className="relative">
+                    <LocationInput
+                      placeholder="Para onde você vai?"
+                      icon="destination"
+                      value={destination}
+                      onChange={setDestination}
+                      onPlaceSelect={handleDestinationSelect}
+                    />
+                  </div>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full hover:bg-primary hover:text-primary-foreground hover:scale-105 active:scale-95 transition-all"
+                    onClick={handleUseCurrentLocation}
+                  >
+                    <Navigation className="h-4 w-4 mr-2" />
+                    Usar minha localização
+                  </Button>
+                </div>
+
+                <div className="flex items-center justify-between mb-3">
+                  <Badge 
+                    variant="secondary" 
+                    className="flex items-center gap-2 bg-primary/10 text-primary border-primary/20"
+                  >
+                    <FaCar className="h-4 w-4" />
+                    <span className="font-semibold">{nearbyParkingSpots.length}</span>
+                    {(destinationCoords || userLocation) && ' • Por distância'}
+                  </Badge>
+                </div>
+
+                {/* Lista de estacionamentos */}
+                <div className="space-y-3 overflow-y-auto flex-1 pr-1">
+                  {loading ? (
+                    <div className="space-y-3">
+                      {[1, 2].map((i) => (
+                        <Card key={i}>
+                          <div className="p-4">
+                            <div className="flex gap-3">
+                              <div className="flex-1 space-y-2">
+                                <Skeleton className="h-5 w-3/4" />
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-1/2" />
+                              </div>
+                              <Skeleton className="h-8 w-16" />
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : visibleParkingSpots.length === 0 ? (
+                    <Card className="border-dashed border-2">
+                      <div className="p-6 text-center">
+                        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-muted mb-3">
+                          <MapPin className="h-7 w-7 text-muted-foreground" />
+                        </div>
+                        <p className="font-medium mb-1">Nenhum estacionamento</p>
+                        <p className="text-xs text-muted-foreground">
+                          Ajuste sua localização
+                        </p>
+                      </div>
+                    </Card>
+                  ) : (
+                    <>
+                      {visibleParkingSpots.map((spot, index) => {
+                        const distance = (destinationCoords || userLocation) && spot.latitude && spot.longitude
+                          ? calculateDistance(
+                              (destinationCoords || userLocation)!.lat,
+                              (destinationCoords || userLocation)!.lng,
+                              spot.latitude,
+                              spot.longitude
+                            )
+                          : null;
+
+                        const isNearby = index < 5 && distance !== null;
+
+                        return (
+                          <Card
+                            key={spot.id}
+                            className={`cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-primary hover:scale-[1.02] active:scale-100 ${
+                              isNearby ? 'border-primary/40 bg-primary/5' : ''
+                            }`}
+                            onClick={() => handleParkingSelect(spot)}
+                          >
+                            <div className="p-3">
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
+                                    <h3 className="font-semibold text-sm line-clamp-1 flex-1 min-w-0">
+                                      {spot.nome}
+                                    </h3>
+                                    {spot.tipo && (
+                                      <Badge 
+                                        variant="outline" 
+                                        className={`text-xs px-1.5 py-0 h-5 ${
+                                          spot.tipo === 'residencial' 
+                                            ? 'bg-blue-50 text-blue-700 border-blue-300' 
+                                            : 'bg-green-50 text-green-700 border-green-300'
+                                        }`}
+                                      >
+                                        {spot.tipo === 'residencial' ? '🏠' : '🏢'}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <div className="space-y-1 text-xs">
+                                    <div className="flex items-start gap-1.5 text-muted-foreground">
+                                      <MapPin className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-primary" />
+                                      <span className="line-clamp-1">{spot.endereco}</span>
+                                    </div>
+                                    {distance !== null && (
+                                      <div className="flex items-center gap-1.5 text-primary font-semibold">
+                                        <Navigation className="h-3.5 w-3.5" />
+                                        {distance.toFixed(1)} km
+                                      </div>
+                                    )}
+                                    <div className="flex items-center gap-3">
+                                      <div className="flex items-center gap-1 text-muted-foreground">
+                                        <FaCar className="h-3.5 w-3.5 text-secondary" />
+                                        <span>{spot.numero_vagas}</span>
+                                      </div>
+                                      {spot.horario_funcionamento && (
+                                        <div className="flex items-center gap-1 text-muted-foreground">
+                                          <Clock className="h-3 w-3" />
+                                          <span className="text-xs">{formatHorario(spot.horario_funcionamento)}</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="text-right flex-shrink-0">
+                                  <p className="text-base font-bold text-primary">
+                                    {spot.preco_hora?.toLocaleString('pt-BR', {
+                                      style: 'currency',
+                                      currency: 'BRL'
+                                    })}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">/h</p>
+                                </div>
+                              </div>
+                            </div>
+                          </Card>
+                        );
+                      })}
+
+                      {hasMoreSpots && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="w-full hover:bg-primary hover:text-primary-foreground"
+                          onClick={handleShowMore}
+                        >
+                          Ver mais <Badge variant="secondary" className="ml-2">+{nearbyParkingSpots.length - visibleCount}</Badge>
+                        </Button>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </div>
+      </div>
+    </Layout>
   );
 };
 
