@@ -16,12 +16,17 @@ const containerStyle = {
   height: '100%',
 };
 
-const mapOptions = {
+/**
+ * Opções de configuração do mapa
+ * gestureHandling: 'greedy' permite navegação com um único dedo no mobile
+ */
+const mapOptions: google.maps.MapOptions = {
   disableDefaultUI: false,
   zoomControl: true,
   streetViewControl: false,
   mapTypeControl: false,
   fullscreenControl: true,
+  gestureHandling: 'greedy', // Permite navegação com um dedo no mobile
   styles: [
     {
       featureType: "poi",
