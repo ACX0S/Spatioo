@@ -104,7 +104,7 @@ const Layout = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="hover:bg-transparent hover:scale-150 transition-transform"
+                className="hover:bg-transparent hover:scale-150 transition-transform dark:hover:text-spatioo-green"
                 onClick={() => navigate(-1)}
               >
                 <ChevronLeft className="h-5 w-5" />
