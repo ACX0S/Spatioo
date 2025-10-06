@@ -37,7 +37,7 @@ const App = () => {
     // Provider do React Query para gerenciamento de estado de servidor.
     <QueryClientProvider client={queryClient}>
       {/* Provider de tema, com tema padrão 'dark' e chave de armazenamento local. */}
-      <ThemeProvider defaultTheme="dark" storageKey="spatioo-theme">
+      <ThemeProvider defaultTheme="system" storageKey="spatioo-theme">
         {/* Provider para habilitar tooltips. */}
         <TooltipProvider>
           {/* Componentes para exibir notificações. */}
