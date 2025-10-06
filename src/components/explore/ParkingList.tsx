@@ -125,11 +125,11 @@ const ParkingList: React.FC<ParkingListProps> = ({
         <Button
           variant="outline"
           size={isMobile ? 'sm' : 'default'}
-          className="w-full hover:bg-primary hover:text-primary-foreground transition-colors"
+          className="w-full hover:text-primary transition-colors hover:bg-transparent hover:scale-[1.02]"
           onClick={onShowMore}
         >
           Ver mais {!isMobile && 'estacionamentos'}
-          <Badge variant="secondary" className="ml-2">
+          <Badge variant="secondary" className="ml-2 bg-primary/10 text-primary border-primary/20 pointer-events-none select-none">
             +{totalCount - visibleCount}
           </Badge>
         </Button>

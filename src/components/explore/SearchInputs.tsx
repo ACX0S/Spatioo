@@ -50,7 +50,7 @@ const SearchInputs: React.FC<SearchInputsProps> = ({
         <Button
           variant="outline"
           size="sm"
-          className="w-full hover:bg-primary hover:text-primary-foreground hover:scale-[1.02] active:scale-95 transition-all"
+          className="w-full hover:bg-primary hover:text-primary-foreground hover:scale-[1.01] active:scale-95 transition-all duration-500"
           onClick={onUseCurrentLocation}
         >
           <Navigation className="h-4 w-4 mr-2" />
