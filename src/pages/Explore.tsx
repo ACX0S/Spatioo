@@ -283,7 +283,7 @@ const Explore = () => {
         <div className="lg:hidden h-full">
           <ResizablePanelGroup direction="vertical">
             {/* Painel do Mapa */}
-            <ResizablePanel defaultSize={80} minSize={15} maxSize={90}>
+            <ResizablePanel defaultSize={40} minSize={12} maxSize={72}>
               <div className="relative h-full">
                 <GoogleMap
                   center={mapCenter}
@@ -308,7 +308,7 @@ const Explore = () => {
             <ResizableHandle withHandle className="bg-primary/10 hover:bg-primary/20 active:bg-primary/30 transition-colors" />
             
             {/* Painel de Busca e Lista */}
-            <ResizablePanel defaultSize={40} minSize={20} maxSize={85}>
+            <ResizablePanel defaultSize={40} minSize={18} maxSize={88}>
               <div className="h-full flex flex-col bg-background p-4 overflow-hidden">
                 {/* Inputs de localização */}
                 <SearchInputs
@@ -322,19 +322,19 @@ const Explore = () => {
                   isMobile
                 />
 
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-2.5">
                   <Badge 
                     variant="secondary" 
                     className="flex items-center gap-2 bg-primary/10 text-primary border-primary/20"
                   >
-                    <FaCar className="h-4 w-4" />
+                    <FaCar className="h-3.5 w-3.5" />
                     <span className="font-semibold">{nearbyParkingSpots.length}</span>
                     {(destinationCoords || userLocation) && ' • Por distância'}
                   </Badge>
                 </div>
 
                 {/* Lista de estacionamentos */}
-                <div className="space-y-3 overflow-y-auto flex-1 pr-1">
+                <div className="space-y-2 overflow-y-auto flex-1 pr-1">
                   <ParkingList
                     spots={nearbyParkingSpots}
                     visibleSpots={visibleParkingSpots}

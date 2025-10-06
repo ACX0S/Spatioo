@@ -58,7 +58,7 @@ const LocationInput: React.FC<LocationInputProps> = ({
         {icon === 'origin' ? (
           <MapPin className="h-5 w-5 text-primary" />
         ) : (
-          <MapPinned className="h-5 w-5 text-secondary" />
+          <MapPinned className="h-5 w-5 text-primary" />
         )}
       </div>
       <Input

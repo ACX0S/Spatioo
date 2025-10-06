@@ -30,7 +30,7 @@ const SearchInputs: React.FC<SearchInputsProps> = ({
 }) => {
   if (isMobile) {
     return (
-      <div className="space-y-3 mb-4">
+      <div className="space-y-2 mb-2">
         <LocationInput
           placeholder="De onde você está saindo?"
           icon="origin"
@@ -50,7 +50,7 @@ const SearchInputs: React.FC<SearchInputsProps> = ({
         <Button
           variant="outline"
           size="sm"
-          className="w-full hover:bg-primary hover:text-primary-foreground hover:scale-105 active:scale-95 transition-all"
+          className="w-full hover:bg-primary hover:text-primary-foreground hover:scale-[1.02] active:scale-95 transition-all"
           onClick={onUseCurrentLocation}
         >
           <Navigation className="h-4 w-4 mr-2" />
