@@ -98,9 +98,9 @@ const CancelBookingDialog = ({
             variant="destructive"
             onClick={handleCancel}
             disabled={isLoading}
-            className="min-w-[120px]"
+            className="min-w-[120px] text-black dark:text-spatioo-white bg-red-600/20 border border-red-600 dark:border-red-600 hover:bg-red-600 hover:text-black dark:hover:text-black hover:scale-[1.02] transition-all"
           >
-            {isLoading ? "Cancelando..." : "Sim, cancelar"}
+            {isLoading ? "Cancelando..." : "Cancelar"}
           </Button>
         </DialogFooter>
       </DialogContent>
