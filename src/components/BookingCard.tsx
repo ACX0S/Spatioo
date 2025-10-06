@@ -57,8 +57,8 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, onCancelBooking }) =
    */
   const getStatusColor = (status: string) => {
     switch(status) {
-      case 'active': return 'bg-green-500';
-      case 'upcoming': return 'bg-blue-500';
+      case 'active': return 'bg-spatioo-primary';
+      case 'upcoming': return 'bg-spatioo-primary dark:bg-spatioo-green/90';
       case 'completed': return 'bg-gray-500';
       case 'cancelled': return 'bg-red-500';
       default: return 'bg-gray-500';
@@ -90,7 +90,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, onCancelBooking }) =
             <h3 className="font-medium truncate">{booking.parkingName}</h3>
             <p className="text-sm text-muted-foreground truncate">{booking.parkingAddress}</p>
           </div>
-          <Badge className={`${getStatusColor(booking.status)} text-white`}>
+          <Badge className={`${getStatusColor(booking.status)} text-white pointer-events-none select-none rounded-sm`}>
             {getStatusText(booking.status)}
           </Badge>
         </div>
@@ -124,7 +124,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, onCancelBooking }) =
                 bookingId={booking.id}
                 onConfirm={onCancelBooking}
                 trigger={
-                  <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50">
+                  <Button variant="outline" size="sm" className="border-red-600 dark:border-red-600 text-red-600 hover:bg-red-600 hover:text-black dark:hover:text-black">
                     Cancelar
                   </Button>
                 }
