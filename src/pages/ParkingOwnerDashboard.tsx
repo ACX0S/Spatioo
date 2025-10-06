@@ -46,7 +46,7 @@ const ParkingOwnerDashboard = () => {
       
       <Tabs defaultValue="parking-spots" value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid grid-cols-3 mb-6">
-          <TabsTrigger value="parking-spots">Meus estacionamentos</TabsTrigger>
+          <TabsTrigger value="parking-spots">Vagas</TabsTrigger>
           <TabsTrigger value="reservations">Reservas</TabsTrigger>
           <TabsTrigger value="earnings">Ganhos</TabsTrigger>
         </TabsList>
