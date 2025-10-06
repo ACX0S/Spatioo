@@ -283,7 +283,7 @@ const Explore = () => {
         <div className="lg:hidden h-full">
           <ResizablePanelGroup direction="vertical">
             {/* Painel do Mapa */}
-            <ResizablePanel defaultSize={60} minSize={30} maxSize={80}>
+            <ResizablePanel defaultSize={80} minSize={15} maxSize={90}>
               <div className="relative h-full">
                 <GoogleMap
                   center={mapCenter}
@@ -308,7 +308,7 @@ const Explore = () => {
             <ResizableHandle withHandle className="bg-primary/10 hover:bg-primary/20 active:bg-primary/30 transition-colors" />
             
             {/* Painel de Busca e Lista */}
-            <ResizablePanel defaultSize={40} minSize={20} maxSize={70}>
+            <ResizablePanel defaultSize={40} minSize={20} maxSize={85}>
               <div className="h-full flex flex-col bg-background p-4 overflow-hidden">
                 {/* Inputs de localização */}
                 <SearchInputs
