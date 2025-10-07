@@ -283,7 +283,7 @@ const Explore = () => {
         <div className="lg:hidden h-full">
           <ResizablePanelGroup direction="vertical">
             {/* Painel do Mapa */}
-            <ResizablePanel defaultSize={40} minSize={12} maxSize={72}>
+            <ResizablePanel defaultSize={40} minSize={12} maxSize={76}>
               <div className="relative h-full">
                 <GoogleMap
                   center={mapCenter}
@@ -291,25 +291,14 @@ const Explore = () => {
                   onParkingSelect={handleParkingSelect}
                   userLocation={userLocation}
                 />
-                
-                {/* Badge de informações sobreposto ao mapa */}
-                <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
-                  <Badge 
-                    variant="secondary" 
-                    className="shadow-lg backdrop-blur-sm bg-background/95 border-2 border-primary/20 px-4 py-2"
-                  >
-                    <FaCar className="h-4 w-4 mr-2 text-primary" />
-                    <span className="font-semibold">{parkingSpots.filter(s => s.latitude && s.longitude).length}</span> no mapa
-                  </Badge>
-                </div>
               </div>
             </ResizablePanel>
             
-            <ResizableHandle withHandle className="bg-primary/10 hover:bg-primary/20 active:bg-primary/30 transition-colors" />
+            <ResizableHandle withHandle className="bg-background p-2" />
             
             {/* Painel de Busca e Lista */}
-            <ResizablePanel defaultSize={40} minSize={18} maxSize={88}>
-              <div className="h-full flex flex-col bg-background p-4 overflow-hidden">
+            <ResizablePanel defaultSize={40} minSize={14} maxSize={88}>
+              <div className="h-full flex flex-col bg-background p-2 overflow-hidden">
                 {/* Inputs de localização */}
                 <SearchInputs
                   origin={origin}

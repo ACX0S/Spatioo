@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { GoogleMap as GoogleMapComponent, Marker, InfoWindow } from '@react-google-maps/api';
 import { PublicParkingData } from '@/services/parkingService';
 import { Button } from '@/components/ui/button';
+import { useMapOptions } from '@/components/ui/useMapOptions';
 import { FaCar, FaWarehouse, FaHouseUser } from 'react-icons/fa';
 
 interface GoogleMapProps {
@@ -16,30 +17,6 @@ const containerStyle = {
   height: '100%',
 };
 
-/**
- * Opções de configuração do mapa
- * gestureHandling: 'greedy' permite navegação com um único dedo no mobile
- */
-const mapOptions: google.maps.MapOptions = {
-  disableDefaultUI: false,
-  zoomControl: true,
-  streetViewControl: false,
-  mapTypeControl: false,
-  fullscreenControl: true,
-  gestureHandling: 'greedy', // Permite navegação com um dedo no mobile
-  styles: [
-    {
-      featureType: "poi",
-      elementType: "labels",
-      stylers: [{ visibility: "off" }]
-    }
-  ]
-};
-
-/**
- * Componente do mapa do Google Maps
- * Exibe marcadores dos estacionamentos e permite interação
- */
 const GoogleMap: React.FC<GoogleMapProps> = ({
   center,
   parkingSpots,
@@ -49,6 +26,8 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [selectedSpot, setSelectedSpot] = useState<PublicParkingData | null>(null);
   const [currentZoom, setCurrentZoom] = useState<number>(14);
+
+  const mapOptions = useMapOptions();
 
   const onLoad = useCallback((map: google.maps.Map) => {
     setMap(map);
@@ -75,7 +54,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
     
     const isResidencial = tipo === 'residencial';
     const color = isResidencial ? '#3B82F6' : '#10B981';
-    const scale = isSelected ? 1.4 : 1;
+    const scale = 0.8;
     const finalSize = size * scale;
     const strokeWidth = isSelected ? 3 : 2;
     
@@ -162,7 +141,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
             position={{ lat: userLocation[0], lng: userLocation[1] }}
             icon={{
               path: google.maps.SymbolPath.CIRCLE,
-              scale: 30,
+              scale: 25,
               fillColor: '#4285F4',
               fillOpacity: 0.1,
               strokeColor: '#4285F4',
@@ -178,13 +157,13 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
         <InfoWindow
           position={{ lat: Number(selectedSpot.latitude), lng: Number(selectedSpot.longitude) }}
           onCloseClick={() => setSelectedSpot(null)}
+          
         >
-          <div className="p-3 min-w-[220px]">
-            <h3 className="font-bold text-base mb-2 text-primary">{selectedSpot.nome}</h3>
-            <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{selectedSpot.endereco}</p>
-            <div className="flex items-center gap-2 mb-3">
-              <FaCar className="w-4 h-4 text-secondary" />
-              <span className="text-sm font-medium">{selectedSpot.numero_vagas} vagas disponíveis</span>
+          <div className="min-w-[200px] relative">
+            <p className="text-sm text-muted-foreground line-clamp-2 text-stone-900">{selectedSpot.nome}</p>
+            <div className="flex items-center gap-1 mb-3">
+              <FaCar className="w-3.5 h-3.5 text-secondary text-spatioo-primary dark:text-spatioo-secondary" />
+              <span className="text-[12.9px] dark:text-stone-800">{selectedSpot.numero_vagas} vagas disponíveis</span>
             </div>
             <Button
               size="sm"
@@ -192,7 +171,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
                 onParkingSelect(selectedSpot);
                 setSelectedSpot(null);
               }}
-              className="w-full bg-primary hover:bg-primary/90"
+              className="w-full bg-primary hover:bg-primary/90 dark:text-stone-800 bg-spatioo-primary dark:bg-spatioo-secondary"
             >
               Ver Detalhes
             </Button>
