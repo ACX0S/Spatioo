@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, Link, useLocation, useNavigate, useHref } from "react-router-dom";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useTheme } from "@/components/theme-provider";
 import { Map, Calendar, ChevronLeft, Compass, Plus } from "lucide-react";
@@ -96,21 +96,25 @@ const Layout = () => {
     <div className="min-h-screen flex flex-col">
       {/* Header - Corrigido para evitar deslocamento */}
       <header className="fixed top-0 z-40 w-full bg-background/80 backdrop-blur-sm border-b border-border">
-        <div className="px-2 h-11 flex items-center justify-between">
+        <div className="px-4 md:px-10 h-10 md:h-14 flex items-center justify-between">
           {/* Mantém largura fixa no lado esquerdo para evitar deslocamento */}
           <div className="flex items-center gap-3 min-w-0 flex-1">
             {/* Container com largura mínima para o botão voltar */}
-            <div className="w-4 sm:w-6 flex-shrink-0">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="bg-transparent p-4 hover:bg-transparent hover:scale-150 transition-transform dark:hover:text-spatioo-green"
-                onClick={() => navigate(-1)}
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </Button>
-            </div>
-            <h1 className="text-lg font-semibold truncate">{pageTitle}</h1>
+            {location.pathname == "/explore" && (
+              <div className="w-0 p-0 transiton-all duration-500">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="scale-150 w-5 p-0 pt-0.5 relative left-[-10px] rounded-s-none bg-transparent text-spatioo-primary hover:bg-transparent hover:scale-150 transition-transform dark:hover:text-spatioo-green"
+                  onClick={() => navigate(-1)}
+                >
+                  <ChevronLeft className="h-10 w-10" />
+                </Button>
+              </div>
+            )}
+            {location.pathname !== "/home" && (<h1 className="text-lg font-semibold truncate ">{pageTitle}</h1>) 
+              || theme==="light" && (<img src=".\Images\logos verdes\LOGO-COMPLETA-verde.svg" alt="Spatioo" className="h-6 md:h-10" />)
+              || theme==="dark" && (<img src=".\Images\logos vclaras\LOGO-COMPLETA-vclaro.svg" alt="Spatioo" className="h-6 md:h-10" />)}
           </div>
 
           <div className="flex items-center gap-2">
@@ -119,7 +123,7 @@ const Layout = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full hover:bg-transparent"
+              className="rounded-full hover:bg-transparent border-none"
               onClick={() => navigate("/profile")}
             >
               <Avatar className="h-8 w-8">
@@ -135,7 +139,7 @@ const Layout = () => {
 
       {/* Main Content */}
       <main
-        className={`flex-1 pt-16 ${
+        className={`flex-1 pt-10 md:pt-14 ${
           location.pathname !== "/explore" ? "pb-16" : ""
         }`}
       >
