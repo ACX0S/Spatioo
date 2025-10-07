@@ -80,12 +80,12 @@ const Layout = () => {
 
   // Define se o texto da navegação deve ser escuro ou claro baseado no tema
   const getNavTextColor = (isActive: boolean) => {
-    if (isActive) return "text-spatioo-green";
+    if (isActive) return "text-black dark:text-white";
 
     if (theme === "light") {
-      return "text-black/80";
+      return "text-black/60";
     } else if (theme === "dark") {
-      return "text-white/70";
+      return "text-white/50";
     } else {
       // Tema system - usa media query para detectar
       return "text-white/70 dark:text-white/70 light:text-black/80";
@@ -105,7 +105,7 @@ const Layout = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="scale-150 w-5 p-0 pt-0.5 relative left-[-10px] rounded-s-none bg-transparent text-spatioo-primary hover:bg-transparent hover:scale-150 transition-transform dark:hover:text-spatioo-green"
+                  className="scale-150 w-5 p-0 pt-0.5 relative left-[-10px] rounded-s-none bg-transparent text-spatioo-primary dark:text-spatioo-secondary hover:bg-transparent hover:scale-150 transition-transform dark:hover:text-spatioo-green"
                   onClick={() => navigate(-1)}
                 >
                   <ChevronLeft className="h-10 w-10" />

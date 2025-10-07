@@ -117,11 +117,10 @@ const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
   return (
     <div className={`relative ${className}`} ref={suggestionsRef}>
       <form onSubmit={handleSubmit} className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
           type="text"
           placeholder={placeholder}
-          className="pl-10 pr-4 h-12 rounded-full bg-card shadow-sm border-input"
+          className="pl-4 pr-4 h-12 rounded-full bg-card shadow-sm border-input"
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value);
@@ -135,7 +134,7 @@ const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
         <Button 
           type="submit"
           size="sm" 
-          className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full bg-spatioo-green hover:bg-spatioo-green-dark text-black h-8"
+          className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full bg-spatioo-white dark:bg-[#ffffff12] hover:bg-spatioo-white/45 text-black dark:text-white h-8"
         >
           <Search className="h-4 w-4" />
         </Button>

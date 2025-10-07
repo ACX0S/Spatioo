@@ -142,11 +142,11 @@ const Home = () => {
         transition={{ duration: 0.5 }}
         className="text-center space-y-2"
       >
-        <h1 className="text-2xl font-bold">
+        <h1 className="text-2xl font-bold text-stone-700 dark:text-spatioo-white">
           Bem Vindo{profile?.name ? `, ${profile.name}` : ''}!
         </h1>
-        <p className="text-muted-foreground">
-          <MapPin className="inline w-4 h-4 mr-1" />
+        <p className="text-muted-foreground ">
+          <MapPin className="inline w-4 h-4 mr-1 text-spatioo-primary dark:text-spatioo-secondary" />
           {userLocation}
         </p>
       </motion.div>
