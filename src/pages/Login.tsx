@@ -1,6 +1,6 @@
-
+import { useTheme } from "@/components/theme-provider";
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -12,8 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 const Login = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  
+  const { theme } = useTheme();
   const { signIn, signUp, signInWithGoogle, user } = useAuth();
   
   // Estados
@@ -131,7 +130,7 @@ const Login = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <motion.div 
+      <motion.div
         className="flex-1 container max-w-md mx-auto p-4 flex flex-col"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -139,22 +138,33 @@ const Login = () => {
       >
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 mb-4">
-            <img src="/Images/LOGO-REDUZIDA-vclaro.png" alt="Spatioo Logo" className="w-full h-full object-contain" />
+          <div className="w-24 h-auto mb-4">
+            {(theme === "light" && (
+              <img
+                src=".\Images\logos verdes\LOGO-COMPLETA-verde.svg"
+                alt="Spatioo"
+              />
+            )) ||
+              (theme === "dark" && (
+                <img
+                  src=".\Images\logos vclaras\LOGO-COMPLETA-vclaro.svg"
+                  alt="Spatioo"
+                />
+              ))}
           </div>
           <h1 className="text-2xl font-bold mb-1">Bem-vindo à Spatioo</h1>
           <p className="text-muted-foreground text-center">
             Encontre e reserve vagas de estacionamento com facilidade
           </p>
         </div>
-        
+
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid grid-cols-2 mb-8">
             <TabsTrigger value="login">Entrar</TabsTrigger>
             <TabsTrigger value="register">Criar conta</TabsTrigger>
           </TabsList>
-          
+
           {/* Login Tab */}
           <TabsContent value="login">
             <form onSubmit={handleLogin} className="space-y-4">
@@ -172,11 +182,14 @@ const Login = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <label className="text-sm font-medium">Senha</label>
-                  <Button variant="link" className="h-auto p-0 text-xs text-muted-foreground">
+                  <Button
+                    variant="link"
+                    className="h-auto p-0 text-xs text-muted-foreground"
+                  >
                     Esqueceu a senha?
                   </Button>
                 </div>
@@ -206,13 +219,13 @@ const Login = () => {
                   </Button>
                 </div>
               </div>
-              
-              <Button 
-                type="submit" 
+
+              <Button
+                type="submit"
                 className="w-full h-12 rounded-lg bg-spatioo-green hover:bg-spatioo-green/80 transition-all duration-500 text-black font-medium mt-6"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Entrando...' : 'Entrar'}
+                {isSubmitting ? "Entrando..." : "Entrar"}
                 {!isSubmitting && <ArrowRight className="ml-2 h-4 w-4" />}
               </Button>
 
@@ -256,7 +269,7 @@ const Login = () => {
               </Button>
             </form>
           </TabsContent>
-          
+
           {/* Register Tab */}
           <TabsContent value="register">
             <form onSubmit={handleRegister} className="space-y-4">
@@ -291,7 +304,7 @@ const Login = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <label className="text-sm font-medium">Email *</label>
                 <div className="relative">
@@ -307,7 +320,7 @@ const Login = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <label className="text-sm font-medium">Telefone *</label>
                 <div className="relative">
@@ -323,7 +336,7 @@ const Login = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <label className="text-sm font-medium">Senha *</label>
                 <div className="relative">
@@ -353,7 +366,8 @@ const Login = () => {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Mínimo 8 caracteres, com letra maiúscula, minúscula, número e símbolo
+                  Mínimo 8 caracteres, com letra maiúscula, minúscula, número e
+                  símbolo
                 </p>
               </div>
 
@@ -386,13 +400,13 @@ const Login = () => {
                   </Button>
                 </div>
               </div>
-              
-              <Button 
-                type="submit" 
+
+              <Button
+                type="submit"
                 className="w-full h-12 rounded-lg bg-spatioo-green hover:bg-spatioo-green/80 transition-all duration-500 text-black font-medium mt-6"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Processando...' : 'Criar conta'}
+                {isSubmitting ? "Processando..." : "Criar conta"}
                 {!isSubmitting && <ArrowRight className="ml-2 h-4 w-4" />}
               </Button>
 
@@ -401,7 +415,9 @@ const Login = () => {
                   <span className="w-full border-t" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">Ou continue com</span>
+                  <span className="bg-background px-2 text-muted-foreground">
+                    Ou continue com
+                  </span>
                 </div>
               </div>
 
@@ -430,7 +446,7 @@ const Login = () => {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                {isSubmitting ? 'Conectando...' : 'Continuar com Google'}
+                {isSubmitting ? "Conectando..." : "Continuar com Google"}
               </Button>
 
               <div className="mt-3 text-center">
@@ -441,7 +457,9 @@ const Login = () => {
                   onClick={handleResendConfirmation}
                   disabled={isResending || !email}
                 >
-                  {isResending ? 'Reenviando...' : 'Não recebeu o e-mail? Reenviar confirmação'}
+                  {isResending
+                    ? "Reenviando..."
+                    : "Não recebeu o e-mail? Reenviar confirmação"}
                 </Button>
               </div>
             </form>
