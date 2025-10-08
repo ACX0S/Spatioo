@@ -45,9 +45,8 @@ const ParkingOwnerDashboard = () => {
       </div>
       
       <Tabs defaultValue="parking-spots" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-3 mb-6">
+        <TabsList className="grid grid-cols-2 mb-4 md:max-w-[300px]">
           <TabsTrigger value="parking-spots">Vagas</TabsTrigger>
-          <TabsTrigger value="reservations">Reservas</TabsTrigger>
           <TabsTrigger value="earnings">Ganhos</TabsTrigger>
         </TabsList>
         
@@ -231,21 +230,7 @@ const ParkingOwnerDashboard = () => {
               }}
             />
           )}
-        </TabsContent>
-        
-        {/* Reservations Tab */}
-        <TabsContent value="reservations" className="space-y-4">
-          <div className="flex justify-center items-center py-12">
-            <div className="text-center">
-              <CalendarIcon className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-lg font-medium mb-2">Reservas em desenvolvimento</p>
-              <p className="text-sm text-muted-foreground">
-                Em breve você poderá visualizar todas as reservas dos seus estacionamentos aqui.
-              </p>
-            </div>
-          </div>
-        </TabsContent>
-        
+        </TabsContent>    
         {/* Earnings Tab */}
         <TabsContent value="earnings" className="space-y-4">
           <div className="flex justify-center items-center py-12">

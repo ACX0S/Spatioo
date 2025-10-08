@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import ParkingOwnerDashboard from "@/pages/ParkingOwnerDashboard";
 
 const Layout = () => {
   const location = useLocation();
@@ -18,6 +19,11 @@ const Layout = () => {
   const [pageTitle, setPageTitle] = useState("Spatioo");
 
   const getPageTitle = (pathname: string) => {
+    if (pathname.startsWith("/estacionamento-dashboard/")) {
+      return "Dashboard do Estacionamento";
+    }else if (pathname.startsWith("/parking/")) {
+      return "Detalhes do Estacionamento";
+    }
     switch (pathname) {
       case "/home":
         return "Spatioo";
@@ -34,9 +40,6 @@ const Layout = () => {
       case "/ofertar":
         return "Ofertar";
       default:
-        if (pathname.includes("/parking/")) {
-          return "Detalhes do Estacionamento";
-        }
         return "Spatioo";
     }
   };
@@ -100,21 +103,31 @@ const Layout = () => {
           {/* Mantém largura fixa no lado esquerdo para evitar deslocamento */}
           <div className="flex items-center gap-3 min-w-0 flex-1">
             {/* Container com largura mínima para o botão voltar */}
-            {location.pathname == "/explore" && (
+            {(location.pathname == "/explore" || location.pathname.startsWith("/estacionamento-dashboard/")) && (
               <div className="w-0 p-0 transiton-all duration-500">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="scale-150 w-5 p-0 pt-0.5 relative left-[-10px] rounded-s-none bg-transparent text-spatioo-primary dark:text-spatioo-secondary hover:bg-transparent hover:scale-150 transition-transform dark:hover:text-spatioo-green"
+                  className="scale-[1.39] md:scale-[1.5] w-5 p-0 pt-0.5 relative left-[-10px] rounded-s-none bg-transparent text-spatioo-primary dark:text-spatioo-secondary hover:bg-transparent hover:scale-150 transition-transform dark:hover:text-spatioo-green"
                   onClick={() => navigate(-1)}
                 >
-                  <ChevronLeft className="h-10 w-10" />
+                  <ChevronLeft/>
                 </Button>
               </div>
             )}
-            {location.pathname !== "/home" && (<h1 className="text-lg font-semibold truncate ">{pageTitle}</h1>) 
-              || theme==="light" && (<img src=".\Images\logos verdes\LOGO-COMPLETA-verde.svg" alt="Spatioo" className="h-6 md:h-10" />)
-              || theme==="dark" && (<img src=".\Images\logos vclaras\LOGO-COMPLETA-vclaro.svg" alt="Spatioo" className="h-6 md:h-10" />)}
+            {(location.pathname !== "/home" && (
+              <h1 className="text-lg font-semibold truncate ">{pageTitle}</h1>)) 
+            ||
+            (theme === "light" && (<img src=".\Images\logos verdes\LOGO-COMPLETA-verde.svg"
+                alt="Spatioo"
+                className="h-6 md:h-10"
+              />)) 
+            ||
+            (theme === "dark" && (<img src=".\Images\logos vclaras\LOGO-COMPLETA-vclaro.svg"
+                alt="Spatioo"
+                className="h-6 md:h-10"
+              />))
+            }
           </div>
 
           <div className="flex items-center gap-2">
@@ -159,7 +172,7 @@ const Layout = () => {
       {/* Bottom Navigation Bar - Oculta na rota /explore */}
       {location.pathname !== "/explore" && (
         //tamanho do navigation bar
-        <nav className="fixed bottom-0 z-40 backdrop-blur-md border-t-2 border-border h-12 w-full bg-background">
+        <nav className="fixed bottom-0 z-40 backdrop-blur-md border-t-2 border-border h-12 md:h-14 w-full bg-background">
           {/* dimensao do navigation bar */}
           <div className="max-w-5xl mx-auto h-full grid grid-cols-4">
             <Link
@@ -169,7 +182,7 @@ const Layout = () => {
                 getNavTextColor(isActive("/home"))
               )}
             >
-              <Map className="h-[18px] w-[18px]" />
+              <Map className="h-[18px] w-[18px] md:h-[20px] md:w-[20px]" />
               <span className="text-xs mt-1">Home</span>
             </Link>
 
@@ -180,7 +193,7 @@ const Layout = () => {
                 getNavTextColor(isActive("/explore"))
               )}
             >
-              <Compass className="h-[18px] w-[18px]" />
+              <Compass className="h-[18px] w-[18px] md:h-[20px] md:w-[20px]" />
               <span className="text-xs mt-1">Explorar</span>
             </Link>
 
@@ -191,7 +204,7 @@ const Layout = () => {
                 getNavTextColor(isActive("/ofertar"))
               )}
             >
-              <Plus className="h-[18px] w-[18px]" />
+              <Plus className="h-[18px] w-[18px] md:h-[20px] md:w-[20px]" />
               <span className="text-xs mt-1">Ofertar</span>
             </Link>
 
@@ -202,7 +215,7 @@ const Layout = () => {
                 getNavTextColor(isActive("/dashboard"))
               )}
             >
-              <Calendar className="h-[18px] w-[18px]" />
+              <Calendar className="h-[18px] w-[18px] md:h-[20px] md:w-[20px]" />
               <span className="text-xs mt-1">Painel</span>
             </Link>
           </div>

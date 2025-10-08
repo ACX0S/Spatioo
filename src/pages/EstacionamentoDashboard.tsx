@@ -8,31 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  SidebarProvider, 
-  Sidebar, 
-  SidebarContent, 
-  SidebarGroup, 
-  SidebarGroupContent, 
-  SidebarGroupLabel, 
-  SidebarMenu, 
-  SidebarMenuButton, 
-  SidebarMenuItem,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { 
-  LayoutDashboard, 
-  Camera, 
-  DollarSign, 
-  TrendingUp, 
-  Users, 
-  Calendar,
-  Upload,
-  X,
-  Building2,
-  Clock,
-  ArrowLeft
-} from "lucide-react";
+import { SidebarProvider, Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,SidebarTrigger,} from "@/components/ui/sidebar";
+import { LayoutDashboard, Camera, DollarSign, TrendingUp, Users, Calendar, Upload, X, Building2, Clock, ArrowLeft, Bell } from "lucide-react";
 import { FaCar } from 'react-icons/fa';
 import { uploadEstacionamentoPhoto, deleteEstacionamentoPhotos } from "@/services/storageService";
 import { Input } from "@/components/ui/input";
@@ -85,7 +62,7 @@ const EstacionamentoDashboard = () => {
     { id: 'dashboard', title: 'Dashboard', icon: LayoutDashboard },
     { id: 'fotos', title: 'Fotos', icon: Camera },
     { id: 'vagas', title: 'Vagas', icon: FaCar },
-    { id: 'solicitacoes', title: 'Solicitações', icon: Calendar },
+    { id: 'solicitacoes', title: 'Solicitações', icon: Bell },
   ];
 
   // Efeito para buscar os nomes dos motoristas quando as vagas mudam
