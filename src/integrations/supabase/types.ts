@@ -16,36 +16,60 @@ export type Database = {
     Tables: {
       bookings: {
         Row: {
+          accepted_at: string | null
+          arrival_confirmed_by_owner_at: string | null
+          arrival_confirmed_by_user_at: string | null
+          completed_at: string | null
           created_at: string | null
           date: string
+          departure_confirmed_by_owner_at: string | null
+          departure_confirmed_by_user_at: string | null
           end_time: string
           estacionamento_id: string
+          expires_at: string | null
           id: string
           price: number
+          rejected_at: string | null
           spot_number: string
           start_time: string
           status: string
           user_id: string
         }
         Insert: {
+          accepted_at?: string | null
+          arrival_confirmed_by_owner_at?: string | null
+          arrival_confirmed_by_user_at?: string | null
+          completed_at?: string | null
           created_at?: string | null
           date: string
+          departure_confirmed_by_owner_at?: string | null
+          departure_confirmed_by_user_at?: string | null
           end_time: string
           estacionamento_id: string
+          expires_at?: string | null
           id?: string
           price: number
+          rejected_at?: string | null
           spot_number: string
           start_time: string
           status?: string
           user_id: string
         }
         Update: {
+          accepted_at?: string | null
+          arrival_confirmed_by_owner_at?: string | null
+          arrival_confirmed_by_user_at?: string | null
+          completed_at?: string | null
           created_at?: string | null
           date?: string
+          departure_confirmed_by_owner_at?: string | null
+          departure_confirmed_by_user_at?: string | null
           end_time?: string
           estacionamento_id?: string
+          expires_at?: string | null
           id?: string
           price?: number
+          rejected_at?: string | null
           spot_number?: string
           start_time?: string
           status?: string
@@ -343,6 +367,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_user_book_today: {
+        Args: { p_user_id: string }
+        Returns: boolean
+      }
+      expire_pending_bookings: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       get_vagas_stats: {
         Args: { estacionamento_id_param: string }
         Returns: {

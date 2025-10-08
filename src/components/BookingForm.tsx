@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CreditCard, Clock, Info, Calendar } from 'lucide-react';
-import { createImmediateBooking } from '@/services/bookingService';
+import { createBookingRequest } from '@/services/bookingService';
 import { toast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { PublicParkingData } from '@/services/parkingService';
@@ -164,7 +164,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
 
   /**
    * @function handleSubmit
-   * @description Lida com a submissão do formulário de reserva.
+   * @description Lida com a submissão do formulário de reserva - agora cria uma solicitação que precisa ser aceita.
    */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -203,7 +203,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
       // Calcula o horário de fim
       const endTime = new Date(bookingDate.getTime() + selectedDuration * 60 * 60 * 1000);
       
-      // 1. Buscar uma vaga disponível
+      // Buscar uma vaga disponível
       const { data: vagasDisponiveis, error: vagasError } = await supabase
         .from('vagas')
         .select('*')
@@ -219,46 +219,32 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
 
       const vagaSelecionada = vagasDisponiveis[0];
 
-      // 2. Criar a reserva no banco de dados
-      const { data: bookingData, error: bookingError } = await supabase
-        .from('bookings')
-        .insert({
-          user_id: user.id,
-          estacionamento_id: parkingSpot.id,
-          date: format(bookingDate, 'yyyy-MM-dd'),
-          start_time: format(bookingDate, 'HH:mm:ss'),
-          end_time: format(endTime, 'HH:mm:ss'),
-          price: calculatedPrice,
-          status: 'upcoming',
-          spot_number: vagaSelecionada.numero_vaga
-        })
-        .select()
-        .single();
-      
-      if (bookingError) throw bookingError;
+      // Criar solicitação de reserva (aguardando confirmação)
+      await createBookingRequest({
+        estacionamento_id: parkingSpot.id,
+        date: format(bookingDate, 'yyyy-MM-dd'),
+        start_time: format(bookingDate, 'HH:mm:ss'),
+        end_time: format(endTime, 'HH:mm:ss'),
+        price: calculatedPrice,
+        spot_number: vagaSelecionada.numero_vaga
+      });
 
-      // 3. Atualizar a vaga para status "reservada" e associar ao usuário e booking
-      const { error: updateVagaError } = await supabase
+      // Atualizar vaga para aguardando confirmação
+      await supabase
         .from('vagas')
-        .update({
-          status: 'reservada',
-          user_id: user.id,
-          booking_id: bookingData.id
-        })
+        .update({ status: 'aguardando_confirmacao' })
         .eq('id', vagaSelecionada.id);
-
-      if (updateVagaError) throw updateVagaError;
       
       toast({ 
-        title: "Reserva confirmada!", 
-        description: `Sua vaga foi reservada para ${selectedDate === 'hoje' ? 'hoje' : 'amanhã'} às ${selectedStartTime} por ${selectedDuration} hora(s).`, 
-        duration: 4000 
+        title: "Solicitação enviada!", 
+        description: "Sua solicitação de reserva foi enviada. Aguarde a confirmação do estabelecimento.", 
+        duration: 5000 
       });
       
-      navigate('/dashboard'); // Redireciona para o dashboard após a reserva.
+      navigate('/dashboard'); // Redireciona para o dashboard após a solicitação.
     } catch (error: any) {
-      console.error('Erro ao criar reserva:', error);
-      toast({ title: "Erro", description: error.message || "Não foi possível completar sua reserva.", variant: "destructive" });
+      console.error('Erro ao criar solicitação:', error);
+      toast({ title: "Erro", description: error.message || "Não foi possível completar sua solicitação.", variant: "destructive" });
     } finally {
       setIsSubmitting(false);
     }

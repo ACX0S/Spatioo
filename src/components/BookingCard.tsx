@@ -118,8 +118,8 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, onCancelBooking }) =
           <p className="font-medium">{formatCurrency(booking.price)}</p>
           
           <div className="flex gap-2">
-            {/* O botão de cancelar só é exibido para reservas futuras ou ativas */}
-            {(booking.status === 'upcoming' || booking.status === 'active') && (
+            {/* O botão de cancelar só é exibido para reservas aguardando confirmação ou reservadas */}
+            {(booking.status === 'aguardando_confirmacao' || booking.status === 'reservada') && (
               <CancelBookingDialog
                 bookingId={booking.id}
                 onConfirm={onCancelBooking}

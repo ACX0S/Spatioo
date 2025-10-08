@@ -54,7 +54,7 @@ export const useBookings = () => {
       setBookings(prev => 
         prev.map(booking => 
           booking.id === bookingId 
-            ? { ...booking, status: 'cancelled' as const } 
+            ? { ...booking, status: 'cancelada' as const } 
             : booking
         )
       );
@@ -93,7 +93,7 @@ export const useBookings = () => {
     error, 
     refreshBookings: loadBookings,
     cancelBooking: handleCancelBooking,
-    activeBookings: bookings.filter(b => ['active', 'upcoming'].includes(b.status)),
-    historyBookings: bookings.filter(b => ['completed', 'cancelled'].includes(b.status))
+    activeBookings: bookings.filter(b => ['aguardando_confirmacao', 'reservada', 'ocupada'].includes(b.status)),
+    historyBookings: bookings.filter(b => ['concluida', 'cancelada', 'rejeitada', 'expirada'].includes(b.status))
   };
 };

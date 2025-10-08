@@ -39,12 +39,15 @@ import { Input } from "@/components/ui/input";
 import { useVagasStats } from "@/hooks/useVagasStats";
 import { useVagas } from "@/hooks/useVagas";
 import { useEstacionamentoBookings } from "@/hooks/useEstacionamentoBookings";
+import { useParkingBookings } from "@/hooks/useParkingBookings";
+import { BookingRequestCard } from "@/components/BookingRequestCard";
+import { BookingActionCard } from "@/components/BookingActionCard";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Trash2, Settings } from "lucide-react";
 import { format } from "date-fns";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-type SidebarOption = 'dashboard' | 'fotos' | 'vagas';
+type SidebarOption = 'dashboard' | 'fotos' | 'vagas' | 'solicitacoes';
 
 const EstacionamentoDashboard = () => {
   const { id } = useParams<{ id: string }>();
@@ -66,6 +69,15 @@ const EstacionamentoDashboard = () => {
   const { stats, refetch: refetchStats } = useVagasStats(estacionamento?.id);
   const { vagas, updateVagaStatus, deleteVaga, refetch: refetchVagas } = useVagas(estacionamento?.id);
   const { bookings, filterBookings } = useEstacionamentoBookings(estacionamento?.id);
+  const { 
+    pendingBookings, 
+    activeBookings, 
+    actionLoading,
+    handleAccept, 
+    handleReject,
+    handleOwnerArrival,
+    handleOwnerDeparture 
+  } = useParkingBookings(estacionamento?.id);
 
   const isMobile = useIsMobile();
 
@@ -73,6 +85,7 @@ const EstacionamentoDashboard = () => {
     { id: 'dashboard', title: 'Dashboard', icon: LayoutDashboard },
     { id: 'fotos', title: 'Fotos', icon: Camera },
     { id: 'vagas', title: 'Vagas', icon: FaCar },
+    { id: 'solicitacoes', title: 'Solicitações', icon: Calendar },
   ];
 
   // Efeito para buscar os nomes dos motoristas quando as vagas mudam

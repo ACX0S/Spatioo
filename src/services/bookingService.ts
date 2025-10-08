@@ -31,8 +31,7 @@ export const fetchUserBookings = async (): Promise<Booking[]> => {
       ...booking,
       parkingName: booking.estacionamento?.nome,
       parkingAddress: booking.estacionamento?.endereco,
-      // Ensure status is one of the allowed types with type assertion
-      status: (booking.status || 'upcoming') as 'active' | 'upcoming' | 'completed' | 'cancelled'
+      status: booking.status as Booking['status'],
     }));
   } catch (error: any) {
     console.error('Erro ao buscar reservas:', error.message);
@@ -72,8 +71,7 @@ export const createBooking = async (bookingData: Omit<Booking, 'id' | 'user_id' 
       ...data,
       parkingName: data.estacionamento?.nome,
       parkingAddress: data.estacionamento?.endereco,
-      // Ensure status is one of the allowed types with type assertion
-      status: (data.status || 'upcoming') as 'active' | 'upcoming' | 'completed' | 'cancelled'
+      status: data.status as Booking['status'],
     };
   } catch (error: any) {
     console.error('Erro ao criar reserva:', error.message);
@@ -81,85 +79,157 @@ export const createBooking = async (bookingData: Omit<Booking, 'id' | 'user_id' 
   }
 };
 
-// Criar uma reserva imediata (tempo real)
-export const createImmediateBooking = async (bookingData: {
-  estacionamento_id: string;
-  duration_hours: number;
-  price: number;
-}): Promise<Booking> => {
+// Criar uma reserva com solicitação (aguardando confirmação)
+export const createBookingRequest = async (bookingData: Omit<Booking, 'id' | 'user_id' | 'created_at' | 'status' | 'expires_at'>): Promise<Booking> => {
   try {
-    // Get the current user
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
       throw new Error('Usuário não autenticado');
     }
-
-    const now = new Date();
-    const startTime = now.toTimeString().slice(0, 5); // HH:MM format
-    const endDate = new Date(now.getTime() + (bookingData.duration_hours * 60 * 60 * 1000));
-    const endTime = endDate.toTimeString().slice(0, 5);
     
-    // Find an available spot
-    const { data: availableSpots, error: spotsError } = await supabase
-      .from('vagas')
-      .select('numero_vaga')
-      .eq('estacionamento_id', bookingData.estacionamento_id)
-      .eq('status', 'disponivel')
-      .limit(1);
-
-    if (spotsError) throw spotsError;
-    
-    if (!availableSpots || availableSpots.length === 0) {
-      throw new Error('Não há vagas disponíveis no momento');
+    // Verificar se o usuário pode fazer reserva para hoje
+    const isToday = new Date(bookingData.date).toDateString() === new Date().toDateString();
+    if (isToday) {
+      const { data: canBook } = await supabase
+        .rpc('can_user_book_today', { p_user_id: user.id });
+      
+      if (!canBook) {
+        throw new Error('Você já possui uma reserva ativa para hoje. Aguarde a confirmação de saída antes de fazer uma nova reserva.');
+      }
     }
-
-    const spotNumber = availableSpots[0].numero_vaga;
-
+    
+    // Definir tempo de expiração (15 minutos)
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 15);
+    
     const { data, error } = await supabase
       .from('bookings')
       .insert({
+        ...bookingData,
         user_id: user.id,
-        estacionamento_id: bookingData.estacionamento_id,
-        date: now.toISOString().split('T')[0], // YYYY-MM-DD format
-        start_time: startTime,
-        end_time: endTime,
-        spot_number: spotNumber,
-        price: bookingData.price,
-        status: 'active' // Immediately active
+        status: 'aguardando_confirmacao',
+        expires_at: expiresAt.toISOString(),
       })
       .select(`
         *,
-        estacionamento:estacionamento_id (nome, endereco)
+        estacionamento:estacionamento_id (nome, endereco, user_id)
       `)
       .single();
     
     if (error) throw error;
-    
-    if (!data) {
-      throw new Error('Erro ao criar reserva');
-    }
-
-    // Update the spot status to reserved
-    await supabase
-      .from('vagas')
-      .update({ 
-        status: 'reservada',
-        user_id: user.id,
-        booking_id: data.id
-      })
-      .eq('estacionamento_id', bookingData.estacionamento_id)
-      .eq('numero_vaga', spotNumber);
+    if (!data) throw new Error('Erro ao criar solicitação de reserva');
     
     return {
       ...data,
       parkingName: data.estacionamento?.nome,
       parkingAddress: data.estacionamento?.endereco,
-      status: 'active' as const
+      status: data.status as Booking['status'],
     };
   } catch (error: any) {
-    console.error('Erro ao criar reserva imediata:', error.message);
-    throw new Error('Falha ao criar sua reserva: ' + error.message);
+    console.error('Erro ao criar solicitação:', error.message);
+    throw new Error(error.message || 'Falha ao criar solicitação de reserva');
+  }
+};
+
+// Aceitar reserva (edge function)
+export const acceptBooking = async (bookingId: string): Promise<void> => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    const response = await supabase.functions.invoke('booking-accept', {
+      body: { bookingId },
+      headers: {
+        Authorization: `Bearer ${session?.access_token}`,
+      },
+    });
+    
+    if (response.error) throw response.error;
+  } catch (error: any) {
+    console.error('Erro ao aceitar reserva:', error);
+    throw new Error('Falha ao aceitar reserva: ' + error.message);
+  }
+};
+
+// Rejeitar reserva (edge function)
+export const rejectBooking = async (bookingId: string): Promise<void> => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    const response = await supabase.functions.invoke('booking-reject', {
+      body: { bookingId },
+      headers: {
+        Authorization: `Bearer ${session?.access_token}`,
+      },
+    });
+    
+    if (response.error) throw response.error;
+  } catch (error: any) {
+    console.error('Erro ao rejeitar reserva:', error);
+    throw new Error('Falha ao rejeitar reserva: ' + error.message);
+  }
+};
+
+// Confirmar chegada
+export const confirmArrival = async (bookingId: string, confirmedBy: 'owner' | 'user'): Promise<void> => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    const response = await supabase.functions.invoke('booking-confirm-arrival', {
+      body: { bookingId, confirmedBy },
+      headers: {
+        Authorization: `Bearer ${session?.access_token}`,
+      },
+    });
+    
+    if (response.error) throw response.error;
+  } catch (error: any) {
+    console.error('Erro ao confirmar chegada:', error);
+    throw new Error('Falha ao confirmar chegada: ' + error.message);
+  }
+};
+
+// Confirmar saída
+export const confirmDeparture = async (bookingId: string, confirmedBy: 'owner' | 'user'): Promise<void> => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    const response = await supabase.functions.invoke('booking-confirm-departure', {
+      body: { bookingId, confirmedBy },
+      headers: {
+        Authorization: `Bearer ${session?.access_token}`,
+      },
+    });
+    
+    if (response.error) throw response.error;
+  } catch (error: any) {
+    console.error('Erro ao confirmar saída:', error);
+    throw new Error('Falha ao confirmar saída: ' + error.message);
+  }
+};
+
+// Buscar solicitações pendentes (para o dashboard do estabelecimento)
+export const fetchPendingBookings = async (estacionamentoId: string): Promise<Booking[]> => {
+  try {
+    const { data: bookings, error } = await supabase
+      .from('bookings')
+      .select(`
+        *,
+        profiles:user_id (name)
+      `)
+      .eq('estacionamento_id', estacionamentoId)
+      .eq('status', 'aguardando_confirmacao')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    
+    return (bookings || []).map(b => ({
+      ...b,
+      status: b.status as Booking['status'],
+    }));
+  } catch (error: any) {
+    console.error('Erro ao buscar solicitações:', error);
+    throw new Error('Falha ao carregar solicitações: ' + error.message);
   }
 };
 
@@ -168,7 +238,7 @@ export const cancelBooking = async (bookingId: string): Promise<void> => {
   try {
     const { error } = await supabase
       .from('bookings')
-      .update({ status: 'cancelled' })
+      .update({ status: 'cancelada' })
       .eq('id', bookingId);
     
     if (error) throw error;
