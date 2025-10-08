@@ -73,45 +73,14 @@ const DeleteEstacionamentoDialog = ({
     setIsDeleting(true);
 
     try {
-      // 1. Exclui as notificações associadas ao estacionamento (corrige o erro de foreign key)
-      const { error: notificationsError } = await supabase
-        .from("notifications")
-        .delete()
-        .eq("estacionamento_id", estacionamentoId);
-
-      if (notificationsError) throw notificationsError;
-
-      // 2. Exclui os preços associados ao estacionamento
-      const { error: precosError } = await supabase
-        .from("estacionamento_precos")
-        .delete()
-        .eq("estacionamento_id", estacionamentoId);
-
-      if (precosError) throw precosError;
-
-      // 3. Exclui as reservas (bookings) associadas ao estacionamento
-      const { error: bookingsError } = await supabase
-        .from("bookings")
-        .delete()
-        .eq("estacionamento_id", estacionamentoId);
-
-      if (bookingsError) throw bookingsError;
-
-      // 4. Exclui as vagas associadas ao estacionamento
-      const { error: vagasError } = await supabase
-        .from("vagas")
-        .delete()
-        .eq("estacionamento_id", estacionamentoId);
-
-      if (vagasError) throw vagasError;
-
-      // 5. Por fim, exclui o estacionamento
-      const { error: estacionamentoError } = await supabase
+      // Agora com ON DELETE CASCADE, basta excluir o estacionamento
+      // e todos os dados relacionados serão excluídos automaticamente
+      const { error } = await supabase
         .from("estacionamento")
         .delete()
         .eq("id", estacionamentoId);
 
-      if (estacionamentoError) throw estacionamentoError;
+      if (error) throw error;
 
       toast({
         title: "Estacionamento excluído",

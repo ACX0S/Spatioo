@@ -18,7 +18,7 @@ export const fetchUserBookings = async (): Promise<Booking[]> => {
       .from('bookings')
       .select(`
         *,
-        estacionamento:estacionamento_id (nome, endereco)
+        estacionamento!bookings_estacionamento_id_fkey (nome, endereco)
       `)
       .eq('user_id', user.id)
       .order('date', { ascending: true })
@@ -57,7 +57,7 @@ export const createBooking = async (bookingData: Omit<Booking, 'id' | 'user_id' 
       })
       .select(`
         *,
-        estacionamento:estacionamento_id (nome, endereco)
+        estacionamento!bookings_estacionamento_id_fkey (nome, endereco)
       `)
       .single();
     
@@ -113,7 +113,7 @@ export const createBookingRequest = async (bookingData: Omit<Booking, 'id' | 'us
       })
       .select(`
         *,
-        estacionamento:estacionamento_id (nome, endereco, user_id)
+        estacionamento!bookings_estacionamento_id_fkey (nome, endereco, user_id)
       `)
       .single();
     
@@ -215,7 +215,7 @@ export const fetchPendingBookings = async (estacionamentoId: string): Promise<Bo
       .from('bookings')
       .select(`
         *,
-        profiles:user_id (name)
+        profiles!bookings_user_id_fkey (name)
       `)
       .eq('estacionamento_id', estacionamentoId)
       .eq('status', 'aguardando_confirmacao')

@@ -77,6 +77,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "bookings_estacionamento_id_fkey"
+            columns: ["estacionamento_id"]
+            isOneToOne: false
+            referencedRelation: "estacionamento"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "fk_bookings_estacionamento"
             columns: ["estacionamento_id"]
             isOneToOne: false
@@ -355,6 +362,13 @@ export type Database = {
           },
           {
             foreignKeyName: "fk_vagas_estacionamento"
+            columns: ["estacionamento_id"]
+            isOneToOne: false
+            referencedRelation: "estacionamento"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vagas_estacionamento_id_fkey"
             columns: ["estacionamento_id"]
             isOneToOne: false
             referencedRelation: "estacionamento"

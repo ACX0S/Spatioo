@@ -22,7 +22,7 @@ export const useUserBookingActions = () => {
         .from('bookings')
         .select(`
           *,
-          estacionamento:estacionamento_id (nome, endereco, latitude, longitude)
+          estacionamento!bookings_estacionamento_id_fkey (nome, endereco, latitude, longitude)
         `)
         .eq('user_id', user.id)
         .in('status', ['reservada', 'ocupada'])

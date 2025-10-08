@@ -39,7 +39,7 @@ export const useParkingBookings = (estacionamentoId: string | undefined) => {
         .from('bookings')
         .select(`
           *,
-          profiles:user_id (name)
+          profiles!bookings_user_id_fkey (name)
         `)
         .eq('estacionamento_id', estacionamentoId)
         .in('status', ['reservada', 'ocupada'])

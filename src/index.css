@@ -179,13 +179,12 @@
   transition: opacity 300ms;
 }
 
-/* Esconde a scroll bar em todos os elementos com a classe `scrollbar-none` */
-html::-webkit-scrollbar {
+/* Hide scrollbar for mobile tabs */
+.scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
-
-html {
-  -ms-overflow-style: none; /* IE/Edge */
-  scrollbar-width: none;    /* Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 

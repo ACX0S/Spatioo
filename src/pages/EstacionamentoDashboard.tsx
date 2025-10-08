@@ -696,10 +696,10 @@ const EstacionamentoDashboard = () => {
   // Mobile Layout com Tabs
   if (isMobile) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-20">
         {/* Header Mobile */}
-        <div className="sticky top-0 z-10 bg-background border-b">
-          <div className="flex items-center gap-3 p-4">
+        <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
+          <div className="flex items-center gap-3 p-3">
             <Button
               variant="ghost"
               size="icon"
@@ -708,29 +708,33 @@ const EstacionamentoDashboard = () => {
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold truncate">{estacionamento.nome}</h1>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-base font-bold truncate">{estacionamento.nome}</h1>
               <p className="text-xs text-muted-foreground truncate">{estacionamento.endereco}</p>
             </div>
           </div>
         </div>
 
-        {/* Tabs Navigation Mobile */}
+        {/* Tabs Navigation Mobile - Scrollable horizontally */}
         <Tabs value={activeSection} onValueChange={(value) => setActiveSection(value as SidebarOption)} className="w-full">
-          <TabsList className="w-full rounded-none border-b h-12 bg-background justify-start overflow-x-auto">
-            {sidebarItems.map((item) => (
-              <TabsTrigger 
-                key={item.id} 
-                value={item.id}
-                className="flex-1 min-w-[100px] data-[state=active]:bg-spatioo-green data-[state=active]:text-black"
-              >
-                <item.icon className="h-4 w-4 mr-2" />
-                {item.title}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+          <div className="sticky top-[57px] z-10 bg-background border-b">
+            <TabsList className="w-full h-auto rounded-none bg-background p-0 flex justify-start">
+              <div className="flex overflow-x-auto scrollbar-hide w-full">
+                {sidebarItems.map((item) => (
+                  <TabsTrigger 
+                    key={item.id} 
+                    value={item.id}
+                    className="flex-shrink-0 min-w-[120px] h-12 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-accent data-[state=active]:text-primary font-medium px-4"
+                  >
+                    <item.icon className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <span className="truncate">{item.title}</span>
+                  </TabsTrigger>
+                ))}
+              </div>
+            </TabsList>
+          </div>
 
-          <div className="p-4">
+          <div className="p-3 space-y-4">
             <TabsContent value="dashboard" className="mt-0">
               {renderDashboardContent()}
             </TabsContent>

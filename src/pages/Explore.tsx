@@ -84,7 +84,7 @@ const Explore = () => {
           .from('bookings')
           .select(`
             *,
-            estacionamento:estacionamento_id (nome, endereco, latitude, longitude)
+            estacionamento!bookings_estacionamento_id_fkey (nome, endereco, latitude, longitude)
           `)
           .eq('id', bookingIdParam)
           .single();
