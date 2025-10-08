@@ -215,7 +215,7 @@ export const fetchPendingBookings = async (estacionamentoId: string): Promise<Bo
       .from('bookings')
       .select(`
         *,
-        profiles!bookings_user_id_fkey (name)
+        profiles!bookings_user_id_profiles_fkey (name)
       `)
       .eq('estacionamento_id', estacionamentoId)
       .eq('status', 'aguardando_confirmacao')
