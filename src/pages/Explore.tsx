@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { FaCar } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { useParkingData } from '@/hooks/useParkingData';
 import { PublicParkingData } from '@/services/parkingService';
@@ -12,13 +12,18 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/componen
 import { toast } from 'sonner';
 import SearchInputs from '@/components/explore/SearchInputs';
 import ParkingList from '@/components/explore/ParkingList';
+import { supabase } from '@/integrations/supabase/client';
+import { Booking } from '@/types/booking';
 
 /**
  * Página Explore - Busca e visualização de estacionamentos
  * Layout responsivo com sidebar (desktop) e painel redimensionável (mobile)
+ * Suporta visualização de rota quando há uma reserva aceita (bookingId na URL)
  */
 const Explore = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const bookingIdParam = searchParams.get('bookingId');
   const { isLoaded, loadError } = useGoogleMaps();
   
   // Estados para origem e destino
@@ -26,6 +31,9 @@ const Explore = () => {
   const [destination, setDestination] = useState('');
   const [originCoords, setOriginCoords] = useState<google.maps.LatLngLiteral | null>(null);
   const [destinationCoords, setDestinationCoords] = useState<google.maps.LatLngLiteral | null>(null);
+  
+  // Estado para reserva aceita
+  const [acceptedBooking, setAcceptedBooking] = useState<Booking | null>(null);
   
   // Centro do mapa (baseado no destino ou localização do usuário)
   const [mapCenter, setMapCenter] = useState<google.maps.LatLngLiteral>({ 
@@ -65,6 +73,65 @@ const Explore = () => {
       );
     }
   }, []);
+
+  // Buscar dados da reserva aceita e configurar rota
+  useEffect(() => {
+    const loadBookingRoute = async () => {
+      if (!bookingIdParam) return;
+
+      try {
+        const { data: booking, error } = await supabase
+          .from('bookings')
+          .select(`
+            *,
+            estacionamento:estacionamento_id (nome, endereco, latitude, longitude)
+          `)
+          .eq('id', bookingIdParam)
+          .single();
+
+        if (error) throw error;
+
+        if (booking && booking.estacionamento) {
+          const parkingLat = Number(booking.estacionamento.latitude);
+          const parkingLng = Number(booking.estacionamento.longitude);
+
+          if (parkingLat && parkingLng) {
+            setDestinationCoords({ lat: parkingLat, lng: parkingLng });
+            setDestination(booking.estacionamento.endereco);
+            setMapCenter({ lat: parkingLat, lng: parkingLng });
+
+            setAcceptedBooking({
+              ...booking,
+              status: booking.status as Booking['status'],
+              parkingName: booking.estacionamento.nome,
+              parkingAddress: booking.estacionamento.endereco,
+            });
+
+            // Obter localização atual como origem
+            if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(
+                (position) => {
+                  const { latitude, longitude } = position.coords;
+                  setOriginCoords({ lat: latitude, lng: longitude });
+                  setOrigin('Sua localização atual');
+                  toast.success('Rota para o estacionamento carregada!');
+                },
+                (error) => {
+                  console.error('Erro ao obter localização:', error);
+                  toast.error('Não foi possível obter sua localização para traçar a rota');
+                }
+              );
+            }
+          }
+        }
+      } catch (error: any) {
+        console.error('Erro ao carregar dados da reserva:', error);
+        toast.error('Erro ao carregar dados da reserva');
+      }
+    };
+
+    loadBookingRoute();
+  }, [bookingIdParam]);
 
   // Usar localização atual como origem
   const handleUseCurrentLocation = useCallback(() => {

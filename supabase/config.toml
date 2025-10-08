@@ -8,3 +8,5 @@ content_path = "./supabase/templates/confirmation.html"
 [functions.booking-reject]
 [functions.booking-confirm-arrival]
 [functions.booking-confirm-departure]
+[functions.expire-bookings]
+verify_jwt = false

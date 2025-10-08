@@ -5,6 +5,8 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorMessage from "@/components/ErrorMessage";
 import { Calendar, History, Bell } from "lucide-react";
 import NotificationsList from "@/components/NotificationsList";
+import { ActiveBookingBanner } from "@/components/ActiveBookingBanner";
+import { UserBookingStatus } from "@/components/UserBookingStatus";
 
 const Dashboard = () => {
   const { bookings, loading, error, cancelBooking, activeBookings, historyBookings } = useBookings();
@@ -22,6 +24,16 @@ const Dashboard = () => {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-foreground mb-2">Reservas</h1>
         <p className="text-muted-foreground">Suas reservas e notificações</p>
+      </div>
+
+      {/* Banner de reserva ativa (redireciona para rota) */}
+      <div className="mb-4">
+        <ActiveBookingBanner />
+      </div>
+
+      {/* Status detalhado da reserva ativa */}
+      <div className="mb-6">
+        <UserBookingStatus />
       </div>
 
       <Tabs defaultValue="active" className="w-full">

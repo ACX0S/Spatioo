@@ -614,6 +614,72 @@ const EstacionamentoDashboard = () => {
           </div>
         );
 
+      case 'solicitacoes':
+        return (
+          <div className="space-y-6">
+            {/* Solicitações Pendentes */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Solicitações Pendentes</CardTitle>
+                <CardDescription>
+                  Gerencie as solicitações de reserva recebidas
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {pendingBookings.length > 0 ? (
+                  <div className="space-y-4">
+                    {pendingBookings.map((booking) => (
+                      <BookingRequestCard
+                        key={booking.id}
+                        booking={booking}
+                        onAccept={handleAccept}
+                        onReject={handleReject}
+                        loading={actionLoading}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Calendar className="h-12 w-12 mx-auto mb-4" />
+                    <p>Nenhuma solicitação pendente</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Reservas Ativas */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Reservas Ativas</CardTitle>
+                <CardDescription>
+                  Gerenciar chegadas e saídas
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {activeBookings.length > 0 ? (
+                  <div className="space-y-4">
+                    {activeBookings.map((booking) => (
+                      <BookingActionCard
+                        key={booking.id}
+                        booking={booking}
+                        onOwnerArrival={handleOwnerArrival}
+                        onOwnerDeparture={handleOwnerDeparture}
+                        isOwner={true}
+                        loading={actionLoading}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <FaCar className="h-12 w-12 mx-auto mb-4" />
+                    <p>Nenhuma reserva ativa no momento</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        );
+
       default:
         return null;
     }
@@ -672,6 +738,9 @@ const EstacionamentoDashboard = () => {
               {renderDashboardContent()}
             </TabsContent>
             <TabsContent value="vagas" className="mt-0">
+              {renderDashboardContent()}
+            </TabsContent>
+            <TabsContent value="solicitacoes" className="mt-0">
               {renderDashboardContent()}
             </TabsContent>
           </div>
