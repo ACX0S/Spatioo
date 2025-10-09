@@ -23,6 +23,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Trash2, Settings } from "lucide-react";
 import { format } from "date-fns";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { StatsCarousel } from "@/components/StatsCarousel";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 type SidebarOption = 'dashboard' | 'fotos' | 'vagas' | 'solicitacoes';
 
@@ -213,54 +215,59 @@ const EstacionamentoDashboard = () => {
       case 'dashboard':
         return (
           <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total de Vagas</CardTitle>
-                  <FaCar className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{estacionamento.numero_vagas}</div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Preço por Hora</CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{formatPrice(estacionamento.preco)}</div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Vagas Ocupadas</CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stats?.vagas_ocupadas || 0}</div>
-                  <p className="text-xs text-muted-foreground">de {stats?.total_vagas || estacionamento.numero_vagas} vagas</p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Receita Hoje</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {bookings.length > 0 
-                      ? formatPrice(bookings.reduce((total, booking) => total + Number(booking.price), 0))
-                      : "R$ 0,00"
-                    }
-                  </div>
-                  <p className="text-xs text-muted-foreground">Total de reservas</p>
-                </CardContent>
-              </Card>
-            </div>
+            {/* Stats Cards - Mobile com carrossel, Desktop com grid */}
+            {isMobile ? (
+              <StatsCarousel stats={stats || { total_vagas: 0, vagas_disponiveis: 0, vagas_ocupadas: 0, vagas_reservadas: 0 }} />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total de Vagas</CardTitle>
+                    <FaCar className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{estacionamento.numero_vagas}</div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Preço por Hora</CardTitle>
+                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{formatPrice(estacionamento.preco)}</div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Vagas Ocupadas</CardTitle>
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{stats?.vagas_ocupadas || 0}</div>
+                    <p className="text-xs text-muted-foreground">de {stats?.total_vagas || estacionamento.numero_vagas} vagas</p>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Receita Hoje</CardTitle>
+                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">
+                      {bookings.length > 0 
+                        ? formatPrice(bookings.reduce((total, booking) => total + Number(booking.price), 0))
+                        : "R$ 0,00"
+                      }
+                    </div>
+                    <p className="text-xs text-muted-foreground">Total de reservas</p>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
@@ -695,8 +702,8 @@ const EstacionamentoDashboard = () => {
         {/* Tabs Navigation Mobile - Scrollable horizontally */}
         <Tabs value={activeSection} onValueChange={(value) => setActiveSection(value as SidebarOption)} className="w-full">
           <div className="sticky top-[57px] z-10 bg-background border-b">
-            <TabsList className="w-full h-auto rounded-none bg-background p-0 flex justify-start">
-              <div className="flex overflow-x-auto scrollbar-hide w-full">
+            <ScrollArea className="w-full">
+              <TabsList className="w-full h-auto rounded-none bg-background p-0 inline-flex">
                 {sidebarItems.map((item) => (
                   <TabsTrigger 
                     key={item.id} 
@@ -707,8 +714,9 @@ const EstacionamentoDashboard = () => {
                     <span className="truncate">{item.title}</span>
                   </TabsTrigger>
                 ))}
-              </div>
-            </TabsList>
+              </TabsList>
+              <ScrollBar orientation="horizontal" className="h-0" />
+            </ScrollArea>
           </div>
 
           <div className="p-3 space-y-4">

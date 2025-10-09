@@ -9,8 +9,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ParkingOwnerDashboard from "@/pages/ParkingOwnerDashboard";
+import { useRealtimeBookings } from "@/hooks/useRealtimeBookings";
 
 const Layout = () => {
+  // Hook para notificações em tempo real
+  useRealtimeBookings();
   const location = useLocation();
   const navigate = useNavigate();
   const { profile } = useAuth();

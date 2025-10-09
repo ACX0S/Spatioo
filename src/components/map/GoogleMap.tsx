@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { GoogleMap as GoogleMapComponent, Marker, InfoWindow } from '@react-google-maps/api';
+import React, { useState, useCallback, useEffect } from 'react';
+import { GoogleMap as GoogleMapComponent, Marker, InfoWindow, DirectionsRenderer } from '@react-google-maps/api';
 import { PublicParkingData } from '@/services/parkingService';
 import { Button } from '@/components/ui/button';
 import { useMapOptions } from '@/components/ui/useMapOptions';
@@ -10,6 +10,8 @@ interface GoogleMapProps {
   parkingSpots: PublicParkingData[];
   onParkingSelect: (spot: PublicParkingData) => void;
   userLocation?: [number, number] | null;
+  origin?: google.maps.LatLngLiteral | null;
+  destination?: google.maps.LatLngLiteral | null;
 }
 
 const containerStyle = {
@@ -21,13 +23,42 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   center,
   parkingSpots,
   onParkingSelect,
-  userLocation
+  userLocation,
+  origin,
+  destination
 }) => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [selectedSpot, setSelectedSpot] = useState<PublicParkingData | null>(null);
   const [currentZoom, setCurrentZoom] = useState<number>(14);
+  const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
 
   const mapOptions = useMapOptions();
+
+  // Calcular rota quando origem e destino são fornecidos
+  useEffect(() => {
+    if (!origin || !destination || !window.google) {
+      setDirections(null);
+      return;
+    }
+
+    const directionsService = new google.maps.DirectionsService();
+
+    directionsService.route(
+      {
+        origin: origin,
+        destination: destination,
+        travelMode: google.maps.TravelMode.DRIVING,
+      },
+      (result, status) => {
+        if (status === google.maps.DirectionsStatus.OK && result) {
+          setDirections(result);
+        } else {
+          console.error('Erro ao calcular rota:', status);
+          setDirections(null);
+        }
+      }
+    );
+  }, [origin, destination]);
 
   const onLoad = useCallback((map: google.maps.Map) => {
     setMap(map);
@@ -104,6 +135,21 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
         }
       }}
     >
+      {/* Renderizar rota se existir */}
+      {directions && (
+        <DirectionsRenderer
+          directions={directions}
+          options={{
+            suppressMarkers: false,
+            polylineOptions: {
+              strokeColor: '#10B981',
+              strokeWeight: 5,
+              strokeOpacity: 0.8,
+            },
+          }}
+        />
+      )}
+
       {/* Renderiza os marcadores de estacionamento no mapa com animação */}
       {parkingSpots.map((spot) => {
         if (!spot.latitude || !spot.longitude) return null;

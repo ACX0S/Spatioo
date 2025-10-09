@@ -342,6 +342,8 @@ const Explore = () => {
               parkingSpots={parkingSpots.filter(s => s.latitude && s.longitude)}
               onParkingSelect={handleParkingSelect}
               userLocation={userLocation}
+              origin={originCoords}
+              destination={destinationCoords}
             />
           </div>
         </div>
@@ -357,6 +359,8 @@ const Explore = () => {
                   parkingSpots={parkingSpots.filter(spot => spot.latitude && spot.longitude)}
                   onParkingSelect={handleParkingSelect}
                   userLocation={userLocation}
+                  origin={originCoords}
+                  destination={destinationCoords}
                 />
               </div>
             </ResizablePanel>
