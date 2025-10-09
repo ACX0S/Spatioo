@@ -390,7 +390,7 @@ const Explore = () => {
                 </div>
 
                 {/* Lista de estacionamentos */}
-                <div className="space-y-2 overflow-y-auto flex-1 pr-1">
+                <div className="space-y-2 overflow-y-auto flex-1 px-2">
                   <ParkingList
                     spots={nearbyParkingSpots}
                     visibleSpots={visibleParkingSpots}
