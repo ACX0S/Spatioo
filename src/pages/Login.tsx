@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { ForgotPasswordDialog } from '@/components/ForgotPasswordDialog';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isResending, setIsResending] = useState(false);
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
   const resolvedTheme = theme === 'system' 
   ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') 
   : theme;
@@ -188,8 +190,10 @@ const Login = () => {
                 <div className="flex justify-between items-center">
                   <label className="text-sm font-medium">Senha</label>
                   <Button
+                    type="button"
                     variant="link"
                     className="h-auto p-0 text-xs text-muted-foreground"
+                    onClick={() => setForgotPasswordOpen(true)}
                   >
                     Esqueceu a senha?
                   </Button>
@@ -481,6 +485,13 @@ const Login = () => {
           </TabsContent>
         </Tabs>
       </motion.div>
+
+      {/* Dialog de recuperação de senha */}
+      <ForgotPasswordDialog
+        open={forgotPasswordOpen}
+        onOpenChange={setForgotPasswordOpen}
+        defaultEmail={email}
+      />
     </div>
   );
 };
