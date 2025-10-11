@@ -27,6 +27,9 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isResending, setIsResending] = useState(false);
+  const resolvedTheme = theme === 'system' 
+  ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') 
+  : theme;
 
   // Redirecionar se o usuário já estiver logado
   useEffect(() => {
@@ -77,7 +80,7 @@ const Login = () => {
 
     setIsSubmitting(true);
     try {
-      await signUp(email, password, name, apelido, phone);
+      await signUp(email, password, name, apelido, phone.replace(/\D/g, ''));
     } finally {
       setIsSubmitting(false);
     }
@@ -138,22 +141,20 @@ const Login = () => {
       >
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-24 h-auto mb-4">
-            {(theme === "light" && (
+          <div className="w-40 h-auto mb-4">
+            {resolvedTheme === "light" ? (
               <img
-                src=".\Images\logos verdes\LOGO-COMPLETA-verde.svg"
+                src="/Images/logos verdes/LOGO-COMPLETA-verde.svg"
                 alt="Spatioo"
               />
-            )) ||
-              (theme === "dark" && (
-                <img
-                  src=".\Images\logos vclaras\LOGO-COMPLETA-vclaro.svg"
-                  alt="Spatioo"
-                />
-              ))}
+            ) : (
+              <img
+                src="/Images/logos vclaras/LOGO-COMPLETA-vclaro.svg"
+                alt="Spatioo"
+              />
+            )}
           </div>
-          <h1 className="text-2xl font-bold mb-1">Bem-vindo à Spatioo</h1>
-          <p className="text-muted-foreground text-center">
+          <p className="text-muted-foreground text-center inline whitespace-nowrap">
             Encontre e reserve vagas de estacionamento com facilidade
           </p>
         </div>
@@ -330,7 +331,21 @@ const Login = () => {
                     placeholder="(11) 98765-4321"
                     className="pl-10"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => {
+                      const digits = e.target.value
+                        .replace(/\D/g, "")
+                        .slice(0, 11); // Limita a 11 dígitos
+                      const len = digits.length;
+
+                      let formatted = "";
+
+                      if (len > 0) formatted += `(${digits.slice(0, 2)}`;
+                      if (len >= 3) formatted += `) ${digits.slice(2, 7)}`;
+                      if (len >= 8) formatted += `-${digits.slice(7)}`;
+                      else if (len > 7) formatted += digits.slice(7); // Se entre 7 e 8, evita hífen prematuro
+
+                      setPhone(formatted);
+                    }}
                     disabled={isSubmitting}
                     required
                   />
