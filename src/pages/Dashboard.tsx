@@ -26,16 +26,6 @@ const Dashboard = () => {
         <p className="text-muted-foreground">Suas reservas e notificações</p>
       </div>
 
-      {/* Banner de reserva ativa (redireciona para rota) */}
-      <div className="mb-4">
-        <ActiveBookingBanner />
-      </div>
-
-      {/* Status detalhado da reserva ativa */}
-      <div className="mb-6">
-        <UserBookingStatus />
-      </div>
-
       <Tabs defaultValue="active" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="active" className="flex items-center gap-2">
@@ -46,7 +36,10 @@ const Dashboard = () => {
             <History className="h-4 w-4" />
             Histórico ({historyBookings.length})
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex items-center gap-2">
+          <TabsTrigger
+            value="notifications"
+            className="flex items-center gap-2"
+          >
             <Bell className="h-4 w-4" />
             Notificações
           </TabsTrigger>
@@ -60,14 +53,23 @@ const Dashboard = () => {
             </div>
           ) : (
             activeBookings.map((booking) => (
-              <BookingCard 
-                key={booking.id} 
+              <BookingCard
+                key={booking.id}
                 booking={booking}
                 onCancelBooking={cancelBooking}
               />
             ))
           )}
         </TabsContent>
+        {/* Banner de reserva ativa (redireciona para rota) */}
+        <div className="mb-4">
+          <ActiveBookingBanner />
+        </div>
+
+        {/* Status detalhado da reserva ativa */}
+        <div className="mb-6">
+          <UserBookingStatus />
+        </div>
 
         <TabsContent value="history" className="space-y-4">
           {historyBookings.length === 0 ? (
@@ -77,8 +79,8 @@ const Dashboard = () => {
             </div>
           ) : (
             historyBookings.map((booking) => (
-              <BookingCard 
-                key={booking.id} 
+              <BookingCard
+                key={booking.id}
                 booking={booking}
                 onCancelBooking={cancelBooking}
               />

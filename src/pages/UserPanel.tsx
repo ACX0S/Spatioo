@@ -18,14 +18,6 @@ const UserPanel = () => {
   // Lista de opções do painel, com o menu "Estacionamento" condicionado ao status de proprietário
   const panelOptions = [
     {
-      title: "Minhas vagas",
-      description: "Gerenciar e cadastrar vagas",
-      icon: FaCar,
-      route: "/ofertar",
-      color: "dark:text-spatioo-green light: text-spatioo-primary",
-      bgColor: "bg-spatioo-green/10"
-    },
-    {
       title: "Reservas",
       description: "Visualizar suas reservas e seu histórico",
       icon: Calendar,
@@ -33,6 +25,15 @@ const UserPanel = () => {
       color: "dark:text-spatioo-green light: text-spatioo-primary",
       bgColor: "bg-spatioo-green/10"
     },
+    {
+      title: "Minhas vagas",
+      description: "Gerenciar e cadastrar vagas",
+      icon: FaCar,
+      route: "/ofertar",
+      color: "dark:text-spatioo-green light: text-spatioo-primary",
+      bgColor: "bg-spatioo-green/10"
+    },
+    
     // Menu "Estacionamento" só aparece para proprietários (dono_estacionamento = true)
     ...(profile?.dono_estacionamento ? [{
       title: "Estacionamento",
@@ -116,7 +117,7 @@ const UserPanel = () => {
               onClick={() => setConfirmDialogOpen(true)}
               className="hover:bg-spatioo-green/10 transition-colors rounded-full dark:hover:text-spatioo-green hover:text-spatioo-primary" 
             >
-              <CirclePlus className=" dark:text-spatioo-green text-spatioo-primary"/>
+              <Building className=" dark:text-spatioo-green text-spatioo-primary"/>
             </Button>
           </div>
         )}
