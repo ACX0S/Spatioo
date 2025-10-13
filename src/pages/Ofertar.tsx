@@ -33,7 +33,7 @@ const Ofertar = () => {
         </h1>
         <p className="text-muted-foreground">
           {estacionamentos.length > 0 
-            ? "Gerencie suas vagas residenciais" 
+            ? "Gerencie suas vagas residenciais e de estacionamento" 
             : "Cadastre sua primeira vaga residencial"
           }
         </p>

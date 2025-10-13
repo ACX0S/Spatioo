@@ -29,11 +29,6 @@ const Dashboard = () => {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground mb-2">Reservas</h1>
-        <p className="text-muted-foreground">Suas reservas e notificações</p>
-      </div>
-
       <Tabs defaultValue="active" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="active" className="flex items-center gap-2">

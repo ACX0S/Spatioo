@@ -30,7 +30,7 @@ const UserPanel = () => {
   // Opções do painel administrativo
   const adminOptions = [
     {
-      title: "Minhas vagas",
+      title: "Vagas Residenciais",
       description: "Gerenciar e cadastrar vagas",
       icon: FaCar,
       route: "/ofertar",
@@ -147,12 +147,12 @@ const UserPanel = () => {
 
           {/* Botão para criar estacionamento (visível apenas se o usuário não for dono de estacionamento) */}
           {!profile?.dono_estacionamento && (
-            <div className="flex justify-center pt-4">
+            <div className="flex justify-center">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setConfirmDialogOpen(true)}
-                className="hover:bg-spatioo-green/10 transition-colors rounded-full dark:hover:text-spatioo-green hover:text-spatioo-primary"
+                className="hover:bg-spatioo-green/10 transition-colors rounded-full dark:hover:text-spatioo-green hover:text-spatioo-primary scale-125"
               >
                 <Building className="dark:text-spatioo-green text-spatioo-primary" />
               </Button>
