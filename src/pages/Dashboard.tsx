@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BookingCard from "@/components/BookingCard";
 import { useBookings } from "@/hooks/useBookings";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import { BookingListSkeleton } from "@/components/skeletons/BookingCardSkeleton";
 import ErrorMessage from "@/components/ErrorMessage";
 import { Calendar, History, Bell } from "lucide-react";
 import NotificationsList from "@/components/NotificationsList";
@@ -12,7 +12,15 @@ const Dashboard = () => {
   const { bookings, loading, error, cancelBooking, activeBookings, historyBookings } = useBookings();
 
   if (loading) {
-    return <LoadingSpinner />;
+    return (
+      <div className="container mx-auto px-4 py-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-foreground mb-2">Reservas</h1>
+          <p className="text-muted-foreground">Suas reservas e notificações</p>
+        </div>
+        <BookingListSkeleton count={3} />
+      </div>
+    );
   }
 
   if (error) {

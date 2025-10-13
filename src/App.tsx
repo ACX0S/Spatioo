@@ -10,20 +10,25 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"; // Co
 
 // Importações de providers e páginas da aplicação.
 import { ThemeProvider } from "@/components/theme-provider"; // Provider para gerenciamento de temas (dark/light).
-import Home from "./pages/Home";
+import { Suspense, lazy } from "react";
 import Login from "./pages/Login";
-import Explore from "./pages/Explore";
-import ParkingDetails from "./pages/ParkingDetails";
-import Dashboard from "./pages/Dashboard";
-import UserPanel from "./pages/UserPanel";
-import ParkingOwnerDashboard from "./pages/ParkingOwnerDashboard";
-import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout";
 import { AuthProvider } from "./contexts/AuthContext"; // Provider para gerenciamento de autenticação.
-import Profile from "./pages/Profile";
-import EstacionamentoDashboard from "./pages/EstacionamentoDashboard";
-import Ofertar from "./pages/Ofertar";
 import RequireAuth from "./components/RequireAuth"; // Componente para proteger rotas que exigem autenticação.
+import LoadingSpinner from "./components/LoadingSpinner";
+import ErrorBoundary from "./components/ErrorBoundary";
+
+// Lazy load pages for better performance
+const Home = lazy(() => import("./pages/Home"));
+const Explore = lazy(() => import("./pages/Explore"));
+const ParkingDetails = lazy(() => import("./pages/ParkingDetails"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const UserPanel = lazy(() => import("./pages/UserPanel"));
+const ParkingOwnerDashboard = lazy(() => import("./pages/ParkingOwnerDashboard"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Profile = lazy(() => import("./pages/Profile"));
+const EstacionamentoDashboard = lazy(() => import("./pages/EstacionamentoDashboard"));
+const Ofertar = lazy(() => import("./pages/Ofertar"));
 
 // Cria uma instância do QueryClient para ser usada em toda a aplicação.
 const queryClient = new QueryClient();
@@ -34,47 +39,51 @@ const queryClient = new QueryClient();
  */
 const App = () => {
   return (
-    // Provider do React Query para gerenciamento de estado de servidor.
-    <QueryClientProvider client={queryClient}>
-      {/* Provider de tema, com tema padrão 'dark' e chave de armazenamento local. */}
-      <ThemeProvider defaultTheme="system" storageKey="spatioo-theme">
-        {/* Provider para habilitar tooltips. */}
-        <TooltipProvider>
-          {/* Componentes para exibir notificações. */}
-          <Toaster />
-          <Sonner />
-          {/* Provider de roteamento que gerencia o histórico de navegação. */}
-          <BrowserRouter>
-            {/* Provider de autenticação que disponibiliza o contexto de usuário. */}
-            <AuthProvider>
-              {/* Componente que define as rotas da aplicação. */}
-              <Routes>
-                {/* Redireciona a rota raiz ('/') para a página de login. */}
-                <Route path="/" element={<Navigate to="/login" replace />} />
-                {/* Rota para a página de login. */}
-                <Route path="/login" element={<Login />} />
-                
-                {/* Grupo de rotas protegidas que exigem autenticação e usam o Layout padrão. */}
-                <Route path="/" element={<RequireAuth><Layout /></RequireAuth>}>
-                  <Route path="home" element={<Home />} />
-                  <Route path="explore" element={<Explore />} />
-                  <Route path="parking/:id" element={<ParkingDetails />} />
-                  <Route path="dashboard" element={<UserPanel />} />
-                  <Route path="dashboard/reservas" element={<Dashboard />} />
-                  <Route path="admin" element={<ParkingOwnerDashboard />} />
-                  <Route path="profile" element={<Profile />} />
-                  <Route path="estacionamento-dashboard/:id" element={<EstacionamentoDashboard />} />
-                  <Route path="ofertar" element={<Ofertar />} />
-                  
-                  {/* Rota para páginas não encontradas (404). */}
-                  <Route path="*" element={<NotFound />} />
-                </Route>
-              </Routes>
-            </AuthProvider>
-          </BrowserRouter>
-        </TooltipProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      {/* Provider do React Query para gerenciamento de estado de servidor. */}
+      <QueryClientProvider client={queryClient}>
+        {/* Provider de tema, com tema padrão 'system' e chave de armazenamento local. */}
+        <ThemeProvider defaultTheme="system" storageKey="spatioo-theme">
+          {/* Provider para habilitar tooltips. */}
+          <TooltipProvider>
+            {/* Componentes para exibir notificações. */}
+            <Toaster />
+            <Sonner />
+            {/* Provider de roteamento que gerencia o histórico de navegação. */}
+            <BrowserRouter>
+              {/* Provider de autenticação que disponibiliza o contexto de usuário. */}
+              <AuthProvider>
+                {/* Componente que define as rotas da aplicação. */}
+                <Suspense fallback={<LoadingSpinner />}>
+                  <Routes>
+                    {/* Redireciona a rota raiz ('/') para a página de login. */}
+                    <Route path="/" element={<Navigate to="/login" replace />} />
+                    {/* Rota para a página de login. */}
+                    <Route path="/login" element={<Login />} />
+                    
+                    {/* Grupo de rotas protegidas que exigem autenticação e usam o Layout padrão. */}
+                    <Route path="/" element={<RequireAuth><Layout /></RequireAuth>}>
+                      <Route path="home" element={<Home />} />
+                      <Route path="explore" element={<Explore />} />
+                      <Route path="parking/:id" element={<ParkingDetails />} />
+                      <Route path="dashboard" element={<UserPanel />} />
+                      <Route path="dashboard/reservas" element={<Dashboard />} />
+                      <Route path="admin" element={<ParkingOwnerDashboard />} />
+                      <Route path="profile" element={<Profile />} />
+                      <Route path="estacionamento-dashboard/:id" element={<EstacionamentoDashboard />} />
+                      <Route path="ofertar" element={<Ofertar />} />
+                      
+                      {/* Rota para páginas não encontradas (404). */}
+                      <Route path="*" element={<NotFound />} />
+                    </Route>
+                  </Routes>
+                </Suspense>
+              </AuthProvider>
+            </BrowserRouter>
+          </TooltipProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 

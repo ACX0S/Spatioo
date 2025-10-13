@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { useParkingDetail } from '@/hooks/useParkingDetail';
+import { ParkingDetailsSkeleton } from '@/components/skeletons/DetailsSkeleton';
 import { MapPin, Clock, ArrowLeft } from 'lucide-react';
 import { FaCar } from 'react-icons/fa';
 import BookingForm from '@/components/BookingForm';
@@ -16,11 +17,7 @@ const ParkingDetails = () => {
   const { parkingSpot, loading, error } = useParkingDetail(id || '');
 
   if (loading) {
-    return (
-      <div className="container p-4 flex items-center justify-center h-[80vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-spatioo-green"></div>
-      </div>
-    );
+    return <ParkingDetailsSkeleton />;
   }
 
   if (error || !parkingSpot) {

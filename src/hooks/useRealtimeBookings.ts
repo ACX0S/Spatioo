@@ -1,23 +1,72 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
+// Debounce helper to prevent toast spam
+const debounce = <T extends (...args: any[]) => void>(
+  func: T,
+  wait: number
+): ((...args: Parameters<T>) => void) => {
+  let timeout: NodeJS.Timeout | null = null;
+  return (...args: Parameters<T>) => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+};
+
 /**
- * Hook para escutar mudanças em bookings em tempo real
- * Mostra toasts e redireciona quando necessário
+ * Hook otimizado para escutar mudanças em bookings em tempo real
+ * Implementa debouncing, rate limiting e event deduplication
  */
 export const useRealtimeBookings = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const processedEvents = useRef<Set<string>>(new Set());
+  const lastNotificationTime = useRef<{ [key: string]: number }>({});
+
+  // Debounced toast functions to prevent spam
+  const showSuccessToast = useCallback(
+    debounce((title: string, description: string) => {
+      toast.success(title, { description, duration: 5000 });
+    }, 500),
+    []
+  );
+
+  const showErrorToast = useCallback(
+    debounce((title: string, description: string) => {
+      toast.error(title, { description, duration: 5000 });
+    }, 500),
+    []
+  );
+
+  const showInfoToast = useCallback(
+    debounce((title: string, description: string) => {
+      toast.info(title, { description, duration: 5000 });
+    }, 500),
+    []
+  );
+
+  // Check if we should show notification (rate limiting)
+  const shouldShowNotification = useCallback((key: string, cooldownMs = 2000) => {
+    const now = Date.now();
+    const lastTime = lastNotificationTime.current[key];
+    
+    if (lastTime && now - lastTime < cooldownMs) {
+      return false;
+    }
+    
+    lastNotificationTime.current[key] = now;
+    return true;
+  }, []);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user?.id) return;
 
-    // Canal para escutar mudanças em bookings do usuário
-    const userBookingsChannel = supabase
-      .channel('user-bookings-realtime')
+    // Subscription for user bookings
+    const userChannel = supabase
+      .channel(`user-bookings-${user.id}`)
       .on(
         'postgres_changes',
         {
@@ -26,75 +75,73 @@ export const useRealtimeBookings = () => {
           table: 'bookings',
           filter: `user_id=eq.${user.id}`
         },
-        (payload: any) => {
-          const newBooking: any = payload.new;
-          const oldBooking: any = payload.old;
+        (payload) => {
+          const eventKey = `${payload.eventType}_${payload.new.id}_${payload.new.status}`;
+          if (processedEvents.current.has(eventKey)) return;
+          processedEvents.current.add(eventKey);
 
-          // Detectar mudanças de status e mostrar toasts apropriados
-          if (newBooking.status !== oldBooking.status) {
-            switch (newBooking.status) {
-              case 'reservada':
-                toast.success('Reserva aceita!', {
-                  description: 'Sua reserva foi aceita pelo estabelecimento.',
-                  duration: 5000,
-                });
-                // Redirecionar para explore com a rota
-                setTimeout(() => {
-                  navigate(`/explore?bookingId=${newBooking.id}`);
-                }, 1000);
-                break;
+          const newRecord = payload.new;
+          const oldRecord = payload.old;
 
-              case 'rejeitada':
-                toast.error('Reserva rejeitada', {
-                  description: 'Sua reserva foi rejeitada pelo estabelecimento.',
-                  duration: 5000,
-                });
-                break;
-
-              case 'ocupada':
-                toast.info('Chegada confirmada', {
-                  description: 'O estabelecimento confirmou sua chegada.',
-                  duration: 5000,
-                });
-                break;
-
-              case 'completada':
-                toast.success('Reserva concluída', {
-                  description: 'Sua reserva foi concluída. Obrigado por usar nosso serviço!',
-                  duration: 5000,
-                });
-                break;
-
-              case 'expirada':
-                toast.warning('Reserva expirada', {
-                  description: 'Sua reserva expirou por falta de confirmação.',
-                  duration: 5000,
-                });
-                break;
+          if (newRecord.status === 'reservada' && oldRecord?.status === 'aguardando_confirmacao') {
+            const notifKey = `accepted_${newRecord.id}`;
+            if (shouldShowNotification(notifKey)) {
+              showSuccessToast('Reserva aceita!', 'Sua reserva foi aceita. Você será redirecionado para a rota.');
+              
+              setTimeout(() => {
+                navigate(`/explore?bookingId=${newRecord.id}`);
+              }, 1500);
             }
           }
 
-          // Detectar confirmações de chegada/saída
-          if (newBooking.arrival_confirmed_by_owner_at && !oldBooking.arrival_confirmed_by_owner_at) {
-            toast.info('Chegada confirmada pelo estabelecimento', {
-              description: 'O estabelecimento confirmou sua chegada. Confirme quando estiver na vaga.',
-              duration: 6000,
-            });
+          if (newRecord.status === 'rejeitada') {
+            const notifKey = `rejected_${newRecord.id}`;
+            if (shouldShowNotification(notifKey)) {
+              showErrorToast('Reserva rejeitada', 'Sua reserva foi rejeitada pelo estabelecimento.');
+            }
           }
 
-          if (newBooking.departure_confirmed_by_owner_at && !oldBooking.departure_confirmed_by_owner_at) {
-            toast.info('Saída confirmada pelo estabelecimento', {
-              description: 'O estabelecimento confirmou sua saída. Confirme quando sair da vaga.',
-              duration: 6000,
-            });
+          if (newRecord.status === 'ocupada' && oldRecord?.status === 'reservada') {
+            const notifKey = `occupied_${newRecord.id}`;
+            if (shouldShowNotification(notifKey)) {
+              showInfoToast('Vaga ocupada', 'O estabelecimento confirmou sua entrada na vaga.');
+            }
+          }
+
+          if (newRecord.status === 'concluida' && oldRecord?.status === 'ocupada') {
+            const notifKey = `completed_${newRecord.id}`;
+            if (shouldShowNotification(notifKey)) {
+              showSuccessToast('Reserva concluída!', 'Sua reserva foi finalizada com sucesso.');
+            }
+          }
+
+          if (newRecord.status === 'expirada') {
+            const notifKey = `expired_${newRecord.id}`;
+            if (shouldShowNotification(notifKey)) {
+              showErrorToast('Reserva expirada', 'Sua solicitação expirou pois não foi confirmada a tempo.');
+            }
+          }
+
+          if (newRecord.arrival_confirmed_by_owner_at && !oldRecord?.arrival_confirmed_by_owner_at) {
+            const notifKey = `arrival_owner_${newRecord.id}`;
+            if (shouldShowNotification(notifKey)) {
+              showInfoToast('Entrada confirmada', 'O estabelecimento confirmou sua chegada.');
+            }
+          }
+
+          if (newRecord.departure_confirmed_by_owner_at && !oldRecord?.departure_confirmed_by_owner_at) {
+            const notifKey = `departure_owner_${newRecord.id}`;
+            if (shouldShowNotification(notifKey)) {
+              showInfoToast('Saída confirmada', 'O estabelecimento confirmou sua saída.');
+            }
           }
         }
       )
       .subscribe();
 
-    // Canal para escutar mudanças em bookings de estacionamentos do usuário (dono)
-    const ownerBookingsChannel = supabase
-      .channel('owner-bookings-realtime')
+    // Subscription for parking owner bookings
+    const estacionamentoChannel = supabase
+      .channel(`estacionamento-bookings-${user.id}`)
       .on(
         'postgres_changes',
         {
@@ -103,54 +150,61 @@ export const useRealtimeBookings = () => {
           table: 'bookings'
         },
         async (payload: any) => {
-          // Verificar se o booking é de um estacionamento do usuário
-          const bookingEstacionamentoId = payload.new?.estacionamento_id || payload.old?.estacionamento_id;
-          
-          if (!bookingEstacionamentoId) return;
+          const eventKey = `${payload.eventType}_${payload.new?.id || payload.old?.id}`;
+          if (processedEvents.current.has(eventKey)) return;
+
+          const bookingData: any = payload.new || payload.old;
+          if (!bookingData?.estacionamento_id) return;
 
           const { data: estacionamento } = await supabase
             .from('estacionamento')
             .select('user_id')
-            .eq('id', bookingEstacionamentoId)
+            .eq('id', bookingData.estacionamento_id)
             .single();
 
-          if (estacionamento?.user_id !== user.id) return;
+          if (!estacionamento || estacionamento.user_id !== user.id) return;
 
-          // Mostrar toasts para ações do cliente
+          processedEvents.current.add(eventKey);
+
           if (payload.eventType === 'INSERT') {
-            toast.info('Nova solicitação de reserva', {
-              description: 'Você recebeu uma nova solicitação de reserva.',
-              duration: 5000,
-            });
+            if (payload.new && payload.new.user_id !== user?.id) {
+              const notifKey = `new_booking_${payload.new.id}`;
+              if (shouldShowNotification(notifKey, 3000)) {
+                showInfoToast('Nova reserva recebida!', `Nova solicitação para ${payload.new.date}`);
+              }
+            }
           }
 
           if (payload.eventType === 'UPDATE') {
-            const newBooking: any = payload.new;
-            const oldBooking: any = payload.old;
+            const newRecord = payload.new;
+            const oldRecord = payload.old;
 
-            // Cliente confirmou chegada
-            if (newBooking.arrival_confirmed_by_user_at && !oldBooking.arrival_confirmed_by_user_at) {
-              toast.info('Cliente confirmou chegada', {
-                description: 'O cliente confirmou que chegou na vaga.',
-                duration: 5000,
-              });
+            if (!newRecord || !oldRecord) return;
+
+            if (newRecord.arrival_confirmed_by_user_at && !oldRecord?.arrival_confirmed_by_user_at) {
+              const notifKey = `client_arrival_${newRecord.id}`;
+              if (shouldShowNotification(notifKey)) {
+                showInfoToast('Cliente chegou', 'O cliente confirmou sua chegada.');
+              }
             }
 
-            // Cliente confirmou saída
-            if (newBooking.departure_confirmed_by_user_at && !oldBooking.departure_confirmed_by_user_at) {
-              toast.info('Cliente confirmou saída', {
-                description: 'O cliente confirmou que saiu da vaga.',
-                duration: 5000,
-              });
+            if (newRecord.departure_confirmed_by_user_at && !oldRecord?.departure_confirmed_by_user_at) {
+              const notifKey = `client_departure_${newRecord.id}`;
+              if (shouldShowNotification(notifKey)) {
+                showInfoToast('Cliente saiu', 'O cliente confirmou sua saída.');
+              }
             }
           }
         }
       )
       .subscribe();
 
+    // Cleanup: remove channels when component unmounts
     return () => {
-      supabase.removeChannel(userBookingsChannel);
-      supabase.removeChannel(ownerBookingsChannel);
+      supabase.removeChannel(userChannel);
+      supabase.removeChannel(estacionamentoChannel);
+      processedEvents.current.clear();
+      lastNotificationTime.current = {};
     };
-  }, [user, navigate]);
+  }, [user?.id, navigate, showSuccessToast, showErrorToast, showInfoToast, shouldShowNotification]);
 };
