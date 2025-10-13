@@ -42,6 +42,8 @@ const Layout = () => {
         return "Gerenciar Estacionamento";
       case "/ofertar":
         return "Ofertar";
+      case "/dashboard/reservas":
+        return "Minhas Reservas";
       default:
         return "Spatioo";
     }
@@ -106,7 +108,7 @@ const Layout = () => {
           {/* Mantém largura fixa no lado esquerdo para evitar deslocamento */}
           <div className="flex items-center gap-3 min-w-0 flex-1">
             {/* Container com largura mínima para o botão voltar */}
-            {(location.pathname == "/explore" || location.pathname.startsWith("/estacionamento-dashboard/")) && (
+            {(location.pathname == "/explore" || location.pathname.startsWith("/estacionamento-dashboard/")) || location.pathname == "/dashboard/reservas" && (
               <div className="w-0 p-0 transiton-all duration-500">
                 <Button
                   variant="ghost"
