@@ -241,7 +241,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
         duration: 5000 
       });
       
-      navigate('/dashboard'); // Redireciona para o dashboard após a solicitação.
+      navigate('/dashboard/reservas'); // Redireciona para o dashboard após a solicitação.
     } catch (error: any) {
       console.error('Erro ao criar solicitação:', error);
       toast({ title: "Erro", description: error.message || "Não foi possível completar sua solicitação.", variant: "destructive" });
