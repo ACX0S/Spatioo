@@ -89,7 +89,7 @@ export const useRealtimeBookings = () => {
               showSuccessToast('Reserva aceita!', 'Sua reserva foi aceita. Você será redirecionado para a rota.');
               
               setTimeout(() => {
-                navigate(`/explore?bookingId=${newRecord.id}`);
+                navigate('/dashboard/reservas');
               }, 1500);
             }
           }
