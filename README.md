@@ -45,3 +45,8 @@ This project is built with .
 - React
 - shadcn-ui
 - Tailwind CSS
+
+## Links Portfólio e Documentação
+
+Portifólio: https://www.canva.com/design/DAGx1YlR4zE/_TP7lbzjE93TKXMf239o3Q/edit?utm_content=DAGx1YlR4zE&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+Documentação : https://edufecap-my.sharepoint.com/:w:/g/personal/debora_machado_fecap_br/EeoI2efCLftAphFLk-WIibYBV89n1jhpsf8beYWE8UGKIg?e=Rhytj6
