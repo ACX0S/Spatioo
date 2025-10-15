@@ -684,14 +684,6 @@ const EstacionamentoDashboard = () => {
         {/* Header Mobile */}
         <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
           <div className="flex items-center gap-3 p-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate('/admin')}
-              className="h-9 w-9"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
             <div className="flex-1 min-w-0">
               <h1 className="text-base font-bold truncate">{estacionamento.nome}</h1>
               <p className="text-xs text-muted-foreground truncate">{estacionamento.endereco}</p>
@@ -743,15 +735,7 @@ const EstacionamentoDashboard = () => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
         <Sidebar collapsible="icon" className="border-r">
-          <div className="p-4 border-b flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate('/admin')}
-              className="h-8 w-8"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
+          <div className="p-2 border-b flex items-center gap-2">
             <SidebarTrigger />
           </div>
           <SidebarContent>

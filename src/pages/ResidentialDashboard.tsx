@@ -152,15 +152,6 @@ const ResidentialDashboard = () => {
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 items-center px-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/painel')}
-            className="mr-2"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar
-          </Button>
           <div className="flex-1">
             <h1 className="text-lg font-semibold">{vaga.nome}</h1>
             <p className="text-xs text-muted-foreground">{vaga.endereco}</p>
