@@ -18,6 +18,9 @@ const Layout = () => {
   const navigate = useNavigate();
   const { profile } = useAuth();
   const { theme } = useTheme();
+  const resolvedTheme = theme === 'system' 
+  ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') 
+  : theme;
   const [isScrolled, setIsScrolled] = useState(false);
   const [pageTitle, setPageTitle] = useState("Spatioo");
 
@@ -90,9 +93,9 @@ const Layout = () => {
   const getNavTextColor = (isActive: boolean) => {
     if (isActive) return "text-black dark:text-white";
 
-    if (theme === "light") {
+    if (resolvedTheme === "light") {
       return "text-black/60";
-    } else if (theme === "dark") {
+    } else if (resolvedTheme === "dark") {
       return "text-white/50";
     } else {
       // Tema system - usa media query para detectar
@@ -108,7 +111,8 @@ const Layout = () => {
           {/* Mantém largura fixa no lado esquerdo para evitar deslocamento */}
           <div className="flex items-center gap-3 min-w-0 flex-1">
             {/* Container com largura mínima para o botão voltar */}
-            {(location.pathname == "/explore" || location.pathname.startsWith("/estacionamento-dashboard/") || location.pathname == "/dashboard/reservas") && (
+            {/*(location.pathname == "/explore" || location.pathname.startsWith("/estacionamento-dashboard/") || location.pathname == "/dashboard/reservas")*/}
+            {(location.pathname !== "/home") && (
               <div className="w-0 p-0 transiton-all duration-500">
                 <Button
                   variant="ghost"
@@ -123,12 +127,12 @@ const Layout = () => {
             {(location.pathname !== "/home" && (
               <h1 className="text-lg font-semibold truncate ">{pageTitle}</h1>)) 
             ||
-            (theme === "light" && (<img src=".\Images\logos verdes\LOGO-COMPLETA-verde.svg"
+            (resolvedTheme === "light" && (<img src=".\Images\logos verdes\LOGO-COMPLETA-verde.svg"
                 alt="Spatioo"
                 className="h-6 md:h-10"
               />)) 
             ||
-            (theme === "dark" && (<img src=".\Images\logos vclaras\LOGO-COMPLETA-vclaro.svg"
+            (resolvedTheme === "dark" && (<img src=".\Images\logos vclaras\LOGO-COMPLETA-vclaro.svg"
                 alt="Spatioo"
                 className="h-6 md:h-10"
               />))
