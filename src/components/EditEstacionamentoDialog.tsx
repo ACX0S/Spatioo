@@ -20,13 +20,14 @@ import { useCep } from "@/hooks/useCep";
 import { useGeocoding } from "@/hooks/useGeocoding";
 
 interface EditEstacionamentoDialogProps {
-  estacionamento: any; // Use any to handle the Database type compatibility
+  estacionamento: any;
   onSuccess?: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-const EditEstacionamentoDialog = ({ estacionamento, onSuccess }: EditEstacionamentoDialogProps) => {
+const EditEstacionamentoDialog = ({ estacionamento, onSuccess, open, onOpenChange }: EditEstacionamentoDialogProps) => {
   const { toast } = useToast();
-  const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { fetchCep, formatCep } = useCep();
   const { geocodeCep } = useGeocoding();
@@ -137,7 +138,7 @@ const EditEstacionamentoDialog = ({ estacionamento, onSuccess }: EditEstacioname
 
       if (error) throw error;
 
-      setIsOpen(false);
+      onOpenChange(false);
       toast({
         title: "Sucesso",
         description: "Estacionamento atualizado com sucesso!",
@@ -157,13 +158,7 @@ const EditEstacionamentoDialog = ({ estacionamento, onSuccess }: EditEstacioname
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Edit2 className="h-4 w-4 mr-2" />
-          Editar
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Editar Estacionamento</DialogTitle>
@@ -348,7 +343,7 @@ const EditEstacionamentoDialog = ({ estacionamento, onSuccess }: EditEstacioname
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => setIsOpen(false)} disabled={loading}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
             Cancelar
           </Button>
           <Button onClick={handleUpdateEstacionamento} disabled={loading}>

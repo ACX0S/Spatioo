@@ -1,11 +1,13 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { MapPin, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Database } from '@/integrations/supabase/types';
 import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Edit2, Trash2, MapPin, Clock, DollarSign } from "lucide-react";
+import { FaCar } from "react-icons/fa";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { Database } from "@/integrations/supabase/types";
 import EditEstacionamentoDialog from "./EditEstacionamentoDialog";
 
 type EstacionamentoData = Database['public']['Tables']['estacionamento']['Row'];
@@ -17,8 +19,10 @@ interface UserParkingCardProps {
 }
 
 export const UserParkingCard = ({ estacionamento, onEdit, onUpdate }: UserParkingCardProps) => {
-  const [isActive, setIsActive] = useState(estacionamento.ativo || false);
+  const { toast } = useToast();
+  const [isActive, setIsActive] = useState(estacionamento.ativo);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -143,10 +147,13 @@ export const UserParkingCard = ({ estacionamento, onEdit, onUpdate }: UserParkin
           
           <div className="flex flex-col items-end gap-2 ml-4">
             <div className="flex gap-2">
-              <EditEstacionamentoDialog 
-                estacionamento={estacionamento}
-                onSuccess={onUpdate}
-              />
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowEditDialog(true)}
+              >
+                <Edit2 className="h-4 w-4" />
+              </Button>
               
               <Button 
                 variant="outline" 
@@ -168,6 +175,18 @@ export const UserParkingCard = ({ estacionamento, onEdit, onUpdate }: UserParkin
           </div>
         </div>
       </CardContent>
+      
+      {showEditDialog && (
+        <EditEstacionamentoDialog
+          estacionamento={estacionamento}
+          onSuccess={() => {
+            setShowEditDialog(false);
+            onUpdate?.();
+          }}
+          open={showEditDialog}
+          onOpenChange={setShowEditDialog}
+        />
+      )}
     </Card>
   );
 };

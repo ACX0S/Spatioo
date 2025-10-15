@@ -1,19 +1,49 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, Building, CirclePlus} from 'lucide-react';
+import { Calendar, Building } from 'lucide-react';
 import { FaCar } from 'react-icons/fa';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import CreateEstacionamentoConfirmDialog from '@/components/CreateEstacionamentoConfirmDialog';
 import CreateEstacionamentoComercialDialog from '@/components/CreateEstacionamentoComercialDialog';
+import EstacionamentoSelectionModal from '@/components/EstacionamentoSelectionModal';
+import { supabase } from '@/integrations/supabase/client';
 
 const UserPanel = () => {
   const navigate = useNavigate();
   const { profile } = useAuth();
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [comercialDialogOpen, setComercialDialogOpen] = useState(false);
+  const [residentialModalOpen, setResidentialModalOpen] = useState(false);
+  const [estacionamentoModalOpen, setEstacionamentoModalOpen] = useState(false);
+  const [residenciais, setResidenciais] = useState<any[]>([]);
+  const [estacionamentos, setEstacionamentos] = useState<any[]>([]);
+
+  // Carregar vagas residenciais e estacionamentos
+  useEffect(() => {
+    if (profile?.id) {
+      loadEstacionamentos();
+    }
+  }, [profile?.id]);
+
+  const loadEstacionamentos = async () => {
+    if (!profile?.id) return;
+
+    const { data, error } = await supabase
+      .from('estacionamento')
+      .select('id, nome, endereco, tipo')
+      .eq('user_id', profile.id)
+      .order('created_at', { ascending: false });
+
+    if (data) {
+      const residenciaisData = data.filter(e => e.tipo === 'residencial');
+      const estacionamentosData = data.filter(e => e.tipo === 'comercial');
+      setResidenciais(residenciaisData);
+      setEstacionamentos(estacionamentosData);
+    }
+  };
 
   // Opções do painel pessoal
   const personalOptions = [
@@ -33,7 +63,7 @@ const UserPanel = () => {
       title: "Vagas Residenciais",
       description: "Gerenciar e cadastrar vagas",
       icon: FaCar,
-      route: "/ofertar",
+      action: handleResidentialClick,
       color: "dark:text-spatioo-green light: text-spatioo-primary",
       bgColor: "bg-spatioo-green/10"
     },
@@ -42,14 +72,39 @@ const UserPanel = () => {
       title: "Estacionamento",
       description: "Gerenciar sua empresa, vagas e ver seus dashboards",
       icon: Building,
-      route: "/admin",
+      action: handleEstacionamentoClick,
       color: "dark:text-spatioo-green light: text-spatioo-primary",
       bgColor: "bg-spatioo-green/10"
     }] : [])
   ];
 
-  const handleOptionClick = (route: string) => {
-    navigate(route);
+  function handleResidentialClick() {
+    if (residenciais.length === 0) {
+      navigate('/ofertar');
+    } else if (residenciais.length === 1) {
+      navigate(`/residential-dashboard/${residenciais[0].id}`);
+    } else {
+      setResidentialModalOpen(true);
+    }
+  }
+
+  function handleEstacionamentoClick() {
+    if (estacionamentos.length === 0) {
+      // Não faz nada, usuário precisa criar primeiro
+      return;
+    } else if (estacionamentos.length === 1) {
+      navigate(`/estacionamento-dashboard/${estacionamentos[0].id}`);
+    } else {
+      setEstacionamentoModalOpen(true);
+    }
+  }
+
+  const handleSelectResidential = (id: string) => {
+    navigate(`/residential-dashboard/${id}`);
+  };
+
+  const handleSelectEstacionamento = (id: string) => {
+    navigate(`/estacionamento-dashboard/${id}`);
   };
 
   /**
@@ -81,7 +136,7 @@ const UserPanel = () => {
             <Card
               key={index}
               className="cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-[1.02] border-border"
-              onClick={() => handleOptionClick(option.route)}
+              onClick={() => navigate(option.route)}
             >
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
@@ -119,7 +174,7 @@ const UserPanel = () => {
             <Card
               key={index}
               className="cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-[1.02] border-border"
-              onClick={() => handleOptionClick(option.route)}
+              onClick={option.action}
             >
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
@@ -172,6 +227,26 @@ const UserPanel = () => {
         open={comercialDialogOpen}
         onOpenChange={setComercialDialogOpen}
         onSuccess={handleSuccessCreateEstacionamento}
+      />
+
+      {/* Modal de seleção de vagas residenciais */}
+      <EstacionamentoSelectionModal
+        open={residentialModalOpen}
+        onOpenChange={setResidentialModalOpen}
+        estacionamentos={residenciais}
+        onSelect={handleSelectResidential}
+        title="Selecione uma Vaga Residencial"
+        description="Escolha qual vaga residencial você deseja gerenciar"
+      />
+
+      {/* Modal de seleção de estacionamentos */}
+      <EstacionamentoSelectionModal
+        open={estacionamentoModalOpen}
+        onOpenChange={setEstacionamentoModalOpen}
+        estacionamentos={estacionamentos}
+        onSelect={handleSelectEstacionamento}
+        title="Selecione um Estacionamento"
+        description="Escolha qual estacionamento você deseja gerenciar"
       />
     </div>
   );
