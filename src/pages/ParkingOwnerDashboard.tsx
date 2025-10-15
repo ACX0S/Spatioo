@@ -214,6 +214,8 @@ const ParkingOwnerDashboard = () => {
                 refetch();
                 setEditingEstacionamento(null);
               }}
+              open={!!editingEstacionamento}
+              onOpenChange={(open) => !open && setEditingEstacionamento(null)}
             />
           )}
 
