@@ -349,10 +349,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
                   <span className="text-muted-foreground">Horário:</span>
                   <span className="font-medium">{selectedStartTime}</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Duração:</span>
-                  <span className="font-medium">{selectedDuration} {selectedDuration === 1 ? 'hora' : 'horas'}</span>
-                </div>
                 <div className="flex justify-between items-center pt-2 border-t border-spatioo-green/20">
                   <span className="text-muted-foreground">Valor Total:</span>
                   <span className="text-xl font-bold text-spatioo-green">
