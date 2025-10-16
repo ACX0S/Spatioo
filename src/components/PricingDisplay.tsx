@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Clock, DollarSign } from 'lucide-react';
 
 interface PricingData {
@@ -71,25 +72,39 @@ const PricingDisplay: React.FC<PricingDisplayProps> = ({ parkingSpotId }) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-3">
-          {pricing.map((item) => (
-            <div 
-              key={item.id} 
-              className="flex justify-between items-center p-3 bg-muted/30 rounded-lg"
-            >
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-spatioo-green" />
-                <span className="font-medium">
-                  {item.horas} hora{item.horas > 1 ? 's' : ''}
-                </span>
-              </div>
-              <div className="text-right">
-                <span className="text-lg font-bold text-spatioo-green">
-                  R$ {Number(item.preco).toFixed(2)}
-                </span>
-              </div>
-            </div>
-          ))}
+        <div className="rounded-lg border bg-card overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-spatioo-green/10 hover:bg-spatioo-green/10">
+                <TableHead className="font-semibold text-foreground">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-spatioo-green" />
+                    Duração
+                  </div>
+                </TableHead>
+                <TableHead className="font-semibold text-foreground text-right">
+                  <div className="flex items-center justify-end gap-2">
+                    <DollarSign className="h-4 w-4 text-spatioo-green" />
+                    Valor
+                  </div>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {pricing.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell className="font-medium">
+                    {item.horas} hora{item.horas > 1 ? 's' : ''}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <span className="text-lg font-bold text-spatioo-green">
+                      R$ {Number(item.preco).toFixed(2)}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
         
         {pricing.length > 1 && (

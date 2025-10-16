@@ -166,6 +166,23 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
         );
       })}
 
+      {/* Renderiza marcador do destino se houver */}
+      {destination && (
+        <Marker
+          position={destination}
+          icon={{
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 8,
+            fillColor: '#EF4444',
+            fillOpacity: 1,
+            strokeColor: '#ffffff',
+            strokeWeight: 2,
+          }}
+          title="Destino"
+          animation={google.maps.Animation.DROP}
+        />
+      )}
+
       {/* Renderiza marcador da localização do usuário com animação */}
       {userLocation && (
         <>
