@@ -52,15 +52,18 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, onCancelBooking }) =
   /**
    * @function getStatusColor
    * @description Retorna a cor de fundo com base no status da reserva.
-   * @param status - O status da reserva ('active', 'upcoming', 'completed', 'cancelled').
+   * @param status - O status da reserva do banco de dados.
    * @returns Uma string de classe CSS para a cor de fundo.
    */
   const getStatusColor = (status: string) => {
     switch(status) {
-      case 'active': return 'bg-spatioo-primary';
-      case 'upcoming': return 'bg-spatioo-primary dark:bg-spatioo-green/90';
-      case 'completed': return 'bg-gray-500';
-      case 'cancelled': return 'bg-red-500';
+      case 'aguardando_confirmacao': return 'bg-yellow-500';
+      case 'reservada': return 'bg-spatioo-primary dark:bg-spatioo-green/90';
+      case 'ocupada': return 'bg-blue-500';
+      case 'concluida': return 'bg-gray-500';
+      case 'cancelada': return 'bg-red-500';
+      case 'rejeitada': return 'bg-red-600';
+      case 'expirada': return 'bg-gray-600';
       default: return 'bg-gray-500';
     }
   };
@@ -68,15 +71,18 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, onCancelBooking }) =
   /**
    * @function getStatusText
    * @description Retorna o texto traduzido para o status da reserva.
-   * @param status - O status da reserva.
+   * @param status - O status da reserva do banco de dados.
    * @returns O texto do status em português.
    */
   const getStatusText = (status: string) => {
     switch(status) {
-      case 'active': return 'Ativa';
-      case 'upcoming': return 'Agendada';
-      case 'completed': return 'Concluída';
-      case 'cancelled': return 'Cancelada';
+      case 'aguardando_confirmacao': return 'Aguardando';
+      case 'reservada': return 'Reservada';
+      case 'ocupada': return 'Ocupada';
+      case 'concluida': return 'Concluída';
+      case 'cancelada': return 'Cancelada';
+      case 'rejeitada': return 'Rejeitada';
+      case 'expirada': return 'Expirada';
       default: return 'Desconhecido';
     }
   };
