@@ -105,7 +105,7 @@ const ParkingDetails = () => {
         <div className="mt-3 p-3 bg-gradient-to-r from-spatioo-green/10 to-spatioo-green/5 rounded-lg border border-spatioo-green/20">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold text-spatioo-green uppercase tracking-wide">
-              {parkingSpot.tipo === 'residencial' ? '🏠 Vaga Residencial' : '🏢 Estacionamento Comercial'}
+              {parkingSpot.tipo === 'residencial' ? '🏠 Vaga Residencial' : '🏢 Estacionamento'}
             </span>
           </div>
           {parkingSpot.tipo === 'residencial' && parkingSpot.proprietario_nome && (
