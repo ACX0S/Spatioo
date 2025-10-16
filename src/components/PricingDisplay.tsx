@@ -76,7 +76,7 @@ const PricingDisplay: React.FC<PricingDisplayProps> = ({ parkingSpotId }) => {
           <Table>
             <TableHeader>
               <TableRow className="bg-spatioo-green/10 hover:bg-spatioo-green/10">
-                <TableHead className="font-semibold text-foreground">
+                <TableHead className="font-semibold text-foreground border-r border-border">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4 text-spatioo-green" />
                     Duração
@@ -93,7 +93,7 @@ const PricingDisplay: React.FC<PricingDisplayProps> = ({ parkingSpotId }) => {
             <TableBody>
               {pricing.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell className="font-medium">
+                  <TableCell className="font-medium border-r border-border">
                     {item.horas} hora{item.horas > 1 ? 's' : ''}
                   </TableCell>
                   <TableCell className="text-right">

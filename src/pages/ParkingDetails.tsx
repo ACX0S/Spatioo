@@ -100,6 +100,20 @@ const ParkingDetails = () => {
             </span>
           </div>
         </div>
+
+        {/* Tipo de Vaga */}
+        <div className="mt-3 p-3 bg-gradient-to-r from-spatioo-green/10 to-spatioo-green/5 rounded-lg border border-spatioo-green/20">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold text-spatioo-green uppercase tracking-wide">
+              {parkingSpot.tipo === 'residencial' ? '🏠 Vaga Residencial' : '🏢 Estacionamento Comercial'}
+            </span>
+          </div>
+          {parkingSpot.tipo === 'residencial' && parkingSpot.proprietario_nome && (
+            <div className="mt-2 text-sm text-muted-foreground">
+              Proprietário: <span className="font-medium text-foreground">{parkingSpot.proprietario_nome}</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Pricing Table */}

@@ -171,12 +171,24 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
         <Marker
           position={destination}
           icon={{
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 8,
-            fillColor: '#EF4444',
-            fillOpacity: 1,
-            strokeColor: '#ffffff',
-            strokeWeight: 2,
+            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+              <svg width="32" height="42" viewBox="0 0 32 42" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <filter id="shadow-dest">
+                    <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.5"/>
+                  </filter>
+                </defs>
+                <path d="M16 0C9.373 0 4 5.373 4 12c0 9 12 24 12 24s12-15 12-24c0-6.627-5.373-12-12-12z" 
+                      fill="#EF4444" 
+                      stroke="white" 
+                      stroke-width="2"
+                      filter="url(#shadow-dest)"
+                />
+                <circle cx="16" cy="12" r="5" fill="white" opacity="0.9"/>
+              </svg>
+            `),
+            scaledSize: new google.maps.Size(32, 42),
+            anchor: new google.maps.Point(16, 42),
           }}
           title="Destino"
           animation={google.maps.Animation.DROP}

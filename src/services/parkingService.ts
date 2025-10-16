@@ -16,6 +16,7 @@ export type PublicParkingData = {
   latitude: number | null;
   longitude: number | null;
   tipo?: string; // 'residencial' ou 'comercial'
+  proprietario_nome?: string; // Nome do proprietário (apenas para residenciais)
   // Comodidades do estacionamento
   funcionamento_24h?: boolean;
   suporte_carro_eletrico?: boolean;
@@ -114,7 +115,7 @@ export const fetchParkingSpotById = async (id: string): Promise<PublicParkingDat
     const { data, error } = await supabase
       .from('estacionamento')
       .select(`
-        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude, tipo,
+        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude, tipo, user_id,
         funcionamento_24h, suporte_carro_eletrico, vaga_coberta, manobrista, suporte_caminhao, vaga_moto,
         estacionamento_precos(preco, horas)
       `)
@@ -132,6 +133,20 @@ export const fetchParkingSpotById = async (id: string): Promise<PublicParkingDat
     // Find the 1-hour price
     const preco1h = data.estacionamento_precos?.find(p => p.horas === 1)?.preco || null;
     
+    // Fetch owner's name if it's a residential parking
+    let proprietarioNome: string | undefined;
+    if (data.tipo === 'residencial' && data.user_id) {
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('name, apelido')
+        .eq('id', data.user_id)
+        .maybeSingle();
+      
+      if (profileData) {
+        proprietarioNome = profileData.apelido || profileData.name || undefined;
+      }
+    }
+    
     return {
       id: data.id,
       nome: data.nome,
@@ -145,6 +160,7 @@ export const fetchParkingSpotById = async (id: string): Promise<PublicParkingDat
       latitude: data.latitude,
       longitude: data.longitude,
       tipo: data.tipo,
+      proprietario_nome: proprietarioNome,
       funcionamento_24h: data.funcionamento_24h,
       suporte_carro_eletrico: data.suporte_carro_eletrico,
       vaga_coberta: data.vaga_coberta,
