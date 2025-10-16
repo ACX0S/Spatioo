@@ -39,7 +39,7 @@ const NotificationsList = () => {
             </Badge>
           )}
         </CardTitle>
-        {unreadCount > 0 && (
+        {notifications.length > 0 && (
           <Button 
             variant="outline" 
             size="sm"
@@ -47,7 +47,7 @@ const NotificationsList = () => {
             className="flex items-center gap-2"
           >
             <CheckCheck className="h-4 w-4" />
-            Marcar todas como lidas
+            Remover todas
           </Button>
         )}
       </CardHeader>
@@ -90,17 +90,15 @@ const NotificationsList = () => {
                       </p>
                     </div>
                     
-                    {!notification.read && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => markAsRead(notification.id)}
-                        className="flex items-center gap-1 text-xs"
-                      >
-                        <Check className="h-3 w-3" />
-                        Marcar como lida
-                      </Button>
-                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => markAsRead(notification.id)}
+                      className="flex items-center gap-1 text-xs"
+                    >
+                      <Check className="h-3 w-3" />
+                      Remover
+                    </Button>
                   </div>
                 </div>
               ))}

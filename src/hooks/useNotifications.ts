@@ -48,23 +48,21 @@ export const useNotifications = () => {
     try {
       const { error } = await supabase
         .from('notifications')
-        .update({ read: true })
+        .delete()
         .eq('id', notificationId);
 
       if (error) throw error;
 
       setNotifications(prev => 
-        prev.map(n => 
-          n.id === notificationId ? { ...n, read: true } : n
-        )
+        prev.filter(n => n.id !== notificationId)
       );
       
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (err: any) {
-      console.error('Error marking notification as read:', err);
+      console.error('Error deleting notification:', err);
       toast({
         title: "Erro",
-        description: "Não foi possível marcar a notificação como lida.",
+        description: "Não foi possível remover a notificação.",
         variant: "destructive"
       });
     }
@@ -74,22 +72,24 @@ export const useNotifications = () => {
     try {
       const { error } = await supabase
         .from('notifications')
-        .update({ read: true })
-        .eq('user_id', user?.id)
-        .eq('read', false);
+        .delete()
+        .eq('user_id', user?.id);
 
       if (error) throw error;
 
-      setNotifications(prev => 
-        prev.map(n => ({ ...n, read: true }))
-      );
+      setNotifications([]);
       
       setUnreadCount(0);
+      
+      toast({
+        title: "Sucesso",
+        description: "Todas as notificações foram removidas.",
+      });
     } catch (err: any) {
-      console.error('Error marking all notifications as read:', err);
+      console.error('Error deleting all notifications:', err);
       toast({
         title: "Erro",
-        description: "Não foi possível marcar todas as notificações como lidas.",
+        description: "Não foi possível remover todas as notificações.",
         variant: "destructive"
       });
     }

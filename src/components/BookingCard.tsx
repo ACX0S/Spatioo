@@ -60,7 +60,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, onCancelBooking }) =
       case 'aguardando_confirmacao': return 'bg-yellow-500';
       case 'reservada': return 'bg-spatioo-primary dark:bg-spatioo-green/90';
       case 'ocupada': return 'bg-blue-500';
-      case 'concluida': return 'bg-gray-500';
+      case 'concluida': return 'bg-green-600';
       case 'cancelada': return 'bg-red-500';
       case 'rejeitada': return 'bg-red-600';
       case 'expirada': return 'bg-gray-600';
