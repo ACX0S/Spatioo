@@ -2,18 +2,21 @@ import { useState, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate, useHref } from "react-router-dom";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useTheme } from "@/components/theme-provider";
-import { Map, Calendar, ChevronLeft, Compass, Plus } from "lucide-react";
+import { Map, Calendar, ChevronLeft, Compass, Plus, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import ParkingOwnerDashboard from "@/pages/ParkingOwnerDashboard";
 import { useRealtimeBookings } from "@/hooks/useRealtimeBookings";
+import { useNotifications } from "@/hooks/useNotifications";
 
 const Layout = () => {
   // Hook para notificações em tempo real
   useRealtimeBookings();
+  const { unreadCount } = useNotifications();
   const location = useLocation();
   const navigate = useNavigate();
   const { profile } = useAuth();
@@ -140,6 +143,23 @@ const Layout = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative"
+              onClick={() => navigate("/dashboard")}
+            >
+              <Bell className="h-5 w-5" />
+              {unreadCount > 0 && (
+                <Badge 
+                  variant="destructive" 
+                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                >
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </Badge>
+              )}
+            </Button>
+            
             <ThemeToggle />
 
             <Button
