@@ -734,9 +734,9 @@ const EstacionamentoDashboard = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <Sidebar collapsible="icon" className="border-r">
+        <Sidebar collapsible="icon" className="border-r mt-[56px]">
           <div className="p-2 border-b flex items-center gap-2">
-            <SidebarTrigger />
+            <SidebarTrigger className="hover:bg-stone-500 hover:text-white "/>
           </div>
           <SidebarContent>
             <SidebarGroup>
