@@ -94,6 +94,6 @@ export const useBookings = () => {
     refreshBookings: loadBookings,
     cancelBooking: handleCancelBooking,
     activeBookings: bookings.filter(b => ['aguardando_confirmacao', 'reservada', 'ocupada'].includes(b.status)),
-    historyBookings: bookings.filter(b => ['concluida', 'cancelada', 'rejeitada', 'expirada'].includes(b.status))
+    historyBookings: bookings.filter(b => ['concluida', 'cancelada', 'rejeitada', 'expirada'].includes(b.status)).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
   };
 };
