@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -7,15 +7,15 @@ import { Estacionamento } from "@/types/estacionamento";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Camera, Upload, X, Bell } from "lucide-react";
-import { FaCar } from 'react-icons/fa';
+import { Camera, Upload, X, Bell, DollarSign, TrendingUp, Activity } from "lucide-react";
 import { uploadEstacionamentoPhoto, deleteEstacionamentoPhotos } from "@/services/storageService";
 import { Input } from "@/components/ui/input";
-import { useVagasStats } from "@/hooks/useVagasStats";
 import { useParkingBookings } from "@/hooks/useParkingBookings";
 import { BookingRequestCard } from "@/components/BookingRequestCard";
 import { BookingActionCard } from "@/components/BookingActionCard";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 const ResidentialDashboard = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,7 +27,6 @@ const ResidentialDashboard = () => {
   const [activeSection, setActiveSection] = useState<'dashboard' | 'fotos' | 'solicitacoes'>('dashboard');
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
-  const { stats } = useVagasStats(vaga?.id);
   const { 
     pendingBookings, 
     activeBookings, 
@@ -69,6 +68,43 @@ const ResidentialDashboard = () => {
       setLoading(false);
     }
   };
+
+  // Cálculos financeiros baseados nas reservas
+  const financialStats = useMemo(() => {
+    const allBookings = [...activeBookings, ...pendingBookings];
+    const completedBookings = allBookings.filter(b => b.status === 'concluida');
+    
+    const totalRevenue = completedBookings.reduce((sum, booking) => sum + Number(booking.price), 0);
+    
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+    
+    const monthlyRevenue = completedBookings
+      .filter(booking => {
+        const bookingDate = new Date(booking.date);
+        return bookingDate.getMonth() === currentMonth && bookingDate.getFullYear() === currentYear;
+      })
+      .reduce((sum, booking) => sum + Number(booking.price), 0);
+
+    return {
+      pricePerHour: vaga?.preco || 0,
+      totalRevenue,
+      monthlyRevenue,
+      totalBookings: completedBookings.length,
+      monthlyBookings: completedBookings.filter(booking => {
+        const bookingDate = new Date(booking.date);
+        return bookingDate.getMonth() === currentMonth && bookingDate.getFullYear() === currentYear;
+      }).length
+    };
+  }, [activeBookings, pendingBookings, vaga]);
+
+  // Atividades recentes (últimas 5 reservas)
+  const recentActivity = useMemo(() => {
+    return [...activeBookings, ...pendingBookings]
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 5);
+  }, [activeBookings, pendingBookings]);
 
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -144,6 +180,18 @@ const ResidentialDashboard = () => {
     }).format(price);
   };
 
+  const getStatusBadge = (status: string) => {
+    const statusMap: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+      'aguardando_confirmacao': { label: 'Pendente', variant: 'secondary' },
+      'reservada': { label: 'Reservada', variant: 'default' },
+      'ocupada': { label: 'Em uso', variant: 'outline' },
+      'concluida': { label: 'Concluída', variant: 'outline' }
+    };
+    
+    const config = statusMap[status] || { label: status, variant: 'outline' };
+    return <Badge variant={config.variant}>{config.label}</Badge>;
+  };
+
   if (loading) return <LoadingSpinner />;
   if (!vaga) return null;
 
@@ -162,17 +210,17 @@ const ResidentialDashboard = () => {
       {/* Navigation Tabs */}
       <div className="border-b">
         <div className="container px-4">
-          <nav className="flex space-x-4 overflow-x-auto">
+          <nav className="flex space-x-4 overflow-x-auto scrollbar-hide">
             <Button
               variant="ghost"
-              className={activeSection === 'dashboard' ? 'border-b-2 border-primary' : ''}
+              className={activeSection === 'dashboard' ? 'border-b-2 border-primary rounded-none' : 'rounded-none'}
               onClick={() => setActiveSection('dashboard')}
             >
               Dashboard
             </Button>
             <Button
               variant="ghost"
-              className={activeSection === 'fotos' ? 'border-b-2 border-primary' : ''}
+              className={activeSection === 'fotos' ? 'border-b-2 border-primary rounded-none' : 'rounded-none'}
               onClick={() => setActiveSection('fotos')}
             >
               <Camera className="h-4 w-4 mr-2" />
@@ -180,7 +228,7 @@ const ResidentialDashboard = () => {
             </Button>
             <Button
               variant="ghost"
-              className={activeSection === 'solicitacoes' ? 'border-b-2 border-primary' : ''}
+              className={activeSection === 'solicitacoes' ? 'border-b-2 border-primary rounded-none' : 'rounded-none'}
               onClick={() => setActiveSection('solicitacoes')}
             >
               <Bell className="h-4 w-4 mr-2" />
@@ -196,44 +244,65 @@ const ResidentialDashboard = () => {
       </div>
 
       {/* Content */}
-      <div className="container px-4 py-6">
+      <div className="container px-4 py-6 max-w-6xl">
         {activeSection === 'dashboard' && (
           <div className="space-y-6">
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {/* Financial Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">Total</CardTitle>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                      Preço por Hora
+                    </CardTitle>
+                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{vaga.numero_vagas}</div>
+                  <div className="text-2xl font-bold text-primary">
+                    {formatPrice(financialStats.pricePerHour)}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Valor configurado
+                  </p>
                 </CardContent>
               </Card>
-              
+
               <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">Disponíveis</CardTitle>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                      Receita do Mês
+                    </CardTitle>
+                    <TrendingUp className="h-4 w-4 text-green-600" />
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-green-600">{stats?.vagas_disponiveis || 0}</div>
+                  <div className="text-2xl font-bold text-green-600">
+                    {formatPrice(financialStats.monthlyRevenue)}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {financialStats.monthlyBookings} reservas este mês
+                  </p>
                 </CardContent>
               </Card>
-              
+
               <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">Ocupadas</CardTitle>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                      Receita Total
+                    </CardTitle>
+                    <TrendingUp className="h-4 w-4 text-primary" />
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-red-600">{stats?.vagas_ocupadas || 0}</div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">Reservadas</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-yellow-600">{stats?.vagas_reservadas || 0}</div>
+                  <div className="text-2xl font-bold">
+                    {formatPrice(financialStats.totalRevenue)}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {financialStats.totalBookings} reservas concluídas
+                  </p>
                 </CardContent>
               </Card>
             </div>
@@ -241,29 +310,71 @@ const ResidentialDashboard = () => {
             {/* Informações Básicas */}
             <Card>
               <CardHeader>
-                <CardTitle>Informações da Vaga</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5" />
+                  Informações da Vaga
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Endereço:</span>
-                  <span className="font-medium">{vaga.endereco}</span>
+              <CardContent className="space-y-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="flex justify-between p-3 bg-muted/50 rounded-lg">
+                    <span className="text-sm text-muted-foreground">Endereço:</span>
+                    <span className="text-sm font-medium text-right">{vaga.endereco}</span>
+                  </div>
+                  <div className="flex justify-between p-3 bg-muted/50 rounded-lg">
+                    <span className="text-sm text-muted-foreground">CEP:</span>
+                    <span className="text-sm font-medium">{vaga.cep}</span>
+                  </div>
+                  <div className="flex justify-between p-3 bg-muted/50 rounded-lg">
+                    <span className="text-sm text-muted-foreground">Horário:</span>
+                    <span className="text-sm font-medium">
+                      {vaga.horario_funcionamento.abertura} às {vaga.horario_funcionamento.fechamento}
+                    </span>
+                  </div>
+                  <div className="flex justify-between p-3 bg-muted/50 rounded-lg">
+                    <span className="text-sm text-muted-foreground">Status:</span>
+                    <Badge variant={vaga.ativo ? "default" : "secondary"}>
+                      {vaga.ativo ? 'Ativa' : 'Inativa'}
+                    </Badge>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">CEP:</span>
-                  <span className="font-medium">{vaga.cep}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Horário:</span>
-                  <span className="font-medium">
-                    {vaga.horario_funcionamento.abertura} às {vaga.horario_funcionamento.fechamento}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Status:</span>
-                  <Badge variant={vaga.ativo ? "default" : "secondary"}>
-                    {vaga.ativo ? 'Ativa' : 'Inativa'}
-                  </Badge>
-                </div>
+              </CardContent>
+            </Card>
+
+            {/* Atividade Recente */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5" />
+                  Atividade Recente
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {recentActivity.length > 0 ? (
+                  <div className="space-y-3">
+                    {recentActivity.map((booking: any) => (
+                      <div key={booking.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+                        <div className="flex-1">
+                          <p className="font-medium text-sm">
+                            Reserva #{booking.id.slice(0, 8)}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {format(new Date(booking.date), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="font-semibold text-sm">{formatPrice(Number(booking.price))}</span>
+                          {getStatusBadge(booking.status)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Activity className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>Nenhuma atividade recente</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -317,7 +428,7 @@ const ResidentialDashboard = () => {
                 </div>
               ) : (
                 <div className="text-center py-12 text-muted-foreground">
-                  <Camera className="h-12 w-12 mx-auto mb-4" />
+                  <Camera className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p>Nenhuma foto adicionada</p>
                 </div>
               )}
@@ -366,7 +477,7 @@ const ResidentialDashboard = () => {
 
             {pendingBookings.length === 0 && activeBookings.length === 0 && (
               <div className="text-center py-12 text-muted-foreground">
-                <Bell className="h-12 w-12 mx-auto mb-4" />
+                <Bell className="h-12 w-12 mx-auto mb-4 opacity-50" />
                 <p>Nenhuma solicitação no momento</p>
               </div>
             )}
