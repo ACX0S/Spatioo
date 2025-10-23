@@ -1,18 +1,42 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useVehicles } from '@/hooks/useVehicles';
 import { Car, Plus, Pencil, Trash2 } from 'lucide-react';
-import { TAMANHO_REFERENCIAS } from '@/types/veiculo';
+import { TAMANHO_REFERENCIAS, Veiculo } from '@/types/veiculo';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorMessage from '@/components/ErrorMessage';
+import { VehicleFormDialog } from '@/components/VehicleFormDialog';
 
 const CarRequest = () => {
-  const { vehicles, loading, error, deleteVehicle } = useVehicles();
+  const { vehicles, loading, error, addVehicle, updateVehicle, deleteVehicle } = useVehicles();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingVehicle, setEditingVehicle] = useState<Veiculo | null>(null);
 
   const handleDelete = async (id: string) => {
     if (window.confirm('Tem certeza que deseja excluir este veículo?')) {
       await deleteVehicle(id);
+    }
+  };
+
+  const handleOpenAddDialog = () => {
+    setEditingVehicle(null);
+    setDialogOpen(true);
+  };
+
+  const handleOpenEditDialog = (vehicle: Veiculo) => {
+    setEditingVehicle(vehicle);
+    setDialogOpen(true);
+  };
+
+  const handleSubmit = async (data: any) => {
+    if (editingVehicle) {
+      // Modo edição
+      return await updateVehicle(editingVehicle.id, data);
+    } else {
+      // Modo criação
+      return await addVehicle(data);
     }
   };
 
@@ -32,7 +56,7 @@ const CarRequest = () => {
           <h1 className="text-2xl font-bold text-foreground mb-2">Meus Veículos</h1>
           <p className="text-muted-foreground">Gerencie seus veículos cadastrados</p>
         </div>
-        <Button className="gap-2">
+        <Button className="gap-2" onClick={handleOpenAddDialog}>
           <Plus className="h-4 w-4" />
           Adicionar veículo
         </Button>
@@ -50,7 +74,7 @@ const CarRequest = () => {
           <p className="text-muted-foreground mb-6">
             Cadastre seu primeiro veículo para facilitar suas reservas
           </p>
-          <Button className="gap-2">
+          <Button className="gap-2" onClick={handleOpenAddDialog}>
             <Plus className="h-4 w-4" />
             Cadastrar veículo
           </Button>
@@ -96,7 +120,12 @@ const CarRequest = () => {
                 </div>
 
                 <div className="flex gap-2 pt-2">
-                  <Button variant="outline" size="sm" className="flex-1 gap-1">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1 gap-1"
+                    onClick={() => handleOpenEditDialog(vehicle)}
+                  >
                     <Pencil className="h-3 w-3" />
                     Editar
                   </Button>
@@ -115,6 +144,14 @@ const CarRequest = () => {
           ))}
         </div>
       )}
+
+      {/* Dialog de formulário */}
+      <VehicleFormDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSubmit={handleSubmit}
+        vehicle={editingVehicle}
+      />
     </div>
   );
 };
