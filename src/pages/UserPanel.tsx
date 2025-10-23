@@ -54,6 +54,14 @@ const UserPanel = () => {
       route: "/dashboard/reservas",
       color: "dark:text-spatioo-green light: text-spatioo-primary",
       bgColor: "bg-spatioo-green/10"
+    },
+    {
+      title: "Meu(s) Veículo(s)",
+      description: "Gerencie e cadastre seus veículos",
+      icon: FaCar,
+      route: "/car-request",
+      color: "dark:text-spatioo-green light: text-spatioo-primary",
+      bgColor: "bg-spatioo-green/10"
     }
   ];
 

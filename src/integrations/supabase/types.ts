@@ -376,19 +376,49 @@ export type Database = {
           },
         ]
       }
+      veiculos: {
+        Row: {
+          cor: string
+          created_at: string
+          id: string
+          modelo: string
+          placa: string
+          tamanho: string
+          tipo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cor: string
+          created_at?: string
+          id?: string
+          modelo: string
+          placa: string
+          tamanho: string
+          tipo: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cor?: string
+          created_at?: string
+          id?: string
+          modelo?: string
+          placa?: string
+          tamanho?: string
+          tipo?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      can_user_book_today: {
-        Args: { p_user_id: string }
-        Returns: boolean
-      }
-      expire_pending_bookings: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      can_user_book_today: { Args: { p_user_id: string }; Returns: boolean }
+      expire_pending_bookings: { Args: never; Returns: undefined }
       get_vagas_stats: {
         Args: { estacionamento_id_param: string }
         Returns: {

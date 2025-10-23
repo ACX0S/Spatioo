@@ -30,6 +30,7 @@ const Profile = lazy(() => import("./pages/Profile"));
 const EstacionamentoDashboard = lazy(() => import("./pages/EstacionamentoDashboard"));
 const ResidentialDashboard = lazy(() => import("./pages/ResidentialDashboard"));
 const Ofertar = lazy(() => import("./pages/Ofertar"));
+const CarRequest = lazy(() => import("./pages/CarRequest"));
 
 // Cria uma instância do QueryClient para ser usada em toda a aplicação.
 const queryClient = new QueryClient();
@@ -74,6 +75,7 @@ const App = () => {
                       <Route path="estacionamento-dashboard/:id" element={<EstacionamentoDashboard />} />
                       <Route path="residential-dashboard/:id" element={<ResidentialDashboard />} />
                       <Route path="ofertar" element={<Ofertar />} />
+                      <Route path="car-request" element={<CarRequest />} />
                       
                       {/* Rota para páginas não encontradas (404). */}
                       <Route path="*" element={<NotFound />} />
