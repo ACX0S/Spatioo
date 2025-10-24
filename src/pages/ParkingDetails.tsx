@@ -101,16 +101,34 @@ const ParkingDetails = () => {
           </div>
         </div>
 
-        {/* Tipo de Vaga */}
-        <div className="mt-3 p-3 bg-gradient-to-r from-spatioo-green/10 to-spatioo-green/5 rounded-lg border border-spatioo-green/20">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-spatioo-green uppercase tracking-wide">
-              {parkingSpot.tipo === 'residencial' ? '🏠 Vaga Residencial' : '🏢 Estacionamento'}
-            </span>
+        {/* Tipo de Vaga e Tamanho */}
+        <div className="mt-3 space-y-2">
+          <div className="p-3 bg-gradient-to-r from-spatioo-green/10 to-spatioo-green/5 rounded-lg border border-spatioo-green/20">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-spatioo-green uppercase tracking-wide">
+                {parkingSpot.tipo === 'residencial' ? '🏠 Vaga Residencial' : '🏢 Estacionamento'}
+              </span>
+            </div>
+            {parkingSpot.tipo === 'residencial' && parkingSpot.proprietario_nome && (
+              <div className="mt-2 text-sm text-muted-foreground">
+                Proprietário: <span className="font-medium text-foreground">{parkingSpot.proprietario_nome}</span>
+              </div>
+            )}
           </div>
-          {parkingSpot.tipo === 'residencial' && parkingSpot.proprietario_nome && (
-            <div className="mt-2 text-sm text-muted-foreground">
-              Proprietário: <span className="font-medium text-foreground">{parkingSpot.proprietario_nome}</span>
+          
+          {/* Tamanho da Vaga */}
+          {parkingSpot.tamanho_vaga && (
+            <div className="p-3 bg-muted/30 rounded-lg border border-border">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Tamanho máximo da vaga:</span>
+                <span className="text-sm font-bold">
+                  {parkingSpot.tamanho_vaga} - {
+                    parkingSpot.tamanho_vaga === 'P' ? 'até 3,8m x 1,7m' :
+                    parkingSpot.tamanho_vaga === 'M' ? 'até 4,3m x 1,8m' :
+                    'acima de 4,3m'
+                  }
+                </span>
+              </div>
             </div>
           )}
         </div>

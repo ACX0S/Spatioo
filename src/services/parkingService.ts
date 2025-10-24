@@ -17,6 +17,7 @@ export type PublicParkingData = {
   longitude: number | null;
   tipo?: string; // 'residencial' ou 'comercial'
   proprietario_nome?: string; // Nome do proprietário (apenas para residenciais)
+  tamanho_vaga?: 'P' | 'M' | 'G'; // Tamanho da vaga
   // Comodidades do estacionamento
   funcionamento_24h?: boolean;
   suporte_carro_eletrico?: boolean;
@@ -115,7 +116,7 @@ export const fetchParkingSpotById = async (id: string): Promise<PublicParkingDat
     const { data, error } = await supabase
       .from('estacionamento')
       .select(`
-        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude, tipo, user_id,
+        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude, tipo, user_id, tamanho_vaga,
         funcionamento_24h, suporte_carro_eletrico, vaga_coberta, manobrista, suporte_caminhao, vaga_moto,
         estacionamento_precos(preco, horas)
       `)
@@ -161,6 +162,7 @@ export const fetchParkingSpotById = async (id: string): Promise<PublicParkingDat
       longitude: data.longitude,
       tipo: data.tipo,
       proprietario_nome: proprietarioNome,
+      tamanho_vaga: data.tamanho_vaga as 'P' | 'M' | 'G' | undefined,
       funcionamento_24h: data.funcionamento_24h,
       suporte_carro_eletrico: data.suporte_carro_eletrico,
       vaga_coberta: data.vaga_coberta,

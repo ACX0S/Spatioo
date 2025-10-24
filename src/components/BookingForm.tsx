@@ -5,13 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CreditCard, Clock, Info, Calendar } from 'lucide-react';
+import { CreditCard, Clock, Info, Calendar, AlertCircle } from 'lucide-react';
 import { createBookingRequest } from '@/services/bookingService';
 import { toast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { PublicParkingData } from '@/services/parkingService';
 import { supabase } from '@/integrations/supabase/client';
 import { format, addDays, parse, isAfter, isBefore } from 'date-fns';
+import { Veiculo, TamanhoVeiculo } from '@/types/veiculo';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 /**
  * @interface BookingFormProps
@@ -40,6 +42,61 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
   const [calculatedPrice, setCalculatedPrice] = useState<number | null>(null); // Preço calculado baseado na duração
   const [tabelaPrecos, setTabelaPrecos] = useState<Array<{ horas: number; preco: number }>>([]); // Tabela de preços do estacionamento
   const [horaExtra, setHoraExtra] = useState<number>(0); // Valor da hora extra
+  
+  // Estados para validação de veículo
+  const [userVehicles, setUserVehicles] = useState<Veiculo[]>([]);
+  const [hasVehicle, setHasVehicle] = useState(false);
+  const [isVehicleCompatible, setIsVehicleCompatible] = useState(true);
+  const [vehicleCheckMessage, setVehicleCheckMessage] = useState<string>('');
+
+  // Efeito para buscar veículos do usuário
+  useEffect(() => {
+    const fetchUserVehicles = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('veiculos')
+          .select('*')
+          .eq('user_id', user.id);
+          
+        if (error) throw error;
+        
+        setUserVehicles(data as Veiculo[] || []);
+        setHasVehicle((data || []).length > 0);
+        
+        // Verifica compatibilidade de tamanho
+        if (data && data.length > 0 && parkingSpot.tamanho_vaga) {
+          const checkCompatibility = () => {
+            const tamanhoOrdem: Record<TamanhoVeiculo, number> = { 'P': 1, 'M': 2, 'G': 3 };
+            
+            // Pega o menor veículo do usuário
+            const menorVeiculo = data.reduce((menor, veiculo) => {
+              return tamanhoOrdem[veiculo.tamanho as TamanhoVeiculo] < tamanhoOrdem[menor.tamanho as TamanhoVeiculo] 
+                ? veiculo 
+                : menor;
+            });
+            
+            const veiculoTamanho = tamanhoOrdem[menorVeiculo.tamanho as TamanhoVeiculo];
+            const vagaTamanho = tamanhoOrdem[parkingSpot.tamanho_vaga as TamanhoVeiculo];
+            
+            return veiculoTamanho <= vagaTamanho;
+          };
+          
+          const compatible = checkCompatibility();
+          setIsVehicleCompatible(compatible);
+          
+          if (!compatible) {
+            setVehicleCheckMessage('Seu veículo excede o tamanho máximo permitido para esta vaga.');
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao buscar veículos:', error);
+      }
+    };
+    
+    fetchUserVehicles();
+  }, [user, parkingSpot.tamanho_vaga]);
 
   // Efeito para buscar os preços e configurações do estacionamento.
   useEffect(() => {
@@ -278,6 +335,13 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
   }
 
   const timeOptions = generateTimeOptions();
+  
+  // Mensagem de erro se não tiver veículo
+  if (!hasVehicle) {
+    setVehicleCheckMessage('Cadastre um veículo no seu painel para realizar reservas.');
+  }
+  
+  const canBook = hasVehicle && isVehicleCompatible;
 
   return (
     <Card>
@@ -292,6 +356,25 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
+          {/* Alerta de validação de veículo */}
+          {(!hasVehicle || !isVehicleCompatible) && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                {vehicleCheckMessage}
+                {!hasVehicle && (
+                  <Button 
+                    variant="link" 
+                    className="h-auto p-0 ml-1 text-destructive underline"
+                    onClick={() => navigate('/car-request')}
+                    type="button"
+                  >
+                    Cadastrar veículo
+                  </Button>
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
           {/* Seleção de Data */}
           <div className="space-y-2">
             <Label htmlFor="date-select" className="flex items-center gap-2">
@@ -362,8 +445,9 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
         <CardFooter>
           <Button 
             type="submit" 
-            className="w-full bg-spatioo-green hover:bg-spatioo-green-dark text-black"
-            disabled={isSubmitting || !calculatedPrice || !selectedStartTime}
+            className="w-full bg-spatioo-green hover:bg-spatioo-green-dark text-black disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isSubmitting || !calculatedPrice || !selectedStartTime || !canBook}
+            title={!canBook ? vehicleCheckMessage : ''}
           >
             <CreditCard className="mr-2 h-4 w-4" />
             {isSubmitting ? 'Processando...' : 'Confirmar Reserva'}

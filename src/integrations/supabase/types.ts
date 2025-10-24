@@ -113,6 +113,7 @@ export type Database = {
           preco: number
           suporte_caminhao: boolean | null
           suporte_carro_eletrico: boolean | null
+          tamanho_vaga: string | null
           tipo: string | null
           updated_at: string
           user_id: string
@@ -139,6 +140,7 @@ export type Database = {
           preco: number
           suporte_caminhao?: boolean | null
           suporte_carro_eletrico?: boolean | null
+          tamanho_vaga?: string | null
           tipo?: string | null
           updated_at?: string
           user_id: string
@@ -165,6 +167,7 @@ export type Database = {
           preco?: number
           suporte_caminhao?: boolean | null
           suporte_carro_eletrico?: boolean | null
+          tamanho_vaga?: string | null
           tipo?: string | null
           updated_at?: string
           user_id?: string

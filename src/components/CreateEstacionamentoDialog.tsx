@@ -91,6 +91,7 @@ const CreateEstacionamentoDialog = ({
     horaExtra: "", // Valor para hora adicional quando não há preço específico cadastrado
     horaExtraNumeric: 0, // Valor numérico para salvar no banco
     funcionamento_24h: false, // Opção de funcionamento 24 horas
+    tamanho_vaga: "M" as 'P' | 'M' | 'G', // Tamanho da vaga (P, M, G)
   });
 
   // Estado para upload de fotos
@@ -296,6 +297,7 @@ const CreateEstacionamentoDialog = ({
             funcionamento_24h: formData.funcionamento_24h, // Marca se funciona 24h
             latitude: coordinates?.latitude || null,
             longitude: coordinates?.longitude || null,
+            tamanho_vaga: formData.tamanho_vaga, // Tamanho da vaga
             // Vagas residenciais não possuem outras comodidades
           })
           .select()
@@ -343,6 +345,7 @@ const CreateEstacionamentoDialog = ({
         horaExtra: "",
         horaExtraNumeric: 0,
         funcionamento_24h: false,
+        tamanho_vaga: "M",
       });
       setPhotos([]);
       setPhotosPreviews([]);
@@ -708,6 +711,45 @@ const CreateEstacionamentoDialog = ({
                 </Button>
               </div>
             </div>
+          </div>
+
+          {/* Tamanho da Vaga */}
+          <div className="space-y-2">
+            <Label htmlFor="tamanho-vaga" className="flex items-center gap-2">
+              <FaCar className="h-4 w-4 text-spatioo-green" />
+              Tamanho da Vaga *
+            </Label>
+            <Select 
+              value={formData.tamanho_vaga} 
+              onValueChange={(value: 'P' | 'M' | 'G') => setFormData(prev => ({ ...prev, tamanho_vaga: value }))}
+            >
+              <SelectTrigger id="tamanho-vaga">
+                <SelectValue placeholder="Selecione o tamanho" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="P">
+                  <div className="flex flex-col py-1">
+                    <span className="font-semibold">P - Pequeno</span>
+                    <span className="text-xs text-muted-foreground">até 3,8m x 1,7m</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="M">
+                  <div className="flex flex-col py-1">
+                    <span className="font-semibold">M - Médio</span>
+                    <span className="text-xs text-muted-foreground">até 4,3m x 1,8m</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="G">
+                  <div className="flex flex-col py-1">
+                    <span className="font-semibold">G - Grande</span>
+                    <span className="text-xs text-muted-foreground">acima de 4,3m</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Escolha o tamanho baseado nas dimensões da vaga disponível
+            </p>
           </div>
 
           {/* Descrição Adicional */}

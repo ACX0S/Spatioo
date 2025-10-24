@@ -26,6 +26,7 @@ export interface Estacionamento {
   manobrista?: boolean;
   suporte_caminhao?: boolean;
   vaga_moto?: boolean;
+  tamanho_vaga?: 'P' | 'M' | 'G'; // Tamanho da vaga residencial
 }
 
 export interface EstacionamentoInsert {
@@ -51,6 +52,7 @@ export interface EstacionamentoInsert {
   manobrista?: boolean;
   suporte_caminhao?: boolean;
   vaga_moto?: boolean;
+  tamanho_vaga?: 'P' | 'M' | 'G'; // Tamanho da vaga residencial
 }
 
 export interface EstacionamentoUpdate {
@@ -76,4 +78,5 @@ export interface EstacionamentoUpdate {
   manobrista?: boolean;
   suporte_caminhao?: boolean;
   vaga_moto?: boolean;
+  tamanho_vaga?: 'P' | 'M' | 'G'; // Tamanho da vaga residencial
 }
