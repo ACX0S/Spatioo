@@ -113,18 +113,27 @@ export const createBookingRequest = async (bookingData: Omit<Booking, 'id' | 'us
       })
       .select(`
         *,
-        estacionamento!bookings_estacionamento_id_fkey (nome, endereco, user_id)
+        estacionamento!bookings_estacionamento_id_fkey (nome, endereco, user_id),
+        veiculo:veiculos(tipo, modelo, cor, placa, tamanho)
       `)
       .single();
     
     if (error) throw error;
     if (!data) throw new Error('Erro ao criar solicitação de reserva');
     
+    // Buscar nome do usuário
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('name, apelido')
+      .eq('id', user.id)
+      .single();
+    
     return {
       ...data,
       parkingName: data.estacionamento?.nome,
       parkingAddress: data.estacionamento?.endereco,
       status: data.status as Booking['status'],
+      user: profileData ? { name: profileData.name || '', apelido: profileData.apelido } : undefined
     };
   } catch (error: any) {
     console.error('Erro ao criar solicitação:', error.message);
@@ -215,7 +224,8 @@ export const fetchPendingBookings = async (estacionamentoId: string): Promise<Bo
       .from('bookings')
       .select(`
         *,
-        profiles!bookings_user_id_profiles_fkey (name)
+        veiculo:veiculos(tipo, modelo, cor, placa, tamanho),
+        estacionamento:estacionamento!inner(nome, endereco)
       `)
       .eq('estacionamento_id', estacionamentoId)
       .eq('status', 'aguardando_confirmacao')
@@ -223,9 +233,24 @@ export const fetchPendingBookings = async (estacionamentoId: string): Promise<Bo
     
     if (error) throw error;
     
+    // Buscar nomes dos usuários
+    const userIds = [...new Set((bookings || []).map(b => b.user_id))];
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, name, apelido')
+      .in('id', userIds);
+    
+    const profilesMap = new Map(profiles?.map(p => [p.id, p]));
+    
     return (bookings || []).map(b => ({
       ...b,
       status: b.status as Booking['status'],
+      user: profilesMap.get(b.user_id) ? {
+        name: profilesMap.get(b.user_id)!.name || '',
+        apelido: profilesMap.get(b.user_id)!.apelido
+      } : undefined,
+      parkingName: b.estacionamento?.nome,
+      parkingAddress: b.estacionamento?.endereco
     }));
   } catch (error: any) {
     console.error('Erro ao buscar solicitações:', error);

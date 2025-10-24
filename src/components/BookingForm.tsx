@@ -45,6 +45,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
   
   // Estados para validação de veículo
   const [userVehicles, setUserVehicles] = useState<Veiculo[]>([]);
+  const [selectedVehicleId, setSelectedVehicleId] = useState<string>('');
   const [hasVehicle, setHasVehicle] = useState(false);
   const [isVehicleCompatible, setIsVehicleCompatible] = useState(true);
   const [vehicleCheckMessage, setVehicleCheckMessage] = useState<string>('');
@@ -58,32 +59,33 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
         const { data, error } = await supabase
           .from('veiculos')
           .select('*')
-          .eq('user_id', user.id);
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
           
         if (error) throw error;
         
-        setUserVehicles(data as Veiculo[] || []);
-        setHasVehicle((data || []).length > 0);
+        const vehicles = data as Veiculo[] || [];
+        setUserVehicles(vehicles);
+        setHasVehicle(vehicles.length > 0);
         
-        // Verifica compatibilidade de tamanho
-        if (data && data.length > 0 && parkingSpot.tamanho_vaga) {
-          const checkCompatibility = () => {
-            const tamanhoOrdem: Record<TamanhoVeiculo, number> = { 'P': 1, 'M': 2, 'G': 3 };
-            
-            // Pega o menor veículo do usuário
-            const menorVeiculo = data.reduce((menor, veiculo) => {
-              return tamanhoOrdem[veiculo.tamanho as TamanhoVeiculo] < tamanhoOrdem[menor.tamanho as TamanhoVeiculo] 
-                ? veiculo 
-                : menor;
-            });
-            
-            const veiculoTamanho = tamanhoOrdem[menorVeiculo.tamanho as TamanhoVeiculo];
-            const vagaTamanho = tamanhoOrdem[parkingSpot.tamanho_vaga as TamanhoVeiculo];
-            
-            return veiculoTamanho <= vagaTamanho;
-          };
+        // Se houver apenas um veículo, seleciona automaticamente
+        if (vehicles.length === 1) {
+          setSelectedVehicleId(vehicles[0].id);
+        }
+        
+        // Verifica compatibilidade do menor veículo
+        if (vehicles.length > 0 && parkingSpot.tamanho_vaga) {
+          const tamanhoOrdem: Record<TamanhoVeiculo, number> = { 'P': 1, 'M': 2, 'G': 3 };
+          const vagaTamanho = tamanhoOrdem[parkingSpot.tamanho_vaga as TamanhoVeiculo];
           
-          const compatible = checkCompatibility();
+          const menorVeiculo = vehicles.reduce((menor, veiculo) => {
+            return tamanhoOrdem[veiculo.tamanho as TamanhoVeiculo] < tamanhoOrdem[menor.tamanho as TamanhoVeiculo] 
+              ? veiculo 
+              : menor;
+          });
+          
+          const veiculoTamanho = tamanhoOrdem[menorVeiculo.tamanho as TamanhoVeiculo];
+          const compatible = veiculoTamanho <= vagaTamanho;
           setIsVehicleCompatible(compatible);
           
           if (!compatible) {
@@ -97,6 +99,27 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
     
     fetchUserVehicles();
   }, [user, parkingSpot.tamanho_vaga]);
+
+  // Validar compatibilidade quando um veículo é selecionado
+  useEffect(() => {
+    if (!selectedVehicleId || !parkingSpot.tamanho_vaga) return;
+
+    const selectedVehicle = userVehicles.find(v => v.id === selectedVehicleId);
+    if (!selectedVehicle) return;
+
+    const tamanhoOrdem: Record<TamanhoVeiculo, number> = { 'P': 1, 'M': 2, 'G': 3 };
+    const vagaTamanho = tamanhoOrdem[parkingSpot.tamanho_vaga as TamanhoVeiculo];
+    const vehicleSize = tamanhoOrdem[selectedVehicle.tamanho as TamanhoVeiculo];
+    
+    const compatible = vehicleSize <= vagaTamanho;
+    setIsVehicleCompatible(compatible);
+    
+    if (!compatible) {
+      setVehicleCheckMessage('O veículo selecionado excede o tamanho máximo permitido para esta vaga.');
+    } else {
+      setVehicleCheckMessage('');
+    }
+  }, [selectedVehicleId, userVehicles, parkingSpot.tamanho_vaga]);
 
   // Efeito para buscar os preços e configurações do estacionamento.
   useEffect(() => {
@@ -276,9 +299,20 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
 
       const vagaSelecionada = vagasDisponiveis[0];
 
+      // Validar seleção de veículo
+      if (userVehicles.length > 0 && !selectedVehicleId) {
+        toast({ 
+          title: "Erro", 
+          description: "Por favor, selecione um veículo", 
+          variant: "destructive" 
+        });
+        return;
+      }
+
       // Criar solicitação de reserva (aguardando confirmação)
       await createBookingRequest({
         estacionamento_id: parkingSpot.id,
+        veiculo_id: selectedVehicleId || undefined,
         date: format(bookingDate, 'yyyy-MM-dd'),
         start_time: format(bookingDate, 'HH:mm:ss'),
         end_time: format(endTime, 'HH:mm:ss'),
@@ -335,12 +369,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
   }
 
   const timeOptions = generateTimeOptions();
-  
-  // Mensagem de erro se não tiver veículo
-  if (!hasVehicle) {
-    setVehicleCheckMessage('Cadastre um veículo no seu painel para realizar reservas.');
-  }
-  
   const canBook = hasVehicle && isVehicleCompatible;
 
   return (
@@ -356,24 +384,64 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
-          {/* Alerta de validação de veículo */}
-          {(!hasVehicle || !isVehicleCompatible) && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                {vehicleCheckMessage}
-                {!hasVehicle && (
-                  <Button 
-                    variant="link" 
-                    className="h-auto p-0 ml-1 text-destructive underline"
-                    onClick={() => navigate('/car-request')}
-                    type="button"
-                  >
-                    Cadastrar veículo
-                  </Button>
-                )}
+          {/* Alerta quando não há veículos cadastrados */}
+          {!hasVehicle && (
+            <Alert className="bg-yellow-500/10 border-yellow-500/50">
+              <AlertCircle className="h-4 w-4 text-yellow-600" />
+              <AlertDescription className="text-yellow-600">
+                Não há veículos cadastrados. Cadastre um veículo para realizar reservas.
+                <Button 
+                  variant="link" 
+                  className="h-auto p-0 ml-1 text-yellow-600 underline"
+                  onClick={() => navigate('/car-request')}
+                  type="button"
+                >
+                  Cadastrar veículo
+                </Button>
               </AlertDescription>
             </Alert>
+          )}
+
+          {/* Alerta quando veículo é incompatível */}
+          {hasVehicle && !isVehicleCompatible && vehicleCheckMessage && (
+            <Alert className="bg-red-500/10 border-red-500/50">
+              <AlertCircle className="h-4 w-4 text-red-600" />
+              <AlertDescription className="text-red-600">
+                {vehicleCheckMessage}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Seletor de veículo */}
+          {hasVehicle && userVehicles.length > 0 && (
+            <div className="space-y-2">
+              <Label htmlFor="vehicle-select">Selecione o veículo *</Label>
+              <Select value={selectedVehicleId} onValueChange={setSelectedVehicleId}>
+                <SelectTrigger id="vehicle-select">
+                  <SelectValue placeholder="Escolha qual veículo você usará" />
+                </SelectTrigger>
+                <SelectContent>
+                  {userVehicles.map((vehicle) => (
+                    <SelectItem key={vehicle.id} value={vehicle.id}>
+                      {vehicle.modelo} - {vehicle.placa} (Tamanho {vehicle.tamanho})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {/* Mostrar veículo selecionado */}
+          {selectedVehicleId && userVehicles.length > 0 && (
+            <div className="p-3 bg-muted/50 rounded-lg border">
+              <p className="text-sm font-medium mb-1">Veículo selecionado:</p>
+              <p className="text-sm text-muted-foreground">
+                {userVehicles.find(v => v.id === selectedVehicleId)?.modelo}
+                {isVehicleCompatible && (
+                  <span className="text-green-600 ml-2">✓ Compatível com a vaga</span>
+                )}
+              </p>
+            </div>
           )}
           {/* Seleção de Data */}
           <div className="space-y-2">

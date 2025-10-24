@@ -2,7 +2,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Booking } from '@/types/booking';
-import { Calendar, Clock, User, MapPin } from 'lucide-react';
+import { Calendar, Clock, User, MapPin, Car } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -53,6 +53,22 @@ export const BookingRequestCard = ({ booking, onAccept, onReject, loading }: Boo
           <span className="font-medium">Vaga:</span>
           <span>{booking.spot_number}</span>
         </div>
+        
+        {booking.user && (
+          <div className="flex items-center gap-2 text-sm">
+            <User className="h-4 w-4 text-muted-foreground" />
+            <span className="font-medium">Solicitante:</span>
+            <span>{booking.user.apelido || booking.user.name}</span>
+          </div>
+        )}
+
+        {booking.veiculo && (
+          <div className="flex items-center gap-2 text-sm">
+            <Car className="h-4 w-4 text-muted-foreground" />
+            <span className="font-medium">Veículo:</span>
+            <span>{booking.veiculo.modelo} - {booking.veiculo.placa} ({booking.veiculo.cor})</span>
+          </div>
+        )}
         
         <div className="flex items-center gap-2 text-sm">
           <span className="font-medium">Valor:</span>

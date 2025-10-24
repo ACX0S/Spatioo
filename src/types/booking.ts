@@ -11,6 +11,7 @@ export interface Booking {
   id: string;
   user_id: string;
   estacionamento_id: string;
+  veiculo_id?: string;
   date: string;
   start_time: string;
   end_time: string;
@@ -31,4 +32,15 @@ export interface Booking {
   parkingName?: string;
   parkingAddress?: string;
   estacionamento?: any;
+  veiculo?: {
+    tipo: string;
+    modelo: string;
+    cor: string;
+    placa: string;
+    tamanho: string;
+  };
+  user?: {
+    name: string;
+    apelido?: string;
+  };
 }

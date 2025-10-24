@@ -34,6 +34,7 @@ export type Database = {
           start_time: string
           status: string
           user_id: string
+          veiculo_id: string | null
         }
         Insert: {
           accepted_at?: string | null
@@ -54,6 +55,7 @@ export type Database = {
           start_time: string
           status?: string
           user_id: string
+          veiculo_id?: string | null
         }
         Update: {
           accepted_at?: string | null
@@ -74,6 +76,7 @@ export type Database = {
           start_time?: string
           status?: string
           user_id?: string
+          veiculo_id?: string | null
         }
         Relationships: [
           {
@@ -88,6 +91,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_veiculo_id_fkey"
+            columns: ["veiculo_id"]
+            isOneToOne: false
+            referencedRelation: "veiculos"
             referencedColumns: ["id"]
           },
         ]
