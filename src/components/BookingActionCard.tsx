@@ -1,10 +1,14 @@
+import { useState } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Booking } from '@/types/booking';
-import { Calendar, Clock, MapPin, CheckCircle, XCircle } from 'lucide-react';
+import { Calendar, Clock, MapPin, CheckCircle, XCircle, Star } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { ReviewModal } from './ReviewModal';
+import { checkIfBookingHasReview } from '@/services/reviewService';
+import { useEffect } from 'react';
 
 interface BookingActionCardProps {
   booking: Booking;
@@ -25,6 +29,20 @@ export const BookingActionCard = ({
   isOwner,
   loading 
 }: BookingActionCardProps) => {
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [hasReview, setHasReview] = useState(false);
+  const [checkingReview, setCheckingReview] = useState(true);
+
+  useEffect(() => {
+    const checkReview = async () => {
+      if (booking.status === 'concluida') {
+        const reviewed = await checkIfBookingHasReview(booking.id);
+        setHasReview(reviewed);
+      }
+      setCheckingReview(false);
+    };
+    checkReview();
+  }, [booking.id, booking.status]);
   const statusBadge = {
     reservada: { label: 'Reservada', variant: 'secondary' as const, color: 'bg-yellow-500/20 text-yellow-700 dark:text-yellow-300' },
     ocupada: { label: 'Ocupada', variant: 'destructive' as const },
@@ -158,7 +176,39 @@ export const BookingActionCard = ({
             Confirmar Minha Saída
           </Button>
         )}
+
+        {/* Botão de avaliar após conclusão */}
+        {booking.status === 'concluida' && !checkingReview && !hasReview && (
+          <Button
+            onClick={() => setShowReviewModal(true)}
+            variant="outline"
+            className="w-full gap-2"
+          >
+            <Star className="w-4 h-4" />
+            Avaliar Experiência
+          </Button>
+        )}
+
+        {booking.status === 'concluida' && hasReview && (
+          <div className="text-center text-sm text-muted-foreground py-2">
+            ✓ Você já avaliou esta reserva
+          </div>
+        )}
       </CardFooter>
+
+      {/* Modal de Avaliação */}
+      {booking.estacionamento?.id && (
+        <ReviewModal
+          open={showReviewModal}
+          onClose={() => {
+            setShowReviewModal(false);
+            setHasReview(true);
+          }}
+          booking={booking}
+          avaliadoTipo="estacionamento"
+          avaliadoId={booking.estacionamento.id}
+        />
+      )}
     </Card>
   );
 };

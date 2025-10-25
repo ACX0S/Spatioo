@@ -2,7 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, Building } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Calendar, Building, Star } from 'lucide-react';
 import { FaCar } from 'react-icons/fa';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,6 +11,7 @@ import CreateEstacionamentoConfirmDialog from '@/components/CreateEstacionamento
 import CreateEstacionamentoComercialDialog from '@/components/CreateEstacionamentoComercialDialog';
 import EstacionamentoSelectionModal from '@/components/EstacionamentoSelectionModal';
 import { supabase } from '@/integrations/supabase/client';
+import { useReviews } from '@/hooks/useReviews';
 
 const UserPanel = () => {
   const navigate = useNavigate();
@@ -20,6 +22,7 @@ const UserPanel = () => {
   const [estacionamentoModalOpen, setEstacionamentoModalOpen] = useState(false);
   const [residenciais, setResidenciais] = useState<any[]>([]);
   const [estacionamentos, setEstacionamentos] = useState<any[]>([]);
+  const { hasPendingReviews } = useReviews();
 
   // Carregar vagas residenciais e estacionamentos
   useEffect(() => {
@@ -134,6 +137,23 @@ const UserPanel = () => {
 
   return (
     <div className="container mx-auto px-4 py-6">
+      {/* Lembrete de avaliações pendentes */}
+      {hasPendingReviews && (
+        <Alert className="mb-6 border-primary/50 bg-primary/10">
+          <Star className="h-4 w-4" />
+          <AlertDescription className="flex items-center justify-between">
+            <span>Você ainda não avaliou sua última reserva.</span>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate('/dashboard/reservas')}
+            >
+              Avaliar agora
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Painel Pessoal */}
       <div className="mb-8">
         <div className="border-b border-border pb-2 mb-4">

@@ -118,6 +118,7 @@ export type Database = {
           latitude: number | null
           longitude: number | null
           manobrista: boolean | null
+          media_avaliacao: number | null
           nome: string
           numero_vagas: number
           preco: number
@@ -145,6 +146,7 @@ export type Database = {
           latitude?: number | null
           longitude?: number | null
           manobrista?: boolean | null
+          media_avaliacao?: number | null
           nome: string
           numero_vagas: number
           preco: number
@@ -172,6 +174,7 @@ export type Database = {
           latitude?: number | null
           longitude?: number | null
           manobrista?: boolean | null
+          media_avaliacao?: number | null
           nome?: string
           numero_vagas?: number
           preco?: number
@@ -291,6 +294,7 @@ export type Database = {
           complement: string | null
           dono_estacionamento: boolean | null
           id: string
+          media_avaliacao: number | null
           name: string | null
           neighborhood: string | null
           number: string | null
@@ -305,6 +309,7 @@ export type Database = {
           complement?: string | null
           dono_estacionamento?: boolean | null
           id: string
+          media_avaliacao?: number | null
           name?: string | null
           neighborhood?: string | null
           number?: string | null
@@ -319,6 +324,7 @@ export type Database = {
           complement?: string | null
           dono_estacionamento?: boolean | null
           id?: string
+          media_avaliacao?: number | null
           name?: string | null
           neighborhood?: string | null
           number?: string | null
@@ -327,6 +333,50 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      reviews: {
+        Row: {
+          avaliado_id: string
+          avaliado_tipo: string
+          avaliador_id: string
+          booking_id: string
+          comentario: string | null
+          created_at: string
+          id: string
+          nota: number
+          tags: string[] | null
+        }
+        Insert: {
+          avaliado_id: string
+          avaliado_tipo: string
+          avaliador_id: string
+          booking_id: string
+          comentario?: string | null
+          created_at?: string
+          id?: string
+          nota: number
+          tags?: string[] | null
+        }
+        Update: {
+          avaliado_id?: string
+          avaliado_tipo?: string
+          avaliador_id?: string
+          booking_id?: string
+          comentario?: string | null
+          created_at?: string
+          id?: string
+          nota?: number
+          tags?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vagas: {
         Row: {

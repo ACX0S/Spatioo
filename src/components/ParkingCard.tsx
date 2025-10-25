@@ -1,8 +1,9 @@
 import React, { memo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { MapPin, Clock, Star } from 'lucide-react';
+import { MapPin, Clock } from 'lucide-react';
 import { FaCar } from 'react-icons/fa';
 import { PublicParkingData } from '@/services/parkingService';
+import { RatingDisplay } from './RatingDisplay';
 
 interface ParkingCardProps {
   parkingSpot: PublicParkingData;
@@ -38,20 +39,23 @@ const ParkingCard = memo(({
       <CardContent className="p-4">
         <div className="space-y-2">
           <div className="flex items-start justify-between gap-2">
-            {showDistance && distance !== undefined ? (
-              <div className="flex items-center text-primary font-semibold text-sm">
-                <Star className="w-3 h-3 mr-1" />
-                <span>{distance.toFixed(1)} km de distância</span>
-              </div>
-            ) : (
-              <h3 
-                className="font-semibold text-sm leading-tight truncate flex-1 min-w-0" 
-                title={parkingSpot.nome}
-              >
-                {parkingSpot.nome}
-              </h3>
-            )}
+            <h3 
+              className="font-semibold text-sm leading-tight truncate flex-1 min-w-0" 
+              title={parkingSpot.nome}
+            >
+              {parkingSpot.nome}
+            </h3>
+            <RatingDisplay 
+              rating={parkingSpot.media_avaliacao || 0} 
+              size="sm"
+            />
           </div>
+          
+          {showDistance && distance !== undefined && (
+            <div className="text-xs text-muted-foreground">
+              {distance.toFixed(1)} km de distância
+            </div>
+          )}
 
           <div className="flex items-center text-xs text-muted-foreground">
             <MapPin className="w-3.5 h-3.5 mr-1 flex-shrink-0 text-spatioo-primary dark:text-spatioo-secondary" />
