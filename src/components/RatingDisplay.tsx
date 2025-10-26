@@ -1,7 +1,9 @@
-import { Star } from 'lucide-react';
+import { Star, Sparkles } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface RatingDisplayProps {
   rating: number;
+  reviewCount?: number; // Total de avaliações
   showNumber?: boolean;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
@@ -9,6 +11,7 @@ interface RatingDisplayProps {
 
 export const RatingDisplay = ({ 
   rating, 
+  reviewCount = 0,
   showNumber = true, 
   size = 'md',
   className = '' 
@@ -25,7 +28,18 @@ export const RatingDisplay = ({
     lg: 'text-base'
   };
 
-  if (rating === 0) {
+  // Se tem menos de 3 avaliações, mostrar "Novo!"
+  if (reviewCount < 3) {
+    return (
+      <Badge variant="secondary" className={`${textSizeClasses[size]} ${className} bg-spatioo-green/20 text-spatioo-green border-spatioo-green/30 gap-1`}>
+        <Sparkles className={sizeClasses[size]} />
+        Novo!
+      </Badge>
+    );
+  }
+
+  // Se não tem avaliações (caso edge)
+  if (rating === 0 || rating === null) {
     return (
       <span className={`text-muted-foreground ${textSizeClasses[size]} ${className}`}>
         Sem avaliações

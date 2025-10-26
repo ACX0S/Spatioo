@@ -6,10 +6,12 @@ import { Separator } from '@/components/ui/separator';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { useParkingDetail } from '@/hooks/useParkingDetail';
 import { ParkingDetailsSkeleton } from '@/components/skeletons/DetailsSkeleton';
-import { MapPin, Clock, ArrowLeft } from 'lucide-react';
+import { MapPin, Clock, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { FaCar } from 'react-icons/fa';
 import BookingForm from '@/components/BookingForm';
 import PricingTable from '@/components/PricingDisplay';
+import { RatingDisplay } from '@/components/RatingDisplay';
+import { Badge } from '@/components/ui/badge';
 
 const ParkingDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -81,7 +83,15 @@ const ParkingDetails = () => {
 
       {/* Basic Info */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-1">{parkingSpot.nome}</h1>
+        <div className="flex items-start justify-between gap-2 mb-1">
+          <h1 className="text-2xl font-bold flex-1">{parkingSpot.nome}</h1>
+          <RatingDisplay 
+            rating={parkingSpot.media_avaliacao || 0}
+            reviewCount={parkingSpot.total_avaliacoes || 0}
+            size="lg"
+          />
+        </div>
+        
         <div className="flex items-center text-muted-foreground mb-2">
           <MapPin className="h-4 w-4 mr-1 text-spatioo-green" />
           <span className="text-sm">{parkingSpot.endereco}</span>
@@ -100,6 +110,16 @@ const ParkingDetails = () => {
             </span>
           </div>
         </div>
+
+        {/* Contador de reservas (apenas se >= 10) */}
+        {parkingSpot.total_reservas_concluidas && parkingSpot.total_reservas_concluidas >= 10 && (
+          <div className="mt-3">
+            <Badge variant="outline" className="gap-1.5 bg-spatioo-green/10 border-spatioo-green/30 text-spatioo-green">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              {parkingSpot.total_reservas_concluidas} reservas concluídas
+            </Badge>
+          </div>
+        )}
 
         {/* Tipo de Vaga e Tamanho */}
         <div className="mt-3 space-y-2">

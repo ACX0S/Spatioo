@@ -18,6 +18,9 @@ export type PublicParkingData = {
   tipo?: string; // 'residencial' ou 'comercial'
   proprietario_nome?: string; // Nome do proprietário (apenas para residenciais)
   tamanho_vaga?: 'P' | 'M' | 'G'; // Tamanho da vaga
+  media_avaliacao?: number | null; // Média das avaliações
+  total_avaliacoes?: number; // Total de avaliações recebidas
+  total_reservas_concluidas?: number; // Total de reservas concluídas
   // Comodidades do estacionamento
   funcionamento_24h?: boolean;
   suporte_carro_eletrico?: boolean;
@@ -74,7 +77,7 @@ export const fetchAllParkingSpots = async (): Promise<PublicParkingData[]> => {
     const { data, error } = await supabase
       .from('estacionamento')
       .select(`
-        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude, tipo,
+        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude, tipo, media_avaliacao,
         estacionamento_precos!inner(preco)
       `)
       .eq('ativo', true)
@@ -85,8 +88,21 @@ export const fetchAllParkingSpots = async (): Promise<PublicParkingData[]> => {
       console.error('Error fetching estacionamento:', error);
       throw error;
     }
+
+    // Get review counts for all estacionamentos
+    const estacionamentoIds = (data || []).map(item => item.id);
+    const { data: reviewCounts } = await supabase
+      .from('reviews')
+      .select('avaliado_id')
+      .eq('avaliado_tipo', 'estacionamento')
+      .in('avaliado_id', estacionamentoIds);
+
+    const countMap = (reviewCounts || []).reduce((acc, review) => {
+      acc[review.avaliado_id] = (acc[review.avaliado_id] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
     
-    // Transform the data to include preco_fixo_1h
+    // Transform the data to include preco_fixo_1h and review info
     const transformedData = (data || []).map(item => ({
       id: item.id,
       nome: item.nome,
@@ -99,7 +115,9 @@ export const fetchAllParkingSpots = async (): Promise<PublicParkingData[]> => {
       created_at: item.created_at,
       latitude: item.latitude,
       longitude: item.longitude,
-      tipo: item.tipo
+      tipo: item.tipo,
+      media_avaliacao: item.media_avaliacao,
+      total_avaliacoes: countMap[item.id] || 0
     }));
     
     return transformedData;
@@ -116,7 +134,7 @@ export const fetchParkingSpotById = async (id: string): Promise<PublicParkingDat
     const { data, error } = await supabase
       .from('estacionamento')
       .select(`
-        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude, tipo, user_id, tamanho_vaga,
+        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude, tipo, user_id, tamanho_vaga, media_avaliacao,
         funcionamento_24h, suporte_carro_eletrico, vaga_coberta, manobrista, suporte_caminhao, vaga_moto,
         estacionamento_precos(preco, horas)
       `)
@@ -133,6 +151,20 @@ export const fetchParkingSpotById = async (id: string): Promise<PublicParkingDat
     
     // Find the 1-hour price
     const preco1h = data.estacionamento_precos?.find(p => p.horas === 1)?.preco || null;
+
+    // Count total reviews
+    const { count: totalReviews } = await supabase
+      .from('reviews')
+      .select('*', { count: 'exact', head: true })
+      .eq('avaliado_id', id)
+      .eq('avaliado_tipo', 'estacionamento');
+
+    // Count total completed bookings
+    const { count: totalBookings } = await supabase
+      .from('bookings')
+      .select('*', { count: 'exact', head: true })
+      .eq('estacionamento_id', id)
+      .eq('status', 'concluida');
     
     // Fetch owner's name if it's a residential parking
     let proprietarioNome: string | undefined;
@@ -163,6 +195,9 @@ export const fetchParkingSpotById = async (id: string): Promise<PublicParkingDat
       tipo: data.tipo,
       proprietario_nome: proprietarioNome,
       tamanho_vaga: data.tamanho_vaga as 'P' | 'M' | 'G' | undefined,
+      media_avaliacao: data.media_avaliacao,
+      total_avaliacoes: totalReviews || 0,
+      total_reservas_concluidas: totalBookings || 0,
       funcionamento_24h: data.funcionamento_24h,
       suporte_carro_eletrico: data.suporte_carro_eletrico,
       vaga_coberta: data.vaga_coberta,
@@ -183,7 +218,7 @@ export const fetchNearbyParkingSpots = async (): Promise<PublicParkingData[]> =>
     const { data, error } = await supabase
       .from('estacionamento')
       .select(`
-        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude, tipo,
+        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude, tipo, media_avaliacao,
         estacionamento_precos!inner(preco)
       `)
       .eq('ativo', true)
@@ -194,8 +229,21 @@ export const fetchNearbyParkingSpots = async (): Promise<PublicParkingData[]> =>
       console.error('Error fetching nearby estacionamentos:', error);
       throw error;
     }
+
+    // Get review counts
+    const estacionamentoIds = (data || []).map(item => item.id);
+    const { data: reviewCounts } = await supabase
+      .from('reviews')
+      .select('avaliado_id')
+      .eq('avaliado_tipo', 'estacionamento')
+      .in('avaliado_id', estacionamentoIds);
+
+    const countMap = (reviewCounts || []).reduce((acc, review) => {
+      acc[review.avaliado_id] = (acc[review.avaliado_id] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
     
-    // Transform the data to include preco_fixo_1h
+    // Transform the data to include preco_fixo_1h and review info
     const transformedData = (data || []).map(item => ({
       id: item.id,
       nome: item.nome,
@@ -208,7 +256,9 @@ export const fetchNearbyParkingSpots = async (): Promise<PublicParkingData[]> =>
       created_at: item.created_at,
       latitude: item.latitude,
       longitude: item.longitude,
-      tipo: item.tipo
+      tipo: item.tipo,
+      media_avaliacao: item.media_avaliacao,
+      total_avaliacoes: countMap[item.id] || 0
     }));
     
     return transformedData;
@@ -225,7 +275,7 @@ export const fetchPopularParkingSpots = async (limit: number = 4): Promise<Publi
     const { data, error } = await supabase
       .from('estacionamento')
       .select(`
-        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude, tipo,
+        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude, tipo, media_avaliacao,
         estacionamento_precos!inner(preco)
       `)
       .eq('ativo', true)
@@ -237,8 +287,21 @@ export const fetchPopularParkingSpots = async (limit: number = 4): Promise<Publi
       console.error('Error fetching popular estacionamentos:', error);
       throw error;
     }
+
+    // Get review counts
+    const estacionamentoIds = (data || []).map(item => item.id);
+    const { data: reviewCounts } = await supabase
+      .from('reviews')
+      .select('avaliado_id')
+      .eq('avaliado_tipo', 'estacionamento')
+      .in('avaliado_id', estacionamentoIds);
+
+    const countMap = (reviewCounts || []).reduce((acc, review) => {
+      acc[review.avaliado_id] = (acc[review.avaliado_id] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
     
-    // Transform the data to include preco_fixo_1h
+    // Transform the data to include preco_fixo_1h and review info
     const transformedData = (data || []).map(item => ({
       id: item.id,
       nome: item.nome,
@@ -251,7 +314,9 @@ export const fetchPopularParkingSpots = async (limit: number = 4): Promise<Publi
       created_at: item.created_at,
       latitude: item.latitude,
       longitude: item.longitude,
-      tipo: item.tipo
+      tipo: item.tipo,
+      media_avaliacao: item.media_avaliacao,
+      total_avaliacoes: countMap[item.id] || 0
     }));
     
     return transformedData;
@@ -268,7 +333,7 @@ export const searchParkingSpots = async (searchTerm: string): Promise<PublicPark
     const { data, error } = await supabase
       .from('estacionamento')
       .select(`
-        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude, tipo,
+        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude, tipo, media_avaliacao,
         estacionamento_precos!inner(preco)
       `)
       .eq('ativo', true)
@@ -280,8 +345,21 @@ export const searchParkingSpots = async (searchTerm: string): Promise<PublicPark
       console.error('Error searching estacionamentos:', error);
       throw error;
     }
+
+    // Get review counts
+    const estacionamentoIds = (data || []).map(item => item.id);
+    const { data: reviewCounts } = await supabase
+      .from('reviews')
+      .select('avaliado_id')
+      .eq('avaliado_tipo', 'estacionamento')
+      .in('avaliado_id', estacionamentoIds);
+
+    const countMap = (reviewCounts || []).reduce((acc, review) => {
+      acc[review.avaliado_id] = (acc[review.avaliado_id] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
     
-    // Transform the data to include preco_fixo_1h
+    // Transform the data to include preco_fixo_1h and review info
     const transformedData = (data || []).map(item => ({
       id: item.id,
       nome: item.nome,
@@ -294,7 +372,9 @@ export const searchParkingSpots = async (searchTerm: string): Promise<PublicPark
       created_at: item.created_at,
       latitude: item.latitude,
       longitude: item.longitude,
-      tipo: item.tipo
+      tipo: item.tipo,
+      media_avaliacao: item.media_avaliacao,
+      total_avaliacoes: countMap[item.id] || 0
     }));
     
     return transformedData;

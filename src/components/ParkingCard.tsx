@@ -46,7 +46,8 @@ const ParkingCard = memo(({
               {parkingSpot.nome}
             </h3>
             <RatingDisplay 
-              rating={parkingSpot.media_avaliacao || 0} 
+              rating={parkingSpot.media_avaliacao || 0}
+              reviewCount={parkingSpot.total_avaliacoes || 0}
               size="sm"
             />
           </div>
