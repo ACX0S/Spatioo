@@ -1,0 +1,3617 @@
+[
+  {
+    "marca": "Agrale Marruá",
+    "largura": 2160.0,
+    "comprimento": 5300.0
+  },
+  {
+    "marca": "Alfa Romeo 145",
+    "largura": 1712.0,
+    "comprimento": 4093.0
+  },
+  {
+    "marca": "Alfa Romeo 146",
+    "largura": 1712.0,
+    "comprimento": 4260.0
+  },
+  {
+    "marca": "Alfa Romeo 147",
+    "largura": 1729.0,
+    "comprimento": 4223.0
+  },
+  {
+    "marca": "Alfa Romeo 155",
+    "largura": 1730.0,
+    "comprimento": 4443.0
+  },
+  {
+    "marca": "Alfa Romeo 156",
+    "largura": 1743.0,
+    "comprimento": 4441.0
+  },
+  {
+    "marca": "Alfa Romeo 164",
+    "largura": 1760.0,
+    "comprimento": 4560.0
+  },
+  {
+    "marca": "Alfa Romeo 166",
+    "largura": 1815.0,
+    "comprimento": 4720.0
+  },
+  {
+    "marca": "Alfa Romeo 2300",
+    "largura": 1692.0,
+    "comprimento": 4719.0
+  },
+  {
+    "marca": "Alfa Romeo Giulia",
+    "largura": 1860.0,
+    "comprimento": 4643.0
+  },
+  {
+    "marca": "Alfa Romeo Spider",
+    "largura": 1630.0,
+    "comprimento": 4257.0
+  },
+  {
+    "marca": "Alfa Romeo Stelvio",
+    "largura": 1903.0,
+    "comprimento": 4687.0
+  },
+  {
+    "marca": "Asia Rocsta",
+    "largura": 1630.0,
+    "comprimento": 3720.0
+  },
+  {
+    "marca": "Asia Topic",
+    "largura": 1690.0,
+    "comprimento": 5260.0
+  },
+  {
+    "marca": "Asia Towner",
+    "largura": 1400.0,
+    "comprimento": 3360.0
+  },
+  {
+    "marca": "Aston Martin DB7",
+    "largura": 1830.0,
+    "comprimento": 4646.0
+  },
+  {
+    "marca": "Aston Martin DB9",
+    "largura": 1880.0,
+    "comprimento": 4709.0
+  },
+  {
+    "marca": "Aston Martin DB11",
+    "largura": 2060.0,
+    "comprimento": 4739.0
+  },
+  {
+    "marca": "Aston Martin DBS",
+    "largura": 1830.0,
+    "comprimento": 4580.0
+  },
+  {
+    "marca": "Aston Martin Rapide",
+    "largura": 1928.0,
+    "comprimento": 5019.0
+  },
+  {
+    "marca": "Aston Martin Vanquish",
+    "largura": 1905.0,
+    "comprimento": 4720.0
+  },
+  {
+    "marca": "Aston Martin Vantage",
+    "largura": 1943.0,
+    "comprimento": 4465.0
+  },
+  {
+    "marca": "Aston Martin Virage",
+    "largura": 2060.0,
+    "comprimento": 4722.0
+  },
+  {
+    "marca": "Aston Martin Vulcan",
+    "largura": 2063.0,
+    "comprimento": 4807.0
+  },
+  {
+    "marca": "Audi A1",
+    "largura": 1740.0,
+    "comprimento": 3954.0
+  },
+  {
+    "marca": "Audi A2",
+    "largura": 1660.0,
+    "comprimento": 3990.0
+  },
+  {
+    "marca": "Audi A3",
+    "largura": 1785.0,
+    "comprimento": 4310.0
+  },
+  {
+    "marca": "Audi A3 Sedan",
+    "largura": 1796.0,
+    "comprimento": 4456.0
+  },
+  {
+    "marca": "Audi A3 Cabriolet",
+    "largura": 1796.0,
+    "comprimento": 4317.0
+  },
+  {
+    "marca": "Audi RS3 Sportback",
+    "largura": 1796.0,
+    "comprimento": 4463.0
+  },
+  {
+    "marca": "Audi RS3",
+    "largura": 1785.0,
+    "comprimento": 4345.0
+  },
+  {
+    "marca": "Audi A4",
+    "largura": 1842.0,
+    "comprimento": 4726.0
+  },
+  {
+    "marca": "Audi A4 Avant",
+    "largura": 1842.0,
+    "comprimento": 4725.0
+  },
+  {
+    "marca": "Audi RS4",
+    "largura": 1866.0,
+    "comprimento": 4781.0
+  },
+  {
+    "marca": "Audi A5",
+    "largura": 1846.0,
+    "comprimento": 4733.0
+  },
+  {
+    "marca": "Audi RS5",
+    "largura": 1854.0,
+    "comprimento": 4712.0
+  },
+  {
+    "marca": "Audi A6",
+    "largura": 1886.0,
+    "comprimento": 4939.0
+  },
+  {
+    "marca": "Audi RS6 Avant",
+    "largura": 1986.0,
+    "comprimento": 4991.0
+  },
+  {
+    "marca": "Audi A7",
+    "largura": 1926.0,
+    "comprimento": 4969.0
+  },
+  {
+    "marca": "Audi RS7",
+    "largura": 1926.0,
+    "comprimento": 4969.0
+  },
+  {
+    "marca": "Audi A8",
+    "largura": 1949.0,
+    "comprimento": 5135.0
+  },
+  {
+    "marca": "Audi e-tron",
+    "largura": 1935.0,
+    "comprimento": 4901.0
+  },
+  {
+    "marca": "Audi Q2",
+    "largura": 1507.0,
+    "comprimento": 4191.0
+  },
+  {
+    "marca": "Audi Q3",
+    "largura": 1831.0,
+    "comprimento": 4385.0
+  },
+  {
+    "marca": "Audi Q4",
+    "largura": 1835.0,
+    "comprimento": 4505.0
+  },
+  {
+    "marca": "Audi Q5",
+    "largura": 1893.0,
+    "comprimento": 4663.0
+  },
+  {
+    "marca": "Audi Q7",
+    "largura": 1968.0,
+    "comprimento": 5052.0
+  },
+  {
+    "marca": "Audi Q8",
+    "largura": 1995.0,
+    "comprimento": 4994.0
+  },
+  {
+    "marca": "Audi TT",
+    "largura": 1832.0,
+    "comprimento": 4191.0
+  },
+  {
+    "marca": "Audi TT RS",
+    "largura": 1777.0,
+    "comprimento": 4180.0
+  },
+  {
+    "marca": "Audi TT Roadster",
+    "largura": 1777.0,
+    "comprimento": 4180.0
+  },
+  {
+    "marca": "Audi R8",
+    "largura": 1940.0,
+    "comprimento": 4426.0
+  },
+  {
+    "marca": "Bentley Arnage",
+    "largura": 1935.0,
+    "comprimento": 5458.0
+  },
+  {
+    "marca": "Bentley Bentayga",
+    "largura": 1998.0,
+    "comprimento": 5141.0
+  },
+  {
+    "marca": "Bentley Brooklands",
+    "largura": 1935.0,
+    "comprimento": 5458.0
+  },
+  {
+    "marca": "Bentley Continental GT",
+    "largura": 1954.0,
+    "comprimento": 4850.0
+  },
+  {
+    "marca": "Bentley Flying Spur",
+    "largura": 1924.0,
+    "comprimento": 5290.0
+  },
+  {
+    "marca": "Bentley Mulsanne",
+    "largura": 1926.0,
+    "comprimento": 5575.0
+  },
+  {
+    "marca": "BMW Série 1",
+    "largura": 1765.0,
+    "comprimento": 4324.0
+  },
+  {
+    "marca": "BMW Série 2",
+    "largura": 1774.0,
+    "comprimento": 4432.0
+  },
+  {
+    "marca": "BMW Série 3",
+    "largura": 1810.0,
+    "comprimento": 4620.0
+  },
+  {
+    "marca": "BMW Série 4",
+    "largura": 1825.0,
+    "comprimento": 4638.0
+  },
+  {
+    "marca": "BMW Série 5",
+    "largura": 1867.0,
+    "comprimento": 4943.0
+  },
+  {
+    "marca": "BMW Série 6",
+    "largura": 1902.0,
+    "comprimento": 5091.0
+  },
+  {
+    "marca": "BMW Série 7",
+    "largura": 1902.0,
+    "comprimento": 5238.0
+  },
+  {
+    "marca": "BMW Série 8",
+    "largura": 1902.0,
+    "comprimento": 4851.0
+  },
+  {
+    "marca": "BMW i3",
+    "largura": 1775.0,
+    "comprimento": 4011.0
+  },
+  {
+    "marca": "BMW i8",
+    "largura": 1942.0,
+    "comprimento": 4689.0
+  },
+  {
+    "marca": "BMW X1",
+    "largura": 1821.0,
+    "comprimento": 4439.0
+  },
+  {
+    "marca": "BMW X2",
+    "largura": 1824.0,
+    "comprimento": 4360.0
+  },
+  {
+    "marca": "BMW X3",
+    "largura": 1891.0,
+    "comprimento": 4708.0
+  },
+  {
+    "marca": "BMW X3 M",
+    "largura": 1902.0,
+    "comprimento": 4714.0
+  },
+  {
+    "marca": "BMW X4",
+    "largura": 1901.0,
+    "comprimento": 4671.0
+  },
+  {
+    "marca": "BMW X4 M",
+    "largura": 1902.0,
+    "comprimento": 4714.0
+  },
+  {
+    "marca": "BMW X5",
+    "largura": 1938.0,
+    "comprimento": 4886.0
+  },
+  {
+    "marca": "BMW X6",
+    "largura": 1989.0,
+    "comprimento": 4909.0
+  },
+  {
+    "marca": "BMW X7",
+    "largura": 2000.0,
+    "comprimento": 5151.0
+  },
+  {
+    "marca": "BMW Z4",
+    "largura": 1864.0,
+    "comprimento": 4324.0
+  },
+  {
+    "marca": "BMW Z4 M",
+    "largura": 1843.0,
+    "comprimento": 4324.0
+  },
+  {
+    "marca": "BMW M2",
+    "largura": 1854.0,
+    "comprimento": 4468.0
+  },
+  {
+    "marca": "BMW M3",
+    "largura": 1854.0,
+    "comprimento": 4708.0
+  },
+  {
+    "marca": "BMW M4",
+    "largura": 1854.0,
+    "comprimento": 4671.0
+  },
+  {
+    "marca": "BMW M5",
+    "largura": 1902.0,
+    "comprimento": 4918.0
+  },
+  {
+    "marca": "BMW M6",
+    "largura": 1902.0,
+    "comprimento": 4918.0
+  },
+  {
+    "marca": "Bugatti Chiron",
+    "largura": 2073.0,
+    "comprimento": 4462.0
+  },
+  {
+    "marca": "Bugatti Divo",
+    "largura": 2073.0,
+    "comprimento": 4462.0
+  },
+  {
+    "marca": "Bugatti EB110",
+    "largura": 1898.0,
+    "comprimento": 4510.0
+  },
+  {
+    "marca": "Bugatti EB112",
+    "largura": 1958.0,
+    "comprimento": 4853.0
+  },
+  {
+    "marca": "Bugatti La Voiture Noire",
+    "largura": 2073.0,
+    "comprimento": 4462.0
+  },
+  {
+    "marca": "Bugatti Veyron",
+    "largura": 2011.0,
+    "comprimento": 4462.0
+  },
+  {
+    "marca": "Cadillac ATS",
+    "largura": 1816.0,
+    "comprimento": 4646.0
+  },
+  {
+    "marca": "Cadillac BLS",
+    "largura": 1816.0,
+    "comprimento": 4646.0
+  },
+  {
+    "marca": "Cadillac CT6",
+    "largura": 2085.0,
+    "comprimento": 5163.0
+  },
+  {
+    "marca": "Cadillac CTS",
+    "largura": 1816.0,
+    "comprimento": 4646.0
+  },
+  {
+    "marca": "Cadillac CTS-V",
+    "largura": 1816.0,
+    "comprimento": 4646.0
+  },
+  {
+    "marca": "Cadillac DeVille",
+    "largura": 1816.0,
+    "comprimento": 4646.0
+  },
+  {
+    "marca": "Cadillac DTS",
+    "largura": 1816.0,
+    "comprimento": 4646.0
+  },
+  {
+    "marca": "Cadillac Eldorado",
+    "largura": 1816.0,
+    "comprimento": 4646.0
+  },
+  {
+    "marca": "Cadillac ELR",
+    "largura": 1816.0,
+    "comprimento": 4646.0
+  },
+  {
+    "marca": "Cadillac Escalade",
+    "largura": 2085.0,
+    "comprimento": 5163.0
+  },
+  {
+    "marca": "Cadillac Fleetwood",
+    "largura": 1816.0,
+    "comprimento": 4646.0
+  },
+  {
+    "marca": "Cadillac Seville",
+    "largura": 1816.0,
+    "comprimento": 4646.0
+  },
+  {
+    "marca": "Cadillac SRX",
+    "largura": 1816.0,
+    "comprimento": 4646.0
+  },
+  {
+    "marca": "Cadillac STS",
+    "largura": 1816.0,
+    "comprimento": 4646.0
+  },
+  {
+    "marca": "Cadillac XT5",
+    "largura": 1816.0,
+    "comprimento": 4646.0
+  },
+  {
+    "marca": "Cadillac XTS",
+    "largura": 1816.0,
+    "comprimento": 4646.0
+  },
+  {
+    "marca": "Chery Arrizo 5",
+    "largura": 1814.0,
+    "comprimento": 4532.0
+  },
+  {
+    "marca": "Chery Arrizo 6",
+    "largura": 1814.0,
+    "comprimento": 4675.0
+  },
+  {
+    "marca": "Chery Celer",
+    "largura": 1686.0,
+    "comprimento": 4139.0
+  },
+  {
+    "marca": "Chery Cielo",
+    "largura": 1794.0,
+    "comprimento": 4352.0
+  },
+  {
+    "marca": "Chery Face",
+    "largura": 1578.0,
+    "comprimento": 3700.0
+  },
+  {
+    "marca": "Chery S18",
+    "largura": 1590.0,
+    "comprimento": 3600.0
+  },
+  {
+    "marca": "Chery QQ",
+    "largura": 1620.0,
+    "comprimento": 3564.0
+  },
+  {
+    "marca": "Chery Tiggo",
+    "largura": 1765.0,
+    "comprimento": 4285.0
+  },
+  {
+    "marca": "Chery Tiggo 2",
+    "largura": 1760.0,
+    "comprimento": 4200.0
+  },
+  {
+    "marca": "Chery Tiggo 3x",
+    "largura": 1760.0,
+    "comprimento": 4200.0
+  },
+  {
+    "marca": "Chery Tiggo 5x",
+    "largura": 1830.0,
+    "comprimento": 4338.0
+  },
+  {
+    "marca": "Chery Tiggo 7",
+    "largura": 1837.0,
+    "comprimento": 4505.0
+  },
+  {
+    "marca": "Chery Tiggo 8",
+    "largura": 1860.0,
+    "comprimento": 4700.0
+  },
+  {
+    "marca": "Chevrolet Agile",
+    "largura": 1680.0,
+    "comprimento": 4000.0
+  },
+  {
+    "marca": "Chevrolet Astra",
+    "largura": 1709.0,
+    "comprimento": 4110.0
+  },
+  {
+    "marca": "Chevrolet Blazer",
+    "largura": 1722.0,
+    "comprimento": 4602.0
+  },
+  {
+    "marca": "Chevrolet Bolt",
+    "largura": 1765.0,
+    "comprimento": 4166.0
+  },
+  {
+    "marca": "Chevrolet Bonanza",
+    "largura": 1990.0,
+    "comprimento": 4500.0
+  },
+  {
+    "marca": "Chevrolet Calibra",
+    "largura": 1688.0,
+    "comprimento": 4492.0
+  },
+  {
+    "marca": "Chevrolet Camaro conversível",
+    "largura": 1897.0,
+    "comprimento": 4784.0
+  },
+  {
+    "marca": "Chevrolet Captiva",
+    "largura": 1850.0,
+    "comprimento": 4575.0
+  },
+  {
+    "marca": "Chevrolet Cavalier",
+    "largura": 1685.0,
+    "comprimento": 4379.0
+  },
+  {
+    "marca": "Chevrolet Caravan",
+    "largura": 1766.0,
+    "comprimento": 4812.0
+  },
+  {
+    "marca": "Chevrolet Celta",
+    "largura": 1610.0,
+    "comprimento": 3750.0
+  },
+  {
+    "marca": "Chevrolet Chevelle",
+    "largura": 1915.0,
+    "comprimento": 5110.0
+  },
+  {
+    "marca": "Chevrolet Chevette",
+    "largura": 1570.0,
+    "comprimento": 4152.0
+  },
+  {
+    "marca": "Chevrolet Chevy 500",
+    "largura": 1570.0,
+    "comprimento": 4180.0
+  },
+  {
+    "marca": "Chevrolet City Express",
+    "largura": 1730.0,
+    "comprimento": 4732.0
+  },
+  {
+    "marca": "Chevrolet Classic",
+    "largura": 1608.0,
+    "comprimento": 4056.0
+  },
+  {
+    "marca": "Chevrolet Cobalt",
+    "largura": 1735.0,
+    "comprimento": 4481.0
+  },
+  {
+    "marca": "Chevrolet Corsa",
+    "largura": 1646.0,
+    "comprimento": 4170.0
+  },
+  {
+    "marca": "Chevrolet Corvette",
+    "largura": 1933.0,
+    "comprimento": 4630.0
+  },
+  {
+    "marca": "Chevrolet Cruze",
+    "largura": 1807.0,
+    "comprimento": 4665.0
+  },
+  {
+    "marca": "Chevrolet Cruze Sport6",
+    "largura": 1807.0,
+    "comprimento": 4448.0
+  },
+  {
+    "marca": "Chevrolet C10",
+    "largura": 1745.0,
+    "comprimento": 4828.0
+  },
+  {
+    "marca": "Chevrolet D20",
+    "largura": 1880.0,
+    "comprimento": 4820.0
+  },
+  {
+    "marca": "Chevrolet El Camino",
+    "largura": 1826.0,
+    "comprimento": 5121.0
+  },
+  {
+    "marca": "Chevrolet Equinox",
+    "largura": 1843.0,
+    "comprimento": 4652.0
+  },
+  {
+    "marca": "Chevrolet Express",
+    "largura": 2012.0,
+    "comprimento": 5692.0
+  },
+  {
+    "marca": "Chevrolet Grand Blazer",
+    "largura": 2000.0,
+    "comprimento": 5050.0
+  },
+  {
+    "marca": "Chevrolet HHR",
+    "largura": 1755.0,
+    "comprimento": 4480.0
+  },
+  {
+    "marca": "Chevrolet Impala",
+    "largura": 1854.0,
+    "comprimento": 5113.0
+  },
+  {
+    "marca": "Chevrolet Ipanema",
+    "largura": 1686.0,
+    "comprimento": 4311.0
+  },
+  {
+    "marca": "Chevrolet Joy",
+    "largura": 1705.0,
+    "comprimento": 3930.0
+  },
+  {
+    "marca": "Chevrolet Joy Plus",
+    "largura": 1964.0,
+    "comprimento": 4275.0
+  },
+  {
+    "marca": "Chevrolet Kadett",
+    "largura": 1686.0,
+    "comprimento": 4073.0
+  },
+  {
+    "marca": "Chevrolet Malibu",
+    "largura": 1786.0,
+    "comprimento": 4782.0
+  },
+  {
+    "marca": "Chevrolet Marajó",
+    "largura": 1570.0,
+    "comprimento": 4195.0
+  },
+  {
+    "marca": "Chevrolet Meriva",
+    "largura": 1694.0,
+    "comprimento": 4042.0
+  },
+  {
+    "marca": "Chevrolet Montana",
+    "largura": 1700.0,
+    "comprimento": 4514.0
+  },
+  {
+    "marca": "Chevrolet Monza",
+    "largura": 1668.0,
+    "comprimento": 4493.0
+  },
+  {
+    "marca": "Chevrolet Omega",
+    "largura": 1899.0,
+    "comprimento": 4894.0
+  },
+  {
+    "marca": "Chevrolet Onix",
+    "largura": 1705.0,
+    "comprimento": 3933.0
+  },
+  {
+    "marca": "Chevrolet Onix Plus",
+    "largura": 1730.0,
+    "comprimento": 4474.0
+  },
+  {
+    "marca": "Chevrolet Omega",
+    "largura": 1760.0,
+    "comprimento": 4738.0
+  },
+  {
+    "marca": "Chevrolet Orlando",
+    "largura": 1836.0,
+    "comprimento": 4652.0
+  },
+  {
+    "marca": "Chevrolet Prisma",
+    "largura": 1705.0,
+    "comprimento": 4275.0
+  },
+  {
+    "marca": "Chevrolet S10",
+    "largura": 1874.0,
+    "comprimento": 5361.0
+  },
+  {
+    "marca": "Chevrolet S10 cabine dupla",
+    "largura": 1874.0,
+    "comprimento": 5361.0
+  },
+  {
+    "marca": "Chevrolet Sail",
+    "largura": 1.69,
+    "comprimento": 4249.0
+  },
+  {
+    "marca": "Chevrolet Silverado",
+    "largura": 2250.0,
+    "comprimento": 4941.0
+  },
+  {
+    "marca": "Chevrolet Sonic",
+    "largura": 1735.0,
+    "comprimento": 4039.0
+  },
+  {
+    "marca": "Chevrolet Spark",
+    "largura": 3824.0,
+    "comprimento": 1596.0
+  },
+  {
+    "marca": "Chevrolet Spin",
+    "largura": 1735.0,
+    "comprimento": 4360.0
+  },
+  {
+    "marca": "Chevrolet SS",
+    "largura": 4995.0,
+    "comprimento": 1896.0
+  },
+  {
+    "marca": "Chevrolet SSR",
+    "largura": 5335.0,
+    "comprimento": 1973.0
+  },
+  {
+    "marca": "Chevrolet Suburban",
+    "largura": 5336.0,
+    "comprimento": 1973.0
+  },
+  {
+    "marca": "Chevrolet Suprema",
+    "largura": 1760.0,
+    "comprimento": 4750.0
+  },
+  {
+    "marca": "Chevrolet Tahoe",
+    "largura": 5336.0,
+    "comprimento": 1973.0
+  },
+  {
+    "marca": "Chevrolet Tigra",
+    "largura": 1590.0,
+    "comprimento": 3920.0
+  },
+  {
+    "marca": "Chevrolet Tracker",
+    "largura": 1776.0,
+    "comprimento": 4258.0
+  },
+  {
+    "marca": "Chevrolet Trailblazer",
+    "largura": 1902.0,
+    "comprimento": 4887.0
+  },
+  {
+    "marca": "Chevrolet Traverse",
+    "largura": 5361.0,
+    "comprimento": 1907.0
+  },
+  {
+    "marca": "Chevrolet Trax",
+    "largura": 4248.0,
+    "comprimento": 1776.0
+  },
+  {
+    "marca": "Chevrolet Uplander",
+    "largura": 4856.0,
+    "comprimento": 1824.0
+  },
+  {
+    "marca": "Chevrolet Vectra",
+    "largura": 1707.0,
+    "comprimento": 4495.0
+  },
+  {
+    "marca": "Chevrolet Venture",
+    "largura": 4856.0,
+    "comprimento": 1824.0
+  },
+  {
+    "marca": "Chevrolet Veraneio",
+    "largura": 1976.0,
+    "comprimento": 5162.0
+  },
+  {
+    "marca": "Chevrolet Volt",
+    "largura": 4416.0,
+    "comprimento": 1776.0
+  },
+  {
+    "marca": "Chevrolet Zafira",
+    "largura": 1742.0,
+    "comprimento": 4334.0
+  },
+  {
+    "marca": "Chrysler 200",
+    "largura": 4746.0,
+    "comprimento": 1826.0
+  },
+  {
+    "marca": "Chrysler 300M",
+    "largura": 4924.0,
+    "comprimento": 1913.0
+  },
+  {
+    "marca": "Chrysler 300C",
+    "largura": 4924.0,
+    "comprimento": 1913.0
+  },
+  {
+    "marca": "Chrysler Neon",
+    "largura": 4527.0,
+    "comprimento": 1735.0
+  },
+  {
+    "marca": "Chrysler Pacifica",
+    "largura": 5184.0,
+    "comprimento": 1964.0
+  },
+  {
+    "marca": "Chrysler PT Cruiser",
+    "largura": 1704.0,
+    "comprimento": 4290.0
+  },
+  {
+    "marca": "Chrysler Sebring",
+    "largura": 1843.0,
+    "comprimento": 4930.0
+  },
+  {
+    "marca": "Chrysler Stratus",
+    "largura": 1822.0,
+    "comprimento": 4746.0
+  },
+  {
+    "marca": "Chrysler Town and Country",
+    "largura": 1998.0,
+    "comprimento": 5151.0
+  },
+  {
+    "marca": "Chrysler Voyager",
+    "largura": 1997.0,
+    "comprimento": 5096.0
+  },
+  {
+    "marca": "Citroen Aircross",
+    "largura": 1723.0,
+    "comprimento": 4279.0
+  },
+  {
+    "marca": "Citroen AX",
+    "largura": 3715.0,
+    "comprimento": 1566.0
+  },
+  {
+    "marca": "Citroen Berlingo",
+    "largura": 1810.0,
+    "comprimento": 4380.0
+  },
+  {
+    "marca": "Citroen BX",
+    "largura": 1625.0,
+    "comprimento": 4237.0
+  },
+  {
+    "marca": "Citroen C-Crosser",
+    "largura": 4580.0,
+    "comprimento": 1810.0
+  },
+  {
+    "marca": "Citroen C3",
+    "largura": 1708.0,
+    "comprimento": 3944.0
+  },
+  {
+    "marca": "Citroen C3 Picasso",
+    "largura": 1723.0,
+    "comprimento": 4092.0
+  },
+  {
+    "marca": "Citroen C4 hatch",
+    "largura": 1773.0,
+    "comprimento": 4260.0
+  },
+  {
+    "marca": "Citroen C4 Cactus",
+    "largura": 1710.0,
+    "comprimento": 4170.0
+  },
+  {
+    "marca": "Citroen C4 Lounge",
+    "largura": 1789.0,
+    "comprimento": 4621.0
+  },
+  {
+    "marca": "Citroen C4 Pallas",
+    "largura": 1773.0,
+    "comprimento": 4770.0
+  },
+  {
+    "marca": "Citroen C4 Picasso",
+    "largura": 1830.0,
+    "comprimento": 4470.0
+  },
+  {
+    "marca": "Citroen C5",
+    "largura": 1860.0,
+    "comprimento": 4779.0
+  },
+  {
+    "marca": "Citroen C-Elysee",
+    "largura": 4410.0,
+    "comprimento": 1746.0
+  },
+  {
+    "marca": "Citroen CX",
+    "largura": 1770.0,
+    "comprimento": 4657.0
+  },
+  {
+    "marca": "Citroen DS3",
+    "largura": 1715.0,
+    "comprimento": 3948.0
+  },
+  {
+    "marca": "Citroen DS4",
+    "largura": 1810.0,
+    "comprimento": 4275.0
+  },
+  {
+    "marca": "Citroen DS5",
+    "largura": 1852.0,
+    "comprimento": 4530.0
+  },
+  {
+    "marca": "Citroen Grand C4 Picasso",
+    "largura": 1830.0,
+    "comprimento": 4590.0
+  },
+  {
+    "marca": "Citroen Jumpy",
+    "largura": 1920.0,
+    "comprimento": 5309.0
+  },
+  {
+    "marca": "Citroen Jumper",
+    "largura": 5304.0,
+    "comprimento": 2166.0
+  },
+  {
+    "marca": "Citroen Saxo",
+    "largura": 3715.0,
+    "comprimento": 1566.0
+  },
+  {
+    "marca": "Citroen Xantia",
+    "largura": 1755.0,
+    "comprimento": 4524.0
+  },
+  {
+    "marca": "Citroen XM",
+    "largura": 1794.0,
+    "comprimento": 4708.0
+  },
+  {
+    "marca": "Citroen Xsara Picasso",
+    "largura": 1751.0,
+    "comprimento": 4276.0
+  },
+  {
+    "marca": "Citroen Xsara",
+    "largura": 1698.0,
+    "comprimento": 4188.0
+  },
+  {
+    "marca": "Citroen Xsara Break",
+    "largura": 4470.0,
+    "comprimento": 1746.0
+  },
+  {
+    "marca": "Citroen ZX",
+    "largura": 1707.0,
+    "comprimento": 4085.0
+  },
+  {
+    "marca": "Daewoo Espero",
+    "largura": 1718.0,
+    "comprimento": 4615.0
+  },
+  {
+    "marca": "Daewoo Kalos -1.670 mm x 3.880 mm\nDaewoo Lacetti",
+    "largura": 1725.0,
+    "comprimento": 4500.0
+  },
+  {
+    "marca": "Daewoo Lanos",
+    "largura": 1678.0,
+    "comprimento": 4237.0
+  },
+  {
+    "marca": "Daewoo Leganza",
+    "largura": 1779.0,
+    "comprimento": 4671.0
+  },
+  {
+    "marca": "Daewoo Magnus",
+    "largura": 1815.0,
+    "comprimento": 4770.0
+  },
+  {
+    "marca": "Daewoo Matiz",
+    "largura": 1495.0,
+    "comprimento": 3495.0
+  },
+  {
+    "marca": "Daewoo Nubira",
+    "largura": 1720.0,
+    "comprimento": 4248.0
+  },
+  {
+    "marca": "Daihatsu Altis",
+    "largura": 4320.0,
+    "comprimento": 1720.0
+  },
+  {
+    "marca": "Daihatsu Applause",
+    "largura": 4270.0,
+    "comprimento": 1680.0
+  },
+  {
+    "marca": "Daihatsu Charade",
+    "largura": 3660.0,
+    "comprimento": 1600.0
+  },
+  {
+    "marca": "Daihatsu Cuore",
+    "largura": 3400.0,
+    "comprimento": 1475.0
+  },
+  {
+    "marca": "Daihatsu Move",
+    "largura": 3395.0,
+    "comprimento": 1475.0
+  },
+  {
+    "marca": "Daihatsu Terios",
+    "largura": 3995.0,
+    "comprimento": 1665.0
+  },
+  {
+    "marca": "Daihatsu YRV",
+    "largura": 3695.0,
+    "comprimento": 1565.0
+  },
+  {
+    "marca": "DMC DeLorean",
+    "largura": 1988.0,
+    "comprimento": 4267.0
+  },
+  {
+    "marca": "Dodge Avenger",
+    "largura": 4924.0,
+    "comprimento": 1913.0
+  },
+  {
+    "marca": "Dodge Caliber",
+    "largura": 4550.0,
+    "comprimento": 1780.0
+  },
+  {
+    "marca": "Dodge Challenger",
+    "largura": 1869.0,
+    "comprimento": 4780.0
+  },
+  {
+    "marca": "Dodge Dakota",
+    "largura": 1819.0,
+    "comprimento": 5463.0
+  },
+  {
+    "marca": "Dodge Durango",
+    "largura": 1811.0,
+    "comprimento": 4914.0
+  },
+  {
+    "marca": "Dodge Journey",
+    "largura": 1834.0,
+    "comprimento": 4887.0
+  },
+  {
+    "marca": "Dodge Ram",
+    "largura": 2210.0,
+    "comprimento": 6066.0
+  },
+  {
+    "marca": "Dodge Magnum",
+    "largura": 1830.0,
+    "comprimento": 5140.0
+  },
+  {
+    "marca": "Dodge Neon",
+    "largura": 1792.0,
+    "comprimento": 4532.0
+  },
+  {
+    "marca": "Dodge Polara",
+    "largura": 1594.0,
+    "comprimento": 4229.0
+  },
+  {
+    "marca": "Dodge Ram 2500",
+    "largura": 2009.0,
+    "comprimento": 6030.0
+  },
+  {
+    "marca": "Dodge Spirit",
+    "largura": 1730.0,
+    "comprimento": 4602.0
+  },
+  {
+    "marca": "Dodge Stealth",
+    "largura": 1840.0,
+    "comprimento": 4565.0
+  },
+  {
+    "marca": "Dodge Viper",
+    "largura": 1920.0,
+    "comprimento": 4450.0
+  },
+  {
+    "marca": "Effa M100",
+    "largura": 1670.0,
+    "comprimento": 3560.0
+  },
+  {
+    "marca": "Effa Plutus",
+    "largura": 1720.0,
+    "comprimento": 5350.0
+  },
+  {
+    "marca": "Effa Start Van",
+    "largura": 1450.0,
+    "comprimento": 4680.0
+  },
+  {
+    "marca": "Effa ULC",
+    "largura": 1480.0,
+    "comprimento": 3721.0
+  },
+  {
+    "marca": "Ferrari 208",
+    "largura": 1720.0,
+    "comprimento": 4230.0
+  },
+  {
+    "marca": "Ferrari 250",
+    "largura": 1600.0,
+    "comprimento": 4325.0
+  },
+  {
+    "marca": "Ferrari 308",
+    "largura": 1720.0,
+    "comprimento": 4230.0
+  },
+  {
+    "marca": "Ferrari 328",
+    "largura": 1730.0,
+    "comprimento": 4255.0
+  },
+  {
+    "marca": "Ferrari 330",
+    "largura": 1753.0,
+    "comprimento": 4811.0
+  },
+  {
+    "marca": "Ferrari 348",
+    "largura": 1894.0,
+    "comprimento": 4230.0
+  },
+  {
+    "marca": "Ferrari 360",
+    "largura": 1922.0,
+    "comprimento": 4447.0
+  },
+  {
+    "marca": "Ferrari 365",
+    "largura": 1670.0,
+    "comprimento": 4470.0
+  },
+  {
+    "marca": "Ferrari 456",
+    "largura": 1920.0,
+    "comprimento": 4730.0
+  },
+  {
+    "marca": "Ferrari 458 Italia",
+    "largura": 1937.0,
+    "comprimento": 4527.0
+  },
+  {
+    "marca": "Ferrari 488 GTB",
+    "largura": 1952.0,
+    "comprimento": 4568.0
+  },
+  {
+    "marca": "Ferrari 512",
+    "largura": 1976.0,
+    "comprimento": 4480.0
+  },
+  {
+    "marca": "Ferrari 550",
+    "largura": 1935.0,
+    "comprimento": 4550.0
+  },
+  {
+    "marca": "Ferrari 575",
+    "largura": 1935.0,
+    "comprimento": 4550.0
+  },
+  {
+    "marca": "Ferrari 599",
+    "largura": 1962.0,
+    "comprimento": 4665.0
+  },
+  {
+    "marca": "Ferrari 612 Scaglietti",
+    "largura": 1957.0,
+    "comprimento": 4902.0
+  },
+  {
+    "marca": "Ferrari 812 Superfast",
+    "largura": 1971.0,
+    "comprimento": 4657.0
+  },
+  {
+    "marca": "Ferrari California",
+    "largura": 1910.0,
+    "comprimento": 4570.0
+  },
+  {
+    "marca": "Ferrari Dino",
+    "largura": 1700.0,
+    "comprimento": 4235.0
+  },
+  {
+    "marca": "Ferrari Enzo",
+    "largura": 2035.0,
+    "comprimento": 4702.0
+  },
+  {
+    "marca": "Ferrari F12 Berlinetta",
+    "largura": 1942.0,
+    "comprimento": 4618.0
+  },
+  {
+    "marca": "Ferrari F355",
+    "largura": 1900.0,
+    "comprimento": 4249.0
+  },
+  {
+    "marca": "Ferrari F40",
+    "largura": 1970.0,
+    "comprimento": 4358.0
+  },
+  {
+    "marca": "Ferrari F430",
+    "largura": 1923.0,
+    "comprimento": 4511.0
+  },
+  {
+    "marca": "Ferrari F8 Tributo",
+    "largura": 1979.0,
+    "comprimento": 4611.0
+  },
+  {
+    "marca": "Ferrari FF",
+    "largura": 1953.0,
+    "comprimento": 4907.0
+  },
+  {
+    "marca": "Ferrari GTC4 Lusso",
+    "largura": 1980.0,
+    "comprimento": 4922.0
+  },
+  {
+    "marca": "Ferrari LaFerrari",
+    "largura": 1992.0,
+    "comprimento": 4702.0
+  },
+  {
+    "marca": "Ferrari Mondial",
+    "largura": 1790.0,
+    "comprimento": 4580.0
+  },
+  {
+    "marca": "Ferrari Portofino",
+    "largura": 1938.0,
+    "comprimento": 4586.0
+  },
+  {
+    "marca": "Ferrari Roma",
+    "largura": 1974.0,
+    "comprimento": 4656.0
+  },
+  {
+    "marca": "Ferrari SF90 Stradale",
+    "largura": 1972.0,
+    "comprimento": 4710.0
+  },
+  {
+    "marca": "Ferrari Testarossa",
+    "largura": 1976.0,
+    "comprimento": 4485.0
+  },
+  {
+    "marca": "Fiat 147",
+    "largura": 1545.0,
+    "comprimento": 3627.0
+  },
+  {
+    "marca": "Fiat 500",
+    "largura": 1627.0,
+    "comprimento": 3546.0
+  },
+  {
+    "marca": "Fiat Adventure",
+    "largura": 1721.0,
+    "comprimento": 4310.0
+  },
+  {
+    "marca": "Fiat Argenta",
+    "largura": 1650.0,
+    "comprimento": 4449.0
+  },
+  {
+    "marca": "Fiat Argo",
+    "largura": 1724.0,
+    "comprimento": 3998.0
+  },
+  {
+    "marca": "Fiat Barchetta",
+    "largura": 1640.0,
+    "comprimento": 3916.0
+  },
+  {
+    "marca": "Fiat Brava",
+    "largura": 1741.0,
+    "comprimento": 4187.0
+  },
+  {
+    "marca": "Fiat Bravo",
+    "largura": 1792.0,
+    "comprimento": 4373.0
+  },
+  {
+    "marca": "Fiat Croma",
+    "largura": 1775.0,
+    "comprimento": 4756.0
+  },
+  {
+    "marca": "Fiat Cronos",
+    "largura": 1724.0,
+    "comprimento": 4364.0
+  },
+  {
+    "marca": "Fiat Doblo",
+    "largura": 1722.0,
+    "comprimento": 4252.0
+  },
+  {
+    "marca": "Fiat Ducato",
+    "largura": 2050.0,
+    "comprimento": 4963.0
+  },
+  {
+    "marca": "Fiat Elba",
+    "largura": 1548.0,
+    "comprimento": 4037.0
+  },
+  {
+    "marca": "Fiat Fiorino",
+    "largura": 1622.0,
+    "comprimento": 4159.0
+  },
+  {
+    "marca": "Fiat Novo Fiorino",
+    "largura": 1643.0,
+    "comprimento": 4384.0
+  },
+  {
+    "marca": "Fiat Fastback",
+    "largura": 1774.0,
+    "comprimento": 4427.0
+  },
+  {
+    "marca": "Fiat Freemont",
+    "largura": 1834.0,
+    "comprimento": 4887.0
+  },
+  {
+    "marca": "Fiat Grand Siena",
+    "largura": 1700.0,
+    "comprimento": 4290.0
+  },
+  {
+    "marca": "Fiat Idea",
+    "largura": 1713.0,
+    "comprimento": 4142.0
+  },
+  {
+    "marca": "Fiat Linea",
+    "largura": 1730.0,
+    "comprimento": 4560.0
+  },
+  {
+    "marca": "Fiat Marea",
+    "largura": 1741.0,
+    "comprimento": 4393.0
+  },
+  {
+    "marca": "Fiat Mille",
+    "largura": 1656.0,
+    "comprimento": 3770.0
+  },
+  {
+    "marca": "Fiat Mobi",
+    "largura": 1633.0,
+    "comprimento": 3566.0
+  },
+  {
+    "marca": "Fiat Multipla",
+    "largura": 1871.0,
+    "comprimento": 3994.0
+  },
+  {
+    "marca": "Fiat Oggi",
+    "largura": 1545.0,
+    "comprimento": 3966.0
+  },
+  {
+    "marca": "Fiat Palio",
+    "largura": 1634.0,
+    "comprimento": 3827.0
+  },
+  {
+    "marca": "Fiat Novo Palio",
+    "largura": 1670.0,
+    "comprimento": 3827.0
+  },
+  {
+    "marca": "Fiat Palio Weekend",
+    "largura": 1721.0,
+    "comprimento": 4310.0
+  },
+  {
+    "marca": "Fiat Panda",
+    "largura": 1643.0,
+    "comprimento": 3653.0
+  },
+  {
+    "marca": "Fiat Panorama",
+    "largura": 1545.0,
+    "comprimento": 3924.0
+  },
+  {
+    "marca": "Fiat Premio",
+    "largura": 1548.0,
+    "comprimento": 4037.0
+  },
+  {
+    "marca": "Fiat Pulse",
+    "largura": 1774.0,
+    "comprimento": 4099.0
+  },
+  {
+    "marca": "Fiat Punto",
+    "largura": 1687.0,
+    "comprimento": 4065.0
+  },
+  {
+    "marca": "Fiat Qubo",
+    "largura": 1716.0,
+    "comprimento": 3957.0
+  },
+  {
+    "marca": "Fiat Regata",
+    "largura": 1650.0,
+    "comprimento": 4260.0
+  },
+  {
+    "marca": "Fiat Scudo",
+    "largura": 1895.0,
+    "comprimento": 4805.0
+  },
+  {
+    "marca": "Fiat Siena",
+    "largura": 1670.0,
+    "comprimento": 4100.0
+  },
+  {
+    "marca": "Fiat Spazio",
+    "largura": 1545.0,
+    "comprimento": 3745.0
+  },
+  {
+    "marca": "Fiat Stilo",
+    "largura": 1756.0,
+    "comprimento": 4253.0
+  },
+  {
+    "marca": "Fiat Strada",
+    "largura": 1664.0,
+    "comprimento": 4409.0
+  },
+  {
+    "marca": "Fiat Tempra",
+    "largura": 1695.0,
+    "comprimento": 4354.0
+  },
+  {
+    "marca": "Fiat Toro",
+    "largura": 1844.0,
+    "comprimento": 4915.0
+  },
+  {
+    "marca": "Fiat Ulysse",
+    "largura": 1920.0,
+    "comprimento": 4956.0
+  },
+  {
+    "marca": "Fiat Uno Furgão",
+    "largura": 1636.0,
+    "comprimento": 3770.0
+  },
+  {
+    "marca": "Fiat Uno antigo",
+    "largura": 1548.0,
+    "comprimento": 3644.0
+  },
+  {
+    "marca": "Fiat Novo Uno",
+    "largura": 1673.0,
+    "comprimento": 3811.0
+  },
+  {
+    "marca": "Fiat Viaggio",
+    "largura": 1850.0,
+    "comprimento": 4679.0
+  },
+  {
+    "marca": "Fiat Weekend",
+    "largura": 1626.0,
+    "comprimento": 4130.0
+  },
+  {
+    "marca": "Ford Belina",
+    "largura": 1659.0,
+    "comprimento": 4488.0
+  },
+  {
+    "marca": "Ford Bronco Sport",
+    "largura": 1888.0,
+    "comprimento": 4386.0
+  },
+  {
+    "marca": "Ford Corcel I",
+    "largura": 1600.0,
+    "comprimento": 4390.0
+  },
+  {
+    "marca": "Ford Corcel II",
+    "largura": 1660.0,
+    "comprimento": 4460.0
+  },
+  {
+    "marca": "Ford Courier",
+    "largura": 1685.0,
+    "comprimento": 4457.0
+  },
+  {
+    "marca": "Ford Crown Victoria",
+    "largura": 1976.0,
+    "comprimento": 5380.0
+  },
+  {
+    "marca": "Ford DelRey",
+    "largura": 1676.0,
+    "comprimento": 4498.0
+  },
+  {
+    "marca": "Ford EcoSport",
+    "largura": 1734.0,
+    "comprimento": 4228.0
+  },
+  {
+    "marca": "Ford Edge",
+    "largura": 1925.0,
+    "comprimento": 4717.0
+  },
+  {
+    "marca": "Ford Escort",
+    "largura": 1692.0,
+    "comprimento": 4040.0
+  },
+  {
+    "marca": "Ford Explorer",
+    "largura": 1783.0,
+    "comprimento": 4681.0
+  },
+  {
+    "marca": "Ford F-100",
+    "largura": 1890.0,
+    "comprimento": 4856.0
+  },
+  {
+    "marca": "Ford F-1000",
+    "largura": 1890.0,
+    "comprimento": 4856.0
+  },
+  {
+    "marca": "Ford F-250",
+    "largura": 2030.0,
+    "comprimento": 6250.0
+  },
+  {
+    "marca": "Ford Fiesta Rocam",
+    "largura": 1765.0,
+    "comprimento": 3935.0
+  },
+  {
+    "marca": "Ford Focus",
+    "largura": 1823.0,
+    "comprimento": 4360.0
+  },
+  {
+    "marca": "Ford Focus Fastback",
+    "largura": 1823.0,
+    "comprimento": 4538.0
+  },
+  {
+    "marca": "Ford Fusion",
+    "largura": 1852.0,
+    "comprimento": 4871.0
+  },
+  {
+    "marca": "Ford Galaxie",
+    "largura": 1999.0,
+    "comprimento": 5330.0
+  },
+  {
+    "marca": "Ford Ka",
+    "largura": 1695.0,
+    "comprimento": 3886.0
+  },
+  {
+    "marca": "Ford Ka Sedan",
+    "largura": 1695.0,
+    "comprimento": 4254.0
+  },
+  {
+    "marca": "Ford Landau",
+    "largura": 1999.0,
+    "comprimento": 5413.0
+  },
+  {
+    "marca": "Ford Maverick",
+    "largura": 1844.0,
+    "comprimento": 5073.0
+  },
+  {
+    "marca": "Ford Maverick Pickup",
+    "largura": 1730.0,
+    "comprimento": 5110.0
+  },
+  {
+    "marca": "Ford Mustang",
+    "largura": 1916.0,
+    "comprimento": 4789.0
+  },
+  {
+    "marca": "Ford New Fiesta",
+    "largura": 1787.0,
+    "comprimento": 3969.0
+  },
+  {
+    "marca": "Ford New Fiesta sedã",
+    "largura": 1787.0,
+    "comprimento": 4406.0
+  },
+  {
+    "marca": "Ford Mondeo",
+    "largura": 1749.0,
+    "comprimento": 4556.0
+  },
+  {
+    "marca": "Ford Pampa",
+    "largura": 1670.0,
+    "comprimento": 4380.0
+  },
+  {
+    "marca": "Ford Ranger",
+    "largura": 1860.0,
+    "comprimento": 5354.0
+  },
+  {
+    "marca": "Ford Pampa",
+    "largura": 1674.0,
+    "comprimento": 4382.0
+  },
+  {
+    "marca": "Ford Taurus",
+    "largura": 1796.0,
+    "comprimento": 4877.0
+  },
+  {
+    "marca": "Ford Territory",
+    "largura": 1936.0,
+    "comprimento": 4580.0
+  },
+  {
+    "marca": "Ford Transit",
+    "largura": 1974.0,
+    "comprimento": 5680.0
+  },
+  {
+    "marca": "Ford Verona",
+    "largura": 1690.0,
+    "comprimento": 4230.0
+  },
+  {
+    "marca": "Geely GC2",
+    "largura": 1630.0,
+    "comprimento": 3598.0
+  },
+  {
+    "marca": "Geely EC7",
+    "largura": 1789.0,
+    "comprimento": 4635.0
+  },
+  {
+    "marca": "Gurgel BR-800",
+    "largura": 1470.0,
+    "comprimento": 3195.0
+  },
+  {
+    "marca": "Gurgel Supermini",
+    "largura": 1500.0,
+    "comprimento": 3195.0
+  },
+  {
+    "marca": "Honda Accord",
+    "largura": 1850.0,
+    "comprimento": 4890.0
+  },
+  {
+    "marca": "Honda City hatch",
+    "largura": 1695.0,
+    "comprimento": 4341.0
+  },
+  {
+    "marca": "Honda City",
+    "largura": 1695.0,
+    "comprimento": 4455.0
+  },
+  {
+    "marca": "Honda Civic",
+    "largura": 2076.0,
+    "comprimento": 4637.0
+  },
+  {
+    "marca": "Honda Civic Si",
+    "largura": 1799.0,
+    "comprimento": 4522.0
+  },
+  {
+    "marca": "Honda CR-V",
+    "largura": 1855.0,
+    "comprimento": 4591.0
+  },
+  {
+    "marca": "Honda Fit",
+    "largura": 1695.0,
+    "comprimento": 4096.0
+  },
+  {
+    "marca": "Honda HR-V",
+    "largura": 1772.0,
+    "comprimento": 4294.0
+  },
+  {
+    "marca": "Honda NSX",
+    "largura": 1810.0,
+    "comprimento": 4405.0
+  },
+  {
+    "marca": "Hummer H1",
+    "largura": 2197.0,
+    "comprimento": 4686.0
+  },
+  {
+    "marca": "Hummer H2",
+    "largura": 2065.0,
+    "comprimento": 5169.0
+  },
+  {
+    "marca": "Hummer H3",
+    "largura": 1897.0,
+    "comprimento": 5403.0
+  },
+  {
+    "marca": "Hyundai Accent",
+    "largura": 1695.0,
+    "comprimento": 4280.0
+  },
+  {
+    "marca": "Hyundai Atos",
+    "largura": 1495.0,
+    "comprimento": 3495.0
+  },
+  {
+    "marca": "Hyundai Azera",
+    "largura": 1865.0,
+    "comprimento": 4930.0
+  },
+  {
+    "marca": "Hyundai New Azera",
+    "largura": 1865.0,
+    "comprimento": 4930.0
+  },
+  {
+    "marca": "Hyundai Creta",
+    "largura": 1785.0,
+    "comprimento": 4270.0
+  },
+  {
+    "marca": "Hyundai Elantra",
+    "largura": 1775.0,
+    "comprimento": 4530.0
+  },
+  {
+    "marca": "Hyundai Excel",
+    "largura": 1610.0,
+    "comprimento": 4280.0
+  },
+  {
+    "marca": "Hyundai Galloper",
+    "largura": 1870.0,
+    "comprimento": 4015.0
+  },
+  {
+    "marca": "Hyundai Genesis",
+    "largura": 1890.0,
+    "comprimento": 4975.0
+  },
+  {
+    "marca": "Hyundai HB20",
+    "largura": 1680.0,
+    "comprimento": 3920.0
+  },
+  {
+    "marca": "Hyundai HB20S",
+    "largura": 1680.0,
+    "comprimento": 4230.0
+  },
+  {
+    "marca": "Hyundai HB20X",
+    "largura": 1710.0,
+    "comprimento": 3955.0
+  },
+  {
+    "marca": "Hyundai HR",
+    "largura": 1740.0,
+    "comprimento": 4850.0
+  },
+  {
+    "marca": "Hyundai i30",
+    "largura": 1765.0,
+    "comprimento": 4245.0
+  },
+  {
+    "marca": "Hyundai i30 CW",
+    "largura": 1765.0,
+    "comprimento": 4475.0
+  },
+  {
+    "marca": "Hyundai ix35",
+    "largura": 1820.0,
+    "comprimento": 4410.0
+  },
+  {
+    "marca": "Hyundai Ioniq",
+    "largura": 1820.0,
+    "comprimento": 4470.0
+  },
+  {
+    "marca": "Hyundai Santa Fe",
+    "largura": 1885.0,
+    "comprimento": 4690.0
+  },
+  {
+    "marca": "Hyundai Starex",
+    "largura": 1820.0,
+    "comprimento": 4695.0
+  },
+  {
+    "marca": "Hyundai Terracan",
+    "largura": 1860.0,
+    "comprimento": 4710.0
+  },
+  {
+    "marca": "Hyundai Tucson",
+    "largura": 1830.0,
+    "comprimento": 4325.0
+  },
+  {
+    "marca": "Hyundai New Tucson",
+    "largura": 1850.0,
+    "comprimento": 4475.0
+  },
+  {
+    "marca": "Hyundai Veloster",
+    "largura": 1790.0,
+    "comprimento": 4220.0
+  },
+  {
+    "marca": "Hyundai Veracruz",
+    "largura": 1945.0,
+    "comprimento": 4840.0
+  },
+  {
+    "marca": "JAC iEV20",
+    "largura": 1670.0,
+    "comprimento": 3660.0
+  },
+  {
+    "marca": "JAC iEV40",
+    "largura": 1750.0,
+    "comprimento": 4135.0
+  },
+  {
+    "marca": "JAC iEV60",
+    "largura": 1800.0,
+    "comprimento": 4410.0
+  },
+  {
+    "marca": "JAC iEV330P",
+    "largura": 1830.0,
+    "comprimento": 5600.0
+  },
+  {
+    "marca": "JAC J2",
+    "largura": 1640.0,
+    "comprimento": 3535.0
+  },
+  {
+    "marca": "JAC J3",
+    "largura": 1650.0,
+    "comprimento": 3970.0
+  },
+  {
+    "marca": "JAC J3 Turin",
+    "largura": 1650.0,
+    "comprimento": 4155.0
+  },
+  {
+    "marca": "JAC J5",
+    "largura": 1765.0,
+    "comprimento": 4590.0
+  },
+  {
+    "marca": "JAC J6",
+    "largura": 1775.0,
+    "comprimento": 4550.0
+  },
+  {
+    "marca": "JAC T140",
+    "largura": 1730.0,
+    "comprimento": 4850.0
+  },
+  {
+    "marca": "JAC T40 Plus",
+    "largura": 1750.0,
+    "comprimento": 4135.0
+  },
+  {
+    "marca": "JAC T5",
+    "largura": 1765.0,
+    "comprimento": 4325.0
+  },
+  {
+    "marca": "JAC T50 Plus",
+    "largura": 1765.0,
+    "comprimento": 4345.0
+  },
+  {
+    "marca": "JAC T6",
+    "largura": 1840.0,
+    "comprimento": 4475.0
+  },
+  {
+    "marca": "JAC T60 Plus",
+    "largura": 1800.0,
+    "comprimento": 4410.0
+  },
+  {
+    "marca": "JAC T8",
+    "largura": 1840.0,
+    "comprimento": 5100.0
+  },
+  {
+    "marca": "JAC T80",
+    "largura": 1900.0,
+    "comprimento": 4790.0
+  },
+  {
+    "marca": "JAC V260",
+    "largura": 1750.0,
+    "comprimento": 4845.0
+  },
+  {
+    "marca": "Jaguar E-Pace",
+    "largura": 1900.0,
+    "comprimento": 4395.0
+  },
+  {
+    "marca": "Jaguar F-Pace",
+    "largura": 1936.0,
+    "comprimento": 4747.0
+  },
+  {
+    "marca": "Jaguar F-Type",
+    "largura": 1923.0,
+    "comprimento": 4470.0
+  },
+  {
+    "marca": "Jaguar I-Pace",
+    "largura": 1895.0,
+    "comprimento": 4682.0
+  },
+  {
+    "marca": "Jaguar S-Type",
+    "largura": 1819.0,
+    "comprimento": 4861.0
+  },
+  {
+    "marca": "Jaguar X-Type",
+    "largura": 1789.0,
+    "comprimento": 4672.0
+  },
+  {
+    "marca": "Jaguar XE",
+    "largura": 1850.0,
+    "comprimento": 4672.0
+  },
+  {
+    "marca": "Jaguar XF",
+    "largura": 1880.0,
+    "comprimento": 4954.0
+  },
+  {
+    "marca": "Jaguar XJ",
+    "largura": 1900.0,
+    "comprimento": 5130.0
+  },
+  {
+    "marca": "Jaguar XK",
+    "largura": 1830.0,
+    "comprimento": 4760.0
+  },
+  {
+    "marca": "Jeep Cherokee",
+    "largura": 1943.0,
+    "comprimento": 4828.0
+  },
+  {
+    "marca": "Jeep Commander",
+    "largura": 1859.0,
+    "comprimento": 4769.0
+  },
+  {
+    "marca": "Jeep Compass",
+    "largura": 1819.0,
+    "comprimento": 4398.0
+  },
+  {
+    "marca": "Jeep Grand Cherokee",
+    "largura": 1943.0,
+    "comprimento": 4828.0
+  },
+  {
+    "marca": "Jeep Renegade",
+    "largura": 1805.0,
+    "comprimento": 4268.0
+  },
+  {
+    "marca": "Jeep Wrangler",
+    "largura": 1894.0,
+    "comprimento": 4785.0
+  },
+  {
+    "marca": "Kia Besta",
+    "largura": 1810.0,
+    "comprimento": 4820.0
+  },
+  {
+    "marca": "Kia Bongo",
+    "largura": 1740.0,
+    "comprimento": 4850.0
+  },
+  {
+    "marca": "Kia Cadenza",
+    "largura": 1850.0,
+    "comprimento": 4970.0
+  },
+  {
+    "marca": "Kia Carens",
+    "largura": 1820.0,
+    "comprimento": 4545.0
+  },
+  {
+    "marca": "Kia Carnival",
+    "largura": 1985.0,
+    "comprimento": 5130.0
+  },
+  {
+    "marca": "Kia Cerato",
+    "largura": 1800.0,
+    "comprimento": 4640.0
+  },
+  {
+    "marca": "Kia Clarus",
+    "largura": 1770.0,
+    "comprimento": 4700.0
+  },
+  {
+    "marca": "Kia Magentis",
+    "largura": 1805.0,
+    "comprimento": 4800.0
+  },
+  {
+    "marca": "Kia Mohave",
+    "largura": 1915.0,
+    "comprimento": 4880.0
+  },
+  {
+    "marca": "Kia Niro",
+    "largura": 1825.0,
+    "comprimento": 4420.0
+  },
+  {
+    "marca": "Kia Opirus",
+    "largura": 1850.0,
+    "comprimento": 4979.0
+  },
+  {
+    "marca": "Kia Optima",
+    "largura": 1830.0,
+    "comprimento": 4845.0
+  },
+  {
+    "marca": "Kia Picanto",
+    "largura": 1595.0,
+    "comprimento": 3595.0
+  },
+  {
+    "marca": "Kia Quoris",
+    "largura": 1900.0,
+    "comprimento": 5090.0
+  },
+  {
+    "marca": "Kia Rio",
+    "largura": 1725.0,
+    "comprimento": 4065.0
+  },
+  {
+    "marca": "Kia Sephia",
+    "largura": 1690.0,
+    "comprimento": 4335.0
+  },
+  {
+    "marca": "Kia Sorento",
+    "largura": 1890.0,
+    "comprimento": 4780.0
+  },
+  {
+    "marca": "Kia Novo Sorento",
+    "largura": 1890.0,
+    "comprimento": 4800.0
+  },
+  {
+    "marca": "Kia Soul",
+    "largura": 1800.0,
+    "comprimento": 4140.0
+  },
+  {
+    "marca": "Kia Sportage",
+    "largura": 1855.0,
+    "comprimento": 4480.0
+  },
+  {
+    "marca": "Kia Stinger",
+    "largura": 1870.0,
+    "comprimento": 4830.0
+  },
+  {
+    "marca": "Lada Laika",
+    "largura": 1620.0,
+    "comprimento": 4115.0
+  },
+  {
+    "marca": "Lada Niva",
+    "largura": 1680.0,
+    "comprimento": 3740.0
+  },
+  {
+    "marca": "Lada Samara",
+    "largura": 1630.0,
+    "comprimento": 4010.0
+  },
+  {
+    "marca": "Lamborghini Huracan",
+    "largura": 1945.0,
+    "comprimento": 4549.0
+  },
+  {
+    "marca": "Lamborghini Aventador",
+    "largura": 2030.0,
+    "comprimento": 4780.0
+  },
+  {
+    "marca": "Lamborghini Urus",
+    "largura": 2016.0,
+    "comprimento": 5112.0
+  },
+  {
+    "marca": "Land Rover Defender",
+    "largura": 1790.0,
+    "comprimento": 4639.0
+  },
+  {
+    "marca": "Land Rover Discovery",
+    "largura": 1915.0,
+    "comprimento": 4829.0
+  },
+  {
+    "marca": "Land Rover Discovery Sport",
+    "largura": 2173.0,
+    "comprimento": 4599.0
+  },
+  {
+    "marca": "Land Rover Freelander",
+    "largura": 1910.0,
+    "comprimento": 4500.0
+  },
+  {
+    "marca": "Land Rover Evoque",
+    "largura": 1965.0,
+    "comprimento": 4365.0
+  },
+  {
+    "marca": "Land Rover Range Rover",
+    "largura": 1983.0,
+    "comprimento": 4999.0
+  },
+  {
+    "marca": "Land Rover Range Rover Velar",
+    "largura": 2032.0,
+    "comprimento": 4803.0
+  },
+  {
+    "marca": "Lexus NX 200t",
+    "largura": 1845.0,
+    "comprimento": 4630.0
+  },
+  {
+    "marca": "Lexus CT 200h",
+    "largura": 1765.0,
+    "comprimento": 4320.0
+  },
+  {
+    "marca": "Lexus RX 350",
+    "largura": 1895.0,
+    "comprimento": 4890.0
+  },
+  {
+    "marca": "Lexus LS 460",
+    "largura": 1830.0,
+    "comprimento": 5025.0
+  },
+  {
+    "marca": "Lexus UX 250",
+    "largura": 1840.0,
+    "comprimento": 4495.0
+  },
+  {
+    "marca": "Lifan 320",
+    "largura": 1620.0,
+    "comprimento": 3745.0
+  },
+  {
+    "marca": "Lifan 530",
+    "largura": 1690.0,
+    "comprimento": 4300.0
+  },
+  {
+    "marca": "Lifan 620",
+    "largura": 1705.0,
+    "comprimento": 4550.0
+  },
+  {
+    "marca": "Lifan Foison",
+    "largura": 1520.0,
+    "comprimento": 4580.0
+  },
+  {
+    "marca": "Lifan X60",
+    "largura": 1790.0,
+    "comprimento": 4325.0
+  },
+  {
+    "marca": "Lifan X80",
+    "largura": 1934.0,
+    "comprimento": 4820.0
+  },
+  {
+    "marca": "Mazda 626",
+    "largura": 1701.0,
+    "comprimento": 4445.0
+  },
+  {
+    "marca": "Mazda MX-3",
+    "largura": 1695.0,
+    "comprimento": 4420.0
+  },
+  {
+    "marca": "Mazda MX-5",
+    "largura": 1735.0,
+    "comprimento": 3915.0
+  },
+  {
+    "marca": "Mazda Protege",
+    "largura": 1695.0,
+    "comprimento": 4335.0
+  },
+  {
+    "marca": "Mazda RX-7",
+    "largura": 1750.0,
+    "comprimento": 4280.0
+  },
+  {
+    "marca": "McLaren 570S",
+    "largura": 1930.0,
+    "comprimento": 4530.0
+  },
+  {
+    "marca": "McLaren 720S",
+    "largura": 1930.0,
+    "comprimento": 4543.0
+  },
+  {
+    "marca": "Benz AMG GT",
+    "largura": 1939.0,
+    "comprimento": 4546.0
+  },
+  {
+    "marca": "Benz Classe A",
+    "largura": 1780.0,
+    "comprimento": 4292.0
+  },
+  {
+    "marca": "Benz Classe A Sedan",
+    "largura": 1796.0,
+    "comprimento": 4549.0
+  },
+  {
+    "marca": "Benz Classe B",
+    "largura": 1777.0,
+    "comprimento": 4273.0
+  },
+  {
+    "marca": "Benz Classe C",
+    "largura": 1810.0,
+    "comprimento": 4686.0
+  },
+  {
+    "marca": "Benz Classe C Coupe",
+    "largura": 2016.0,
+    "comprimento": 4686.0
+  },
+  {
+    "marca": "Benz Classe CLA",
+    "largura": 1777.0,
+    "comprimento": 4630.0
+  },
+  {
+    "marca": "Benz Classe CLS",
+    "largura": 1881.0,
+    "comprimento": 4937.0
+  },
+  {
+    "marca": "Benz Classe E",
+    "largura": 1860.0,
+    "comprimento": 4942.0
+  },
+  {
+    "marca": "Benz Classe G",
+    "largura": 1867.0,
+    "comprimento": 4672.0
+  },
+  {
+    "marca": "Benz Classe GLA",
+    "largura": 1804.0,
+    "comprimento": 4417.0
+  },
+  {
+    "marca": "Benz Classe GLC",
+    "largura": 1890.0,
+    "comprimento": 4656.0
+  },
+  {
+    "marca": "Benz Classe GLC Coupe",
+    "largura": 1890.0,
+    "comprimento": 4732.0
+  },
+  {
+    "marca": "Benz Classe GLE",
+    "largura": 2003.0,
+    "comprimento": 4900.0
+  },
+  {
+    "marca": "Benz Classe GLE Coupe",
+    "largura": 1935.0,
+    "comprimento": 4819.0
+  },
+  {
+    "marca": "Benz Classe ML",
+    "largura": 1926.0,
+    "comprimento": 4804.0
+  },
+  {
+    "marca": "Benz Classe S",
+    "largura": 1899.0,
+    "comprimento": 5246.0
+  },
+  {
+    "marca": "Benz Classe SL",
+    "largura": 1817.0,
+    "comprimento": 4134.0
+  },
+  {
+    "marca": "Benz Classe SLC",
+    "largura": 1817.0,
+    "comprimento": 4133.0
+  },
+  {
+    "marca": "Benz Classe SLK",
+    "largura": 1810.0,
+    "comprimento": 4134.0
+  },
+  {
+    "marca": "Benz Sprinter",
+    "largura": 1994.0,
+    "comprimento": 6590.0
+  },
+  {
+    "marca": "MINI Cooper",
+    "largura": 1485.0,
+    "comprimento": 4036.0
+  },
+  {
+    "marca": "MINI Countryman",
+    "largura": 1822.0,
+    "comprimento": 4297.0
+  },
+  {
+    "marca": "MINI Clubman",
+    "largura": 1800.0,
+    "comprimento": 4266.0
+  },
+  {
+    "marca": "MINI Roadster",
+    "largura": 1683.0,
+    "comprimento": 3734.0
+  },
+  {
+    "marca": "Mitsubishi 3000GT",
+    "largura": 1840.0,
+    "comprimento": 4570.0
+  },
+  {
+    "marca": "Mitsubishi ASX",
+    "largura": 1780.0,
+    "comprimento": 4360.0
+  },
+  {
+    "marca": "Mitsubishi Airtrek",
+    "largura": 1780.0,
+    "comprimento": 4545.0
+  },
+  {
+    "marca": "Mitsubishi Eclipse",
+    "largura": 1695.0,
+    "comprimento": 4390.0
+  },
+  {
+    "marca": "Mitsubishi Eclipse Cross",
+    "largura": 1805.0,
+    "comprimento": 4405.0
+  },
+  {
+    "marca": "Mitsubishi Galant",
+    "largura": 1730.0,
+    "comprimento": 4620.0
+  },
+  {
+    "marca": "Mitsubishi Grandis",
+    "largura": 1700.0,
+    "comprimento": 4765.0
+  },
+  {
+    "marca": "Mitsubishi L200 Triton",
+    "largura": 1815.0,
+    "comprimento": 5280.0
+  },
+  {
+    "marca": "Mitsubishi L200 Triton Sport",
+    "largura": 1820.0,
+    "comprimento": 5280.0
+  },
+  {
+    "marca": "Mitsubishi Lancer",
+    "largura": 1760.0,
+    "comprimento": 4570.0
+  },
+  {
+    "marca": "Mitsubishi Outlander",
+    "largura": 1810.0,
+    "comprimento": 4695.0
+  },
+  {
+    "marca": "Mitsubishi Outlander Sport",
+    "largura": 1805.0,
+    "comprimento": 4376.0
+  },
+  {
+    "marca": "Mitsubishi Pajero",
+    "largura": 1780.0,
+    "comprimento": 4720.0
+  },
+  {
+    "marca": "Mitsubishi Pajero Full",
+    "largura": 1875.0,
+    "comprimento": 4900.0
+  },
+  {
+    "marca": "Mitsubishi Pajero Full 3D",
+    "largura": 1875.0,
+    "comprimento": 4385.0
+  },
+  {
+    "marca": "Mitsubishi Pajero iO",
+    "largura": 1680.0,
+    "comprimento": 4030.0
+  },
+  {
+    "marca": "Mitsubishi Pajero Sport",
+    "largura": 1815.0,
+    "comprimento": 4785.0
+  },
+  {
+    "marca": "Mitsubishi Pajero TR4",
+    "largura": 1680.0,
+    "comprimento": 4058.0
+  },
+  {
+    "marca": "Nissan 300ZX",
+    "largura": 1790.0,
+    "comprimento": 4300.0
+  },
+  {
+    "marca": "Nissan 350Z",
+    "largura": 1815.0,
+    "comprimento": 4310.0
+  },
+  {
+    "marca": "Nissan 370Z",
+    "largura": 1845.0,
+    "comprimento": 4250.0
+  },
+  {
+    "marca": "Nissan Altima",
+    "largura": 1830.0,
+    "comprimento": 4865.0
+  },
+  {
+    "marca": "Nissan Frontier",
+    "largura": 1850.0,
+    "comprimento": 5250.0
+  },
+  {
+    "marca": "Nissan Grand Livina",
+    "largura": 1690.0,
+    "comprimento": 4420.0
+  },
+  {
+    "marca": "Nissan GT-R",
+    "largura": 1895.0,
+    "comprimento": 4710.0
+  },
+  {
+    "marca": "Nissan Juke",
+    "largura": 1765.0,
+    "comprimento": 4135.0
+  },
+  {
+    "marca": "Nissan Leaf",
+    "largura": 1770.0,
+    "comprimento": 4445.0
+  },
+  {
+    "marca": "Nissan Kicks",
+    "largura": 1760.0,
+    "comprimento": 4295.0
+  },
+  {
+    "marca": "Nissan Livina",
+    "largura": 1690.0,
+    "comprimento": 4180.0
+  },
+  {
+    "marca": "Nissan March",
+    "largura": 1675.0,
+    "comprimento": 3827.0
+  },
+  {
+    "marca": "Nissan Maxima",
+    "largura": 1780.0,
+    "comprimento": 4930.0
+  },
+  {
+    "marca": "Nissan Murano",
+    "largura": 1880.0,
+    "comprimento": 4770.0
+  },
+  {
+    "marca": "Nissan Pathfinder",
+    "largura": 1865.0,
+    "comprimento": 4740.0
+  },
+  {
+    "marca": "Nissan Sentra",
+    "largura": 1761.0,
+    "comprimento": 4567.0
+  },
+  {
+    "marca": "Nissan Tiida",
+    "largura": 1695.0,
+    "comprimento": 4295.0
+  },
+  {
+    "marca": "Nissan Tiida Sedan",
+    "largura": 1695.0,
+    "comprimento": 4472.0
+  },
+  {
+    "marca": "Nissan V-Drive",
+    "largura": 1695.0,
+    "comprimento": 4492.0
+  },
+  {
+    "marca": "Nissan XTerra",
+    "largura": 1790.0,
+    "comprimento": 4530.0
+  },
+  {
+    "marca": "Nissan XTrail",
+    "largura": 1785.0,
+    "comprimento": 4630.0
+  },
+  {
+    "marca": "Peugeot 106",
+    "largura": 1590.0,
+    "comprimento": 3678.0
+  },
+  {
+    "marca": "Peugeot 205",
+    "largura": 1572.0,
+    "comprimento": 3705.0
+  },
+  {
+    "marca": "Peugeot 206",
+    "largura": 1652.0,
+    "comprimento": 3835.0
+  },
+  {
+    "marca": "Peugeot 207",
+    "largura": 1652.0,
+    "comprimento": 3872.0
+  },
+  {
+    "marca": "Peugeot 207 Sedan",
+    "largura": 1669.0,
+    "comprimento": 4235.0
+  },
+  {
+    "marca": "Peugeot 207 SW",
+    "largura": 1652.0,
+    "comprimento": 4084.0
+  },
+  {
+    "marca": "Peugeot 208",
+    "largura": 1702.0,
+    "comprimento": 3975.0
+  },
+  {
+    "marca": "Peugeot Novo 208",
+    "largura": 1730.0,
+    "comprimento": 4050.0
+  },
+  {
+    "marca": "Peugeot 2008",
+    "largura": 1739.0,
+    "comprimento": 4159.0
+  },
+  {
+    "marca": "Peugeot 306",
+    "largura": 1680.0,
+    "comprimento": 4034.0
+  },
+  {
+    "marca": "Peugeot 307",
+    "largura": 1762.0,
+    "comprimento": 4212.0
+  },
+  {
+    "marca": "Peugeot 308",
+    "largura": 1815.0,
+    "comprimento": 4292.0
+  },
+  {
+    "marca": "Peugeot 3008",
+    "largura": 1906.0,
+    "comprimento": 4447.0
+  },
+  {
+    "marca": "Peugeot 405",
+    "largura": 1690.0,
+    "comprimento": 4410.0
+  },
+  {
+    "marca": "Peugeot 406",
+    "largura": 1780.0,
+    "comprimento": 4615.0
+  },
+  {
+    "marca": "Peugeot 407",
+    "largura": 1811.0,
+    "comprimento": 4676.0
+  },
+  {
+    "marca": "Peugeot 408",
+    "largura": 1815.0,
+    "comprimento": 4680.0
+  },
+  {
+    "marca": "Peugeot 504 Pickup",
+    "largura": 1710.0,
+    "comprimento": 4866.0
+  },
+  {
+    "marca": "Peugeot 508",
+    "largura": 1853.0,
+    "comprimento": 4792.0
+  },
+  {
+    "marca": "Peugeot 5008",
+    "largura": 1906.0,
+    "comprimento": 4641.0
+  },
+  {
+    "marca": "Peugeot 607",
+    "largura": 1835.0,
+    "comprimento": 4871.0
+  },
+  {
+    "marca": "Peugeot Boxer",
+    "largura": 2050.0,
+    "comprimento": 6363.0
+  },
+  {
+    "marca": "Peugeot Expert",
+    "largura": 1920.0,
+    "comprimento": 5309.0
+  },
+  {
+    "marca": "Peugeot Hoggar",
+    "largura": 1668.0,
+    "comprimento": 4547.0
+  },
+  {
+    "marca": "Peugeot Partner",
+    "largura": 1724.0,
+    "comprimento": 4137.0
+  },
+  {
+    "marca": "Porsche 911",
+    "largura": 1852.0,
+    "comprimento": 4572.0
+  },
+  {
+    "marca": "Porsche 918 Spyder",
+    "largura": 1940.0,
+    "comprimento": 4645.0
+  },
+  {
+    "marca": "Porsche Boxster",
+    "largura": 1801.0,
+    "comprimento": 4379.0
+  },
+  {
+    "marca": "Porsche Carrera GT",
+    "largura": 1921.0,
+    "comprimento": 4613.0
+  },
+  {
+    "marca": "Porsche Cayenne",
+    "largura": 1983.0,
+    "comprimento": 4926.0
+  },
+  {
+    "marca": "Porsche Cayman",
+    "largura": 1801.0,
+    "comprimento": 4379.0
+  },
+  {
+    "marca": "Porsche Macan",
+    "largura": 1927.0,
+    "comprimento": 4726.0
+  },
+  {
+    "marca": "Porsche Panamera",
+    "largura": 1937.0,
+    "comprimento": 5049.0
+  },
+  {
+    "marca": "Porsche Taycan",
+    "largura": 1966.0,
+    "comprimento": 4974.0
+  },
+  {
+    "marca": "RAM 2500",
+    "largura": 2037.0,
+    "comprimento": 6066.0
+  },
+  {
+    "marca": "RAM 3500",
+    "largura": 2120.0,
+    "comprimento": 6066.0
+  },
+  {
+    "marca": "Renault 19",
+    "largura": 1694.0,
+    "comprimento": 4156.0
+  },
+  {
+    "marca": "Renault 21",
+    "largura": 1711.0,
+    "comprimento": 4528.0
+  },
+  {
+    "marca": "Renault Captur",
+    "largura": 1813.0,
+    "comprimento": 4329.0
+  },
+  {
+    "marca": "Renault Clio",
+    "largura": 1640.0,
+    "comprimento": 3811.0
+  },
+  {
+    "marca": "Renault Clio Sedan",
+    "largura": 1640.0,
+    "comprimento": 4191.0
+  },
+  {
+    "marca": "Renault Duster",
+    "largura": 1822.0,
+    "comprimento": 4315.0
+  },
+  {
+    "marca": "Renault Fluence",
+    "largura": 1810.0,
+    "comprimento": 4620.0
+  },
+  {
+    "marca": "Renault Grand Scenic",
+    "largura": 1810.0,
+    "comprimento": 4498.0
+  },
+  {
+    "marca": "Renault Kangoo Express",
+    "largura": 1672.0,
+    "comprimento": 4010.0
+  },
+  {
+    "marca": "Renault Kwid",
+    "largura": 1586.0,
+    "comprimento": 3680.0
+  },
+  {
+    "marca": "Renault Laguna",
+    "largura": 1811.0,
+    "comprimento": 4801.0
+  },
+  {
+    "marca": "Renault Logan",
+    "largura": 1733.0,
+    "comprimento": 4349.0
+  },
+  {
+    "marca": "Renault Master",
+    "largura": 2070.0,
+    "comprimento": 6198.0
+  },
+  {
+    "marca": "Renault Megane",
+    "largura": 1777.0,
+    "comprimento": 4498.0
+  },
+  {
+    "marca": "Renault Megane Grand Tour",
+    "largura": 1777.0,
+    "comprimento": 4498.0
+  },
+  {
+    "marca": "Renault Oroch",
+    "largura": 1822.0,
+    "comprimento": 4693.0
+  },
+  {
+    "marca": "Renault Sandero",
+    "largura": 1733.0,
+    "comprimento": 4060.0
+  },
+  {
+    "marca": "Renault Scenic",
+    "largura": 1719.0,
+    "comprimento": 4169.0
+  },
+  {
+    "marca": "Renault Symbol",
+    "largura": 1672.0,
+    "comprimento": 4261.0
+  },
+  {
+    "marca": "Renault Trafic",
+    "largura": 2080.0,
+    "comprimento": 4500.0
+  },
+  {
+    "marca": "Renault Twingo",
+    "largura": 1630.0,
+    "comprimento": 3433.0
+  },
+  {
+    "marca": "Renault Zoe",
+    "largura": 1787.0,
+    "comprimento": 4084.0
+  },
+  {
+    "marca": "Royce Ghost",
+    "largura": 1948.0,
+    "comprimento": 5399.0
+  },
+  {
+    "marca": "Royce Phantom",
+    "largura": 1990.0,
+    "comprimento": 5842.0
+  },
+  {
+    "marca": "Royce Wraith",
+    "largura": 1947.0,
+    "comprimento": 5269.0
+  },
+  {
+    "marca": "Royce Dawn",
+    "largura": 1947.0,
+    "comprimento": 5296.0
+  },
+  {
+    "marca": "SsangYong Actyon",
+    "largura": 1910.0,
+    "comprimento": 4990.0
+  },
+  {
+    "marca": "SsangYong Actyon Sports",
+    "largura": 1910.0,
+    "comprimento": 4990.0
+  },
+  {
+    "marca": "SsangYong Korando",
+    "largura": 1870.0,
+    "comprimento": 4450.0
+  },
+  {
+    "marca": "SsangYong Kyron",
+    "largura": 1880.0,
+    "comprimento": 4660.0
+  },
+  {
+    "marca": "SsangYong Rexton",
+    "largura": 1900.0,
+    "comprimento": 4755.0
+  },
+  {
+    "marca": "SsangYong Tivoli",
+    "largura": 1798.0,
+    "comprimento": 4202.0
+  },
+  {
+    "marca": "Subaru BRZ",
+    "largura": 1775.0,
+    "comprimento": 4240.0
+  },
+  {
+    "marca": "Subaru Forester",
+    "largura": 1815.0,
+    "comprimento": 4625.0
+  },
+  {
+    "marca": "Subaru Impreza",
+    "largura": 1740.0,
+    "comprimento": 4415.0
+  },
+  {
+    "marca": "Subaru XV",
+    "largura": 1800.0,
+    "comprimento": 4485.0
+  },
+  {
+    "marca": "Subaru Legacy",
+    "largura": 1840.0,
+    "comprimento": 4795.0
+  },
+  {
+    "marca": "Subaru Outback",
+    "largura": 1840.0,
+    "comprimento": 4815.0
+  },
+  {
+    "marca": "Suzuki Grand Vitara",
+    "largura": 1570.0,
+    "comprimento": 4500.0
+  },
+  {
+    "marca": "Suzuki Jimny",
+    "largura": 1600.0,
+    "comprimento": 3645.0
+  },
+  {
+    "marca": "Suzuki Jimny Sierra",
+    "largura": 1645.0,
+    "comprimento": 3645.0
+  },
+  {
+    "marca": "Suzuki Swift Sport",
+    "largura": 1695.0,
+    "comprimento": 3890.0
+  },
+  {
+    "marca": "Suzuki SX4",
+    "largura": 1730.0,
+    "comprimento": 4135.0
+  },
+  {
+    "marca": "Suzuki S-Cross",
+    "largura": 1785.0,
+    "comprimento": 4300.0
+  },
+  {
+    "marca": "Suzuki Vitara",
+    "largura": 1775.0,
+    "comprimento": 4175.0
+  },
+  {
+    "marca": "Tesla Model 3",
+    "largura": 1849.0,
+    "comprimento": 4694.0
+  },
+  {
+    "marca": "Tesla Model S",
+    "largura": 1964.0,
+    "comprimento": 4970.0
+  },
+  {
+    "marca": "Tesla Model X",
+    "largura": 1999.0,
+    "comprimento": 5052.0
+  },
+  {
+    "marca": "Tesla Model Y",
+    "largura": 1850.0,
+    "comprimento": 4775.0
+  },
+  {
+    "marca": "Toyota Bandeirante",
+    "largura": 1715.0,
+    "comprimento": 5300.0
+  },
+  {
+    "marca": "Toyota Camry",
+    "largura": 1825.0,
+    "comprimento": 4850.0
+  },
+  {
+    "marca": "Toyota Corolla",
+    "largura": 1780.0,
+    "comprimento": 4630.0
+  },
+  {
+    "marca": "Toyota Corolla Fielder",
+    "largura": 1705.0,
+    "comprimento": 4455.0
+  },
+  {
+    "marca": "Toyota Etios",
+    "largura": 1695.0,
+    "comprimento": 3777.0
+  },
+  {
+    "marca": "Toyota Etios Sedan",
+    "largura": 1695.0,
+    "comprimento": 4369.0
+  },
+  {
+    "marca": "Toyota Hilux",
+    "largura": 1830.0,
+    "comprimento": 5255.0
+  },
+  {
+    "marca": "Toyota Hilux SW4",
+    "largura": 1835.0,
+    "comprimento": 4705.0
+  },
+  {
+    "marca": "Toyota Prius",
+    "largura": 1760.0,
+    "comprimento": 4540.0
+  },
+  {
+    "marca": "Toyota RAV4",
+    "largura": 1845.0,
+    "comprimento": 4605.0
+  },
+  {
+    "marca": "Toyota Supra",
+    "largura": 1811.0,
+    "comprimento": 4515.0
+  },
+  {
+    "marca": "Toyota Tundra",
+    "largura": 1910.0,
+    "comprimento": 5545.0
+  },
+  {
+    "marca": "Toyota Yaris",
+    "largura": 1730.0,
+    "comprimento": 4145.0
+  },
+  {
+    "marca": "Toyota Yaris Sedan",
+    "largura": 1730.0,
+    "comprimento": 4425.0
+  },
+  {
+    "marca": "Troller RF",
+    "largura": 1850.0,
+    "comprimento": 3980.0
+  },
+  {
+    "marca": "Troller T4",
+    "largura": 1850.0,
+    "comprimento": 3940.0
+  },
+  {
+    "marca": "Volkswagen Amarok",
+    "largura": 1954.0,
+    "comprimento": 5254.0
+  },
+  {
+    "marca": "Volkswagen Apollo",
+    "largura": 1640.0,
+    "comprimento": 4215.0
+  },
+  {
+    "marca": "Volkswagen Bora",
+    "largura": 1735.0,
+    "comprimento": 4376.0
+  },
+  {
+    "marca": "Volkswagen Brasília",
+    "largura": 1606.0,
+    "comprimento": 4040.0
+  },
+  {
+    "marca": "Volkswagen CC",
+    "largura": 1855.0,
+    "comprimento": 4799.0
+  },
+  {
+    "marca": "Volkswagen CrossFox",
+    "largura": 1677.0,
+    "comprimento": 4034.0
+  },
+  {
+    "marca": "Volkswagen Fox",
+    "largura": 1660.0,
+    "comprimento": 3868.0
+  },
+  {
+    "marca": "Volkswagen Fusca",
+    "largura": 1540.0,
+    "comprimento": 4026.0
+  },
+  {
+    "marca": "Volkswagen Novo Fusca",
+    "largura": 1808.0,
+    "comprimento": 4278.0
+  },
+  {
+    "marca": "Volkswagen Gol Bolinha",
+    "largura": 1647.0,
+    "comprimento": 3807.0
+  },
+  {
+    "marca": "Volkswagen Gol G3",
+    "largura": 1651.0,
+    "comprimento": 3931.0
+  },
+  {
+    "marca": "Volkswagen Gol G4",
+    "largura": 1620.0,
+    "comprimento": 3807.0
+  },
+  {
+    "marca": "Volkswagen Golf",
+    "largura": 1735.0,
+    "comprimento": 4204.0
+  },
+  {
+    "marca": "Volkswagen Novo Golf",
+    "largura": 1799.0,
+    "comprimento": 4255.0
+  },
+  {
+    "marca": "Volkswagen Golf Variant",
+    "largura": 1799.0,
+    "comprimento": 4562.0
+  },
+  {
+    "marca": "Volkswagen Jetta Variant",
+    "largura": 1778.0,
+    "comprimento": 4771.0
+  },
+  {
+    "marca": "Volkswagen Kombi",
+    "largura": 1720.0,
+    "comprimento": 4505.0
+  },
+  {
+    "marca": "Volkswagen Logus",
+    "largura": 1695.0,
+    "comprimento": 4276.0
+  },
+  {
+    "marca": "Volkswagen New Beetle",
+    "largura": 1721.0,
+    "comprimento": 4129.0
+  },
+  {
+    "marca": "Volkswagen Nivus",
+    "largura": 1757.0,
+    "comprimento": 4266.0
+  },
+  {
+    "marca": "Volkswagen Parati",
+    "largura": 1651.0,
+    "comprimento": 4189.0
+  },
+  {
+    "marca": "Volkswagen Passat",
+    "largura": 1832.0,
+    "comprimento": 4767.0
+  },
+  {
+    "marca": "Volkswagen Pointer",
+    "largura": 1695.0,
+    "comprimento": 4076.0
+  },
+  {
+    "marca": "Volkswagen Polo",
+    "largura": 1751.0,
+    "comprimento": 4057.0
+  },
+  {
+    "marca": "Volkswagen Polo Classic",
+    "largura": 1720.0,
+    "comprimento": 4487.0
+  },
+  {
+    "marca": "Volkswagen Quantum",
+    "largura": 1700.0,
+    "comprimento": 4612.0
+  },
+  {
+    "marca": "Volkswagen Santana",
+    "largura": 1695.0,
+    "comprimento": 4527.0
+  },
+  {
+    "marca": "Volkswagen Saveiro",
+    "largura": 1708.0,
+    "comprimento": 4498.0
+  },
+  {
+    "marca": "Volkswagen SP2",
+    "largura": 1610.0,
+    "comprimento": 4217.0
+  },
+  {
+    "marca": "Volkswagen SpaceCross",
+    "largura": 1680.0,
+    "comprimento": 4178.0
+  },
+  {
+    "marca": "Volkswagen SpaceFox",
+    "largura": 1660.0,
+    "comprimento": 4178.0
+  },
+  {
+    "marca": "Volkswagen Taos",
+    "largura": 1841.0,
+    "comprimento": 4465.0
+  },
+  {
+    "marca": "Volkswagen T-Cross",
+    "largura": 1760.0,
+    "comprimento": 4199.0
+  },
+  {
+    "marca": "Volkswagen Tiguan",
+    "largura": 1809.0,
+    "comprimento": 4427.0
+  },
+  {
+    "marca": "Volkswagen Tiguan Allspace",
+    "largura": 1839.0,
+    "comprimento": 4701.0
+  },
+  {
+    "marca": "Volkswagen TL",
+    "largura": 1570.0,
+    "comprimento": 4220.0
+  },
+  {
+    "marca": "Volkswagen Touareg",
+    "largura": 1940.0,
+    "comprimento": 4795.0
+  },
+  {
+    "marca": "Volkswagen Variant",
+    "largura": 1570.0,
+    "comprimento": 4320.0
+  },
+  {
+    "marca": "Volkswagen Variant II",
+    "largura": 1630.0,
+    "comprimento": 4326.0
+  },
+  {
+    "marca": "Volkswagen Virtus",
+    "largura": 1751.0,
+    "comprimento": 4482.0
+  },
+  {
+    "marca": "Volkswagen Voyage",
+    "largura": 1656.0,
+    "comprimento": 4215.0
+  },
+  {
+    "marca": "Volvo 440",
+    "largura": 1690.0,
+    "comprimento": 4310.0
+  },
+  {
+    "marca": "Volvo 850",
+    "largura": 1760.0,
+    "comprimento": 4670.0
+  },
+  {
+    "marca": "Volvo 940",
+    "largura": 1750.0,
+    "comprimento": 4870.0
+  },
+  {
+    "marca": "Volvo 960",
+    "largura": 1750.0,
+    "comprimento": 4870.0
+  },
+  {
+    "marca": "Volvo C30",
+    "largura": 1782.0,
+    "comprimento": 4266.0
+  },
+  {
+    "marca": "Volvo S40",
+    "largura": 1782.0,
+    "comprimento": 4369.0
+  },
+  {
+    "marca": "Volvo S60",
+    "largura": 1825.0,
+    "comprimento": 4635.0
+  },
+  {
+    "marca": "Volvo S70",
+    "largura": 1671.0,
+    "comprimento": 4722.0
+  },
+  {
+    "marca": "Volvo S80",
+    "largura": 1861.0,
+    "comprimento": 4851.0
+  },
+  {
+    "marca": "Volvo S90",
+    "largura": 2019.0,
+    "comprimento": 4963.0
+  },
+  {
+    "marca": "Volvo V40",
+    "largura": 1783.0,
+    "comprimento": 4369.0
+  },
+  {
+    "marca": "Volvo V50",
+    "largura": 1770.0,
+    "comprimento": 4514.0
+  },
+  {
+    "marca": "Volvo V60",
+    "largura": 1825.0,
+    "comprimento": 4635.0
+  },
+  {
+    "marca": "Volvo V70",
+    "largura": 1804.0,
+    "comprimento": 4710.0
+  },
+  {
+    "marca": "Volvo XC40",
+    "largura": 1910.0,
+    "comprimento": 4425.0
+  },
+  {
+    "marca": "Volvo XC60",
+    "largura": 1902.0,
+    "comprimento": 4688.0
+  },
+  {
+    "marca": "Volvo XC70",
+    "largura": 1860.0,
+    "comprimento": 4730.0
+  },
+  {
+    "marca": "Volvo XC90",
+    "largura": 2008.0,
+    "comprimento": 4950.0
+  }
+]
