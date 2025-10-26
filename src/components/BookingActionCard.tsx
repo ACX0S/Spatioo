@@ -33,16 +33,21 @@ export const BookingActionCard = ({
   const [hasReview, setHasReview] = useState(false);
   const [checkingReview, setCheckingReview] = useState(true);
 
+  // Só permitir avaliação quando ambas confirmações de saída estiverem completas
+  const canReview = booking.status === 'concluida' && 
+                    booking.departure_confirmed_by_owner_at && 
+                    booking.departure_confirmed_by_user_at;
+
   useEffect(() => {
     const checkReview = async () => {
-      if (booking.status === 'concluida') {
+      if (canReview) {
         const reviewed = await checkIfBookingHasReview(booking.id);
         setHasReview(reviewed);
       }
       setCheckingReview(false);
     };
     checkReview();
-  }, [booking.id, booking.status]);
+  }, [booking.id, canReview]);
   const statusBadge = {
     reservada: { label: 'Reservada', variant: 'secondary' as const, color: 'bg-yellow-500/20 text-yellow-700 dark:text-yellow-300' },
     ocupada: { label: 'Ocupada', variant: 'destructive' as const },
@@ -177,8 +182,8 @@ export const BookingActionCard = ({
           </Button>
         )}
 
-        {/* Botão de avaliar após conclusão */}
-        {booking.status === 'concluida' && !checkingReview && !hasReview && (
+        {/* Botão de avaliar - só após dupla confirmação de saída */}
+        {canReview && !checkingReview && !hasReview && (
           <Button
             onClick={() => setShowReviewModal(true)}
             variant="outline"
@@ -189,7 +194,7 @@ export const BookingActionCard = ({
           </Button>
         )}
 
-        {booking.status === 'concluida' && hasReview && (
+        {canReview && hasReview && (
           <div className="text-center text-sm text-muted-foreground py-2">
             ✓ Você já avaliou esta reserva
           </div>

@@ -8,6 +8,10 @@ import LoadingSpinner from "./LoadingSpinner";
 import ErrorMessage from "./ErrorMessage";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useState } from "react";
+import { ReviewNotificationModal } from "./ReviewNotificationModal";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const NotificationsList = () => {
   const { 
@@ -18,6 +22,68 @@ const NotificationsList = () => {
     markAsRead, 
     markAllAsRead 
   } = useNotifications();
+  const { user } = useAuth();
+  
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<any>(null);
+  const [reviewTarget, setReviewTarget] = useState<{
+    tipo: 'motorista' | 'estacionamento';
+    id: string;
+    name: string;
+  } | null>(null);
+
+  const handleReviewClick = async (notification: any) => {
+    if (!notification.booking_id) return;
+
+    try {
+      // Buscar detalhes da reserva
+      const { data: booking, error } = await supabase
+        .from('bookings')
+        .select(`
+          *,
+          estacionamento!bookings_estacionamento_id_fkey (id, nome, user_id)
+        `)
+        .eq('id', notification.booking_id)
+        .single();
+
+      if (error) throw error;
+
+      setSelectedBooking(booking);
+
+      // Determinar quem está avaliando quem
+      if (user?.id === booking.user_id) {
+        // Motorista avaliando estacionamento
+        setReviewTarget({
+          tipo: 'estacionamento',
+          id: booking.estacionamento.id,
+          name: booking.estacionamento.nome
+        });
+      } else {
+        // Estacionamento avaliando motorista - buscar nome do usuário
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('name, apelido')
+          .eq('id', booking.user_id)
+          .single();
+
+        setReviewTarget({
+          tipo: 'motorista',
+          id: booking.user_id,
+          name: profile?.apelido || profile?.name || 'Motorista'
+        });
+      }
+
+      setReviewModalOpen(true);
+    } catch (error) {
+      console.error('Erro ao carregar reserva:', error);
+    }
+  };
+
+  const handleReviewClose = () => {
+    setReviewModalOpen(false);
+    setSelectedBooking(null);
+    setReviewTarget(null);
+  };
 
   if (loading) {
     return <LoadingSpinner />;
@@ -90,15 +156,27 @@ const NotificationsList = () => {
                       </p>
                     </div>
                     
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => markAsRead(notification.id)}
-                      className="flex items-center gap-1 text-xs"
-                    >
-                      <Check className="h-3 w-3" />
-                      Remover
-                    </Button>
+                    <div className="flex gap-2">
+                      {notification.type === 'review_request' && (
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => handleReviewClick(notification)}
+                          className="flex items-center gap-1 text-xs bg-spatioo-green hover:bg-spatioo-green/90"
+                        >
+                          Avaliar
+                        </Button>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => markAsRead(notification.id)}
+                        className="flex items-center gap-1 text-xs"
+                      >
+                        <Check className="h-3 w-3" />
+                        Remover
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -106,6 +184,18 @@ const NotificationsList = () => {
           </ScrollArea>
         )}
       </CardContent>
+
+      {/* Modal de avaliação */}
+      {selectedBooking && reviewTarget && (
+        <ReviewNotificationModal
+          isOpen={reviewModalOpen}
+          onClose={handleReviewClose}
+          bookingId={selectedBooking.id}
+          avaliadoTipo={reviewTarget.tipo}
+          avaliadoId={reviewTarget.id}
+          targetName={reviewTarget.name}
+        />
+      )}
     </Card>
   );
 };

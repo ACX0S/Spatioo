@@ -101,22 +101,22 @@ serve(async (req) => {
         .eq('numero_vaga', booking.spot_number)
         .eq('estacionamento_id', booking.estacionamento_id)
 
-      // Notificar ambos que a reserva foi concluída
+      // Notificar ambos que a reserva foi concluída e solicitar avaliação
       await supabaseClient
         .from('notifications')
         .insert([
           {
             user_id: booking.user_id,
-            type: 'booking_completed',
-            title: 'Reserva concluída',
-            message: 'Sua reserva foi finalizada com sucesso. Obrigado por usar o Spatioo!',
+            type: 'review_request',
+            title: 'Avalie sua experiência',
+            message: 'Sua reserva foi finalizada. Que tal avaliar o estacionamento?',
             booking_id: bookingId,
           },
           {
             user_id: booking.estacionamento.user_id,
-            type: 'booking_completed',
-            title: 'Reserva concluída',
-            message: 'A reserva foi finalizada com sucesso.',
+            type: 'review_request',
+            title: 'Avalie o motorista',
+            message: 'A reserva foi concluída. Avalie a experiência com o motorista.',
             booking_id: bookingId,
           }
         ])

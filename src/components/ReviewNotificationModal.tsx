@@ -1,66 +1,72 @@
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { useState } from 'react';
 import { Star } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
-import { TAGS_ESTACIONAMENTO, TAGS_MOTORISTA } from '@/types/review';
 import { createReview } from '@/services/reviewService';
 import { toast } from '@/hooks/use-toast';
-import { Booking } from '@/types/booking';
+import { TAGS_ESTACIONAMENTO, TAGS_MOTORISTA } from '@/types/review';
+import { Badge } from '@/components/ui/badge';
 
-interface ReviewModalProps {
-  open: boolean;
+interface ReviewNotificationModalProps {
+  isOpen: boolean;
   onClose: () => void;
-  booking: Booking;
+  bookingId: string;
   avaliadoTipo: 'motorista' | 'estacionamento';
   avaliadoId: string;
+  targetName: string;
 }
 
-export const ReviewModal = ({ open, onClose, booking, avaliadoTipo, avaliadoId }: ReviewModalProps) => {
+export const ReviewNotificationModal = ({
+  isOpen,
+  onClose,
+  bookingId,
+  avaliadoTipo,
+  avaliadoId,
+  targetName
+}: ReviewNotificationModalProps) => {
   const [nota, setNota] = useState(0);
   const [hoverNota, setHoverNota] = useState(0);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [comentario, setComentario] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const availableTags = avaliadoTipo === 'estacionamento' ? TAGS_ESTACIONAMENTO : TAGS_MOTORISTA;
+  const tags = avaliadoTipo === 'estacionamento' ? TAGS_ESTACIONAMENTO : TAGS_MOTORISTA;
 
   const handleSubmit = async () => {
     if (nota === 0) {
       toast({
         title: 'Erro',
-        description: 'Por favor, selecione uma nota',
-        variant: 'destructive'
+        description: 'Por favor, selecione uma nota.',
+        variant: 'destructive',
       });
       return;
     }
 
-    setIsSubmitting(true);
     try {
+      setIsSubmitting(true);
       await createReview({
-        booking_id: booking.id,
+        booking_id: bookingId,
         avaliado_tipo: avaliadoTipo,
         avaliado_id: avaliadoId,
         nota,
         tags: selectedTags.length > 0 ? selectedTags : undefined,
-        comentario: comentario.trim() || undefined
+        comentario: comentario.trim() || undefined,
       });
 
       toast({
-        title: 'Sucesso',
-        description: 'Avaliação enviada com sucesso!'
+        title: 'Avaliação enviada!',
+        description: 'Obrigado pelo seu feedback.',
       });
 
-      onClose();
       resetForm();
+      onClose();
     } catch (error: any) {
-      console.error('Erro ao enviar avaliação:', error);
       toast({
         title: 'Erro',
-        description: error.message || 'Não foi possível enviar sua avaliação',
-        variant: 'destructive'
+        description: error.message || 'Não foi possível enviar a avaliação.',
+        variant: 'destructive',
       });
     } finally {
       setIsSubmitting(false);
@@ -76,43 +82,41 @@ export const ReviewModal = ({ open, onClose, booking, avaliadoTipo, avaliadoId }
 
   const toggleTag = (tag: string) => {
     setSelectedTags(prev =>
-      prev.includes(tag)
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
     );
   };
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-background via-background to-primary/5 border-primary/20">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-background via-background to-primary/5">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-primary to-spatioo-green bg-clip-text text-transparent">
+          <DialogTitle className="text-2xl text-center bg-gradient-to-r from-primary to-spatioo-green bg-clip-text text-transparent">
             Avalie sua experiência
           </DialogTitle>
-          <DialogDescription className="text-center text-muted-foreground">
-            Sua opinião nos ajuda a melhorar o Spatioo
-          </DialogDescription>
+          <p className="text-center text-muted-foreground mt-2">
+            Como foi sua experiência com {targetName}?
+          </p>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
-          {/* Seletor de Estrelas */}
+          {/* Seletor de estrelas */}
           <div className="flex justify-center gap-2">
             {[1, 2, 3, 4, 5].map((star) => (
               <motion.button
                 key={star}
                 type="button"
-                whileHover={{ scale: 1.2 }}
-                whileTap={{ scale: 0.9 }}
                 onClick={() => setNota(star)}
                 onMouseEnter={() => setHoverNota(star)}
                 onMouseLeave={() => setHoverNota(0)}
-                className="focus:outline-none transition-all"
+                whileHover={{ scale: 1.2 }}
+                whileTap={{ scale: 0.9 }}
+                className="focus:outline-none"
               >
                 <Star
-                  className={`w-10 h-10 transition-all ${
+                  className={`h-10 w-10 transition-all ${
                     star <= (hoverNota || nota)
-                      ? 'fill-spatioo-green text-spatioo-green drop-shadow-[0_0_8px_rgba(1,233,121,0.5)]'
-                      : 'text-muted-foreground hover:text-spatioo-green/50'
+                      ? 'fill-spatioo-green text-spatioo-green'
+                      : 'text-muted-foreground'
                   }`}
                 />
               </motion.button>
@@ -130,7 +134,7 @@ export const ReviewModal = ({ open, onClose, booking, avaliadoTipo, avaliadoId }
             </motion.p>
           )}
 
-          {/* Tags (apenas se nota < 5) */}
+          {/* Tags (só aparece se nota < 5) */}
           {nota > 0 && nota < 5 && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
@@ -139,15 +143,11 @@ export const ReviewModal = ({ open, onClose, booking, avaliadoTipo, avaliadoId }
             >
               <p className="text-sm font-medium">O que poderia melhorar?</p>
               <div className="flex flex-wrap gap-2">
-                {availableTags.map((tag) => (
+                {tags.map((tag) => (
                   <Badge
                     key={tag}
                     variant={selectedTags.includes(tag) ? 'default' : 'outline'}
-                    className={`cursor-pointer transition-all hover:scale-105 ${
-                      selectedTags.includes(tag) 
-                        ? 'bg-spatioo-green hover:bg-spatioo-green/90' 
-                        : 'hover:border-spatioo-green'
-                    }`}
+                    className="cursor-pointer transition-all hover:scale-105"
                     onClick={() => toggleTag(tag)}
                   >
                     {tag}
@@ -158,30 +158,21 @@ export const ReviewModal = ({ open, onClose, booking, avaliadoTipo, avaliadoId }
           )}
 
           {/* Comentário */}
-          {nota > 0 && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              className="space-y-2"
-            >
-              <label className="text-sm font-medium">
-                Descreva sua experiência (opcional)
-              </label>
-              <Textarea
-                placeholder="Compartilhe mais detalhes sobre sua experiência..."
-                value={comentario}
-                onChange={(e) => setComentario(e.target.value)}
-                rows={4}
-                maxLength={500}
-                className="resize-none focus:border-spatioo-green focus:ring-spatioo-green"
-              />
-              <p className="text-xs text-muted-foreground text-right">
-                {comentario.length}/500
-              </p>
-            </motion.div>
-          )}
+          <div className="space-y-2">
+            <label htmlFor="comentario" className="text-sm font-medium">
+              Descreva sua experiência (opcional)
+            </label>
+            <Textarea
+              id="comentario"
+              placeholder="Conte-nos mais sobre sua experiência..."
+              value={comentario}
+              onChange={(e) => setComentario(e.target.value)}
+              rows={4}
+              className="resize-none"
+            />
+          </div>
 
-          {/* Botão de Confirmar */}
+          {/* Botão de confirmar */}
           <Button
             onClick={handleSubmit}
             disabled={nota === 0 || isSubmitting}

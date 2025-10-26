@@ -78,7 +78,7 @@ serve(async (req) => {
         user_id: booking.user_id,
         type: 'booking_accepted',
         title: 'Reserva confirmada!',
-        message: 'Sua reserva foi aceita pelo estacionamento. Você pode visualizar a rota na página Explorar.',
+        message: 'Sua reserva foi aceita pelo estacionamento. Acesse suas reservas para acompanhar o status.',
         booking_id: bookingId,
         estacionamento_id: booking.estacionamento_id,
       })
