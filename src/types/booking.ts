@@ -33,11 +33,11 @@ export interface Booking {
   parkingAddress?: string;
   estacionamento?: any;
   veiculo?: {
-    tipo: string;
-    modelo: string;
+    nome: string;
     cor: string;
     placa: string;
-    tamanho: string;
+    largura: number;
+    comprimento: number;
   };
   user?: {
     name: string;

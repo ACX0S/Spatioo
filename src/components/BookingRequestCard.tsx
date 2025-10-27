@@ -66,7 +66,7 @@ export const BookingRequestCard = ({ booking, onAccept, onReject, loading }: Boo
           <div className="flex items-center gap-2 text-sm">
             <Car className="h-4 w-4 text-muted-foreground" />
             <span className="font-medium">Veículo:</span>
-            <span>{booking.veiculo.modelo} - {booking.veiculo.placa} ({booking.veiculo.cor})</span>
+            <span>{booking.veiculo.nome} - {booking.veiculo.placa} ({booking.veiculo.cor})</span>
           </div>
         )}
         

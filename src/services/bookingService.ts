@@ -114,7 +114,7 @@ export const createBookingRequest = async (bookingData: Omit<Booking, 'id' | 'us
       .select(`
         *,
         estacionamento!bookings_estacionamento_id_fkey (nome, endereco, user_id),
-        veiculo:veiculos(tipo, modelo, cor, placa, tamanho)
+        veiculo:veiculos(nome, cor, placa, largura, comprimento)
       `)
       .single();
     
@@ -224,7 +224,7 @@ export const fetchPendingBookings = async (estacionamentoId: string): Promise<Bo
       .from('bookings')
       .select(`
         *,
-        veiculo:veiculos(tipo, modelo, cor, placa, tamanho),
+        veiculo:veiculos(nome, cor, placa, largura, comprimento),
         estacionamento:estacionamento!inner(nome, endereco)
       `)
       .eq('estacionamento_id', estacionamentoId)

@@ -26,7 +26,7 @@ export function useVehicles() {
 
       if (fetchError) throw fetchError;
 
-      setVehicles((data || []) as Veiculo[]);
+      setVehicles((data || []) as unknown as Veiculo[]);
     } catch (err: any) {
       console.error('Error fetching vehicles:', err);
       const errorMsg = err.message || 'Erro ao carregar veículos';

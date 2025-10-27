@@ -61,10 +61,10 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
           .select('*')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
-          
+        
         if (error) throw error;
         
-        const vehicles = data as Veiculo[] || [];
+        const vehicles = data as unknown as Veiculo[] || [];
         setUserVehicles(vehicles);
         setHasVehicle(vehicles.length > 0);
         

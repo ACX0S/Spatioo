@@ -441,35 +441,35 @@ export type Database = {
       }
       veiculos: {
         Row: {
+          comprimento: number
           cor: string
           created_at: string
           id: string
-          modelo: string
+          largura: number
+          nome: string
           placa: string
-          tamanho: string
-          tipo: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          comprimento: number
           cor: string
           created_at?: string
           id?: string
-          modelo: string
+          largura: number
+          nome: string
           placa: string
-          tamanho: string
-          tipo: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          comprimento?: number
           cor?: string
           created_at?: string
           id?: string
-          modelo?: string
+          largura?: number
+          nome?: string
           placa?: string
-          tamanho?: string
-          tipo?: string
           updated_at?: string
           user_id?: string
         }
