@@ -51,7 +51,7 @@ const vehicleSchema = z.object({
   placa: z.string()
     .min(7, 'Placa deve ter 7 caracteres')
     .max(7, 'Placa deve ter 7 caracteres')
-    .regex(/^[A-Z0-9]{7}$/, 'Placa inválida'),
+    .regex(/^[A-Z]{3}[0-9]{4}$|^[A-Z]{3}[0-9][A-Z][0-9]{2}$/, 'Placa inválida. Use formato ABC1234 ou ABC1D23'),
   largura: z.number().positive('Largura deve ser positiva'),
   comprimento: z.number().positive('Comprimento deve ser positivo'),
 });
@@ -138,7 +138,8 @@ export function VehicleFormDialog({
   };
 
   const formatPlaca = (value: string) => {
-    return value.replace(/[^A-Z0-9]/g, '').toUpperCase().slice(0, 7);
+    // Remove caracteres especiais e converte para maiúsculo
+    return value.replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 7);
   };
 
   const handleCarSelect = (carName: string) => {
@@ -260,16 +261,18 @@ export function VehicleFormDialog({
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder="ABC1D23"
+                      type="text"
+                      placeholder="ABC1D23 ou ABC1234"
                       onChange={(e) => {
                         const formatted = formatPlaca(e.target.value);
                         field.onChange(formatted);
                       }}
                       maxLength={7}
+                      className="uppercase"
                     />
                   </FormControl>
                   <FormDescription>
-                    Digite a placa sem traços ou espaços
+                    Formato antigo (ABC1234) ou Mercosul (ABC1D23)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
