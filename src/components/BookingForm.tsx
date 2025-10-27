@@ -73,22 +73,12 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
           setSelectedVehicleId(vehicles[0].id);
         }
         
-        // Verifica compatibilidade do menor veículo
+        // Verificar compatibilidade com base nas dimensões reais
         if (vehicles.length > 0 && parkingSpot.tamanho_vaga) {
-          const tamanhoOrdem: Record<TamanhoVeiculo, number> = { 'P': 1, 'M': 2, 'G': 3 };
-          const vagaTamanho = tamanhoOrdem[parkingSpot.tamanho_vaga as TamanhoVeiculo];
+          const isCompatible = checkVehicleCompatibility(vehicles[0], parkingSpot.tamanho_vaga);
+          setIsVehicleCompatible(isCompatible);
           
-          const menorVeiculo = vehicles.reduce((menor, veiculo) => {
-            return tamanhoOrdem[veiculo.tamanho as TamanhoVeiculo] < tamanhoOrdem[menor.tamanho as TamanhoVeiculo] 
-              ? veiculo 
-              : menor;
-          });
-          
-          const veiculoTamanho = tamanhoOrdem[menorVeiculo.tamanho as TamanhoVeiculo];
-          const compatible = veiculoTamanho <= vagaTamanho;
-          setIsVehicleCompatible(compatible);
-          
-          if (!compatible) {
+          if (!isCompatible) {
             setVehicleCheckMessage('Seu veículo excede o tamanho máximo permitido para esta vaga.');
           }
         }
@@ -100,6 +90,21 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
     fetchUserVehicles();
   }, [user, parkingSpot.tamanho_vaga]);
 
+  // Função helper para verificar compatibilidade
+  const checkVehicleCompatibility = (vehicle: Veiculo, vagaSize: string): boolean => {
+    // Tamanhos de referência em metros
+    const vagaSizes = {
+      'P': { maxLength: 3.8, maxWidth: 1.7 },
+      'M': { maxLength: 4.3, maxWidth: 1.8 },
+      'G': { maxLength: 999, maxWidth: 999 } // Grande sem limite prático
+    };
+    
+    const vagaLimits = vagaSizes[vagaSize as keyof typeof vagaSizes];
+    if (!vagaLimits) return true;
+    
+    return vehicle.comprimento <= vagaLimits.maxLength && vehicle.largura <= vagaLimits.maxWidth;
+  };
+
   // Validar compatibilidade quando um veículo é selecionado
   useEffect(() => {
     if (!selectedVehicleId || !parkingSpot.tamanho_vaga) return;
@@ -107,11 +112,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
     const selectedVehicle = userVehicles.find(v => v.id === selectedVehicleId);
     if (!selectedVehicle) return;
 
-    const tamanhoOrdem: Record<TamanhoVeiculo, number> = { 'P': 1, 'M': 2, 'G': 3 };
-    const vagaTamanho = tamanhoOrdem[parkingSpot.tamanho_vaga as TamanhoVeiculo];
-    const vehicleSize = tamanhoOrdem[selectedVehicle.tamanho as TamanhoVeiculo];
-    
-    const compatible = vehicleSize <= vagaTamanho;
+    const compatible = checkVehicleCompatibility(selectedVehicle, parkingSpot.tamanho_vaga);
     setIsVehicleCompatible(compatible);
     
     if (!compatible) {
@@ -423,7 +424,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
                 <SelectContent>
                   {userVehicles.map((vehicle) => (
                     <SelectItem key={vehicle.id} value={vehicle.id}>
-                      {vehicle.modelo} - {vehicle.placa} (Tamanho {vehicle.tamanho})
+                      {vehicle.nome} - {vehicle.placa}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -436,7 +437,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
             <div className="p-3 bg-muted/50 rounded-lg border">
               <p className="text-sm font-medium mb-1">Veículo selecionado:</p>
               <p className="text-sm text-muted-foreground">
-                {userVehicles.find(v => v.id === selectedVehicleId)?.modelo}
+                {userVehicles.find(v => v.id === selectedVehicleId)?.nome}
                 {isVehicleCompatible && (
                   <span className="text-green-600 ml-2">✓ Compatível com a vaga</span>
                 )}

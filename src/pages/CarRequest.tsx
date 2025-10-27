@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useVehicles } from '@/hooks/useVehicles';
 import { Car, Plus, Pencil, Trash2 } from 'lucide-react';
-import { TAMANHO_REFERENCIAS, Veiculo } from '@/types/veiculo';
+import { Veiculo } from '@/types/veiculo';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorMessage from '@/components/ErrorMessage';
 import { VehicleFormDialog } from '@/components/VehicleFormDialog';
@@ -90,12 +90,12 @@ const CarRequest = () => {
                       <Car className="h-5 w-5 text-spatioo-green" />
                     </div>
                     <div>
-                      <CardTitle className="text-base">{vehicle.modelo}</CardTitle>
-                      <p className="text-sm text-muted-foreground">{vehicle.tipo}</p>
+                      <CardTitle className="text-base">{vehicle.nome}</CardTitle>
+                      <p className="text-sm text-muted-foreground">{vehicle.cor}</p>
                     </div>
                   </div>
-                  <Badge variant="outline" className="font-semibold">
-                    {vehicle.tamanho}
+                  <Badge variant="outline" className="font-mono">
+                    {vehicle.placa}
                   </Badge>
                 </div>
               </CardHeader>
@@ -112,9 +112,15 @@ const CarRequest = () => {
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Tamanho:</span>
-                    <span className="text-xs text-muted-foreground">
-                      {TAMANHO_REFERENCIAS[vehicle.tamanho]}
+                    <span className="text-muted-foreground">Largura:</span>
+                    <span className="text-sm text-muted-foreground">
+                      {vehicle.largura.toFixed(2)}m
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Comprimento:</span>
+                    <span className="text-sm text-muted-foreground">
+                      {vehicle.comprimento.toFixed(2)}m
                     </span>
                   </div>
                 </div>

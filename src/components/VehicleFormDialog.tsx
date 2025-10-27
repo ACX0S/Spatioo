@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -6,47 +6,54 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter
 } from '@/components/ui/dialog';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription
 } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from '@/components/ui/select';
-import { Input, Button } from '@/components/ui';
-import { Veiculo, VeiculoInsert, TAMANHO_REFERENCIAS, TamanhoVeiculo } from '@/types/veiculo';
-import { Loader2 } from 'lucide-react';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from '@/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Loader2, Check, ChevronsUpDown } from 'lucide-react';
+import { Veiculo, CORES_DISPONIVEIS } from '@/types/veiculo';
+import { cn } from '@/lib/utils';
+import carDictionary from '@/components/ui/car_dictionary.json';
 
-// Schema de validação
 const vehicleSchema = z.object({
-  tipo: z.string().min(2, 'Tipo deve ter no mínimo 2 caracteres').max(50, 'Tipo muito longo'),
-  modelo: z.string().min(2, 'Modelo deve ter no mínimo 2 caracteres').max(100, 'Modelo muito longo'),
-  cor: z.string().min(3, 'Cor deve ter no mínimo 3 caracteres').max(30, 'Cor muito longa'),
-  placa: z
-    .string()
-    .min(7, 'Placa inválida')
-    .max(8, 'Placa inválida')
-    .regex(
-      /^[A-Z]{3}[0-9]{1}[A-Z0-9]{1}[0-9]{2}$|^[A-Z]{3}[0-9]{4}$/,
-      'Formato de placa inválido (use ABC1234 ou ABC1D23)'
-    )
-    .transform((val) => val.toUpperCase()),
-  tamanho: z.enum(['P', 'M', 'G'], {
-    required_error: 'Selecione um tamanho'
-  })
+  nome: z.string().min(1, 'Nome do veículo é obrigatório'),
+  cor: z.string().min(1, 'Cor é obrigatória'),
+  placa: z.string()
+    .min(7, 'Placa deve ter 7 caracteres')
+    .max(7, 'Placa deve ter 7 caracteres')
+    .regex(/^[A-Z0-9]{7}$/, 'Placa inválida'),
+  largura: z.number().positive('Largura deve ser positiva'),
+  comprimento: z.number().positive('Comprimento deve ser positivo'),
 });
 
 type VehicleFormData = z.infer<typeof vehicleSchema>;
@@ -55,66 +62,86 @@ interface VehicleFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: VehicleFormData) => Promise<any>;
-  vehicle?: Veiculo | null;
+  vehicle?: Veiculo;
+}
+
+interface CarData {
+  marca: string;
+  largura: number;
+  comprimento: number;
 }
 
 export function VehicleFormDialog({
   open,
   onOpenChange,
   onSubmit,
-  vehicle
+  vehicle,
 }: VehicleFormDialogProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [openCombobox, setOpenCombobox] = useState(false);
   const isEditing = !!vehicle;
-  
+
+  const cars = carDictionary as CarData[];
+
   const form = useForm<VehicleFormData>({
     resolver: zodResolver(vehicleSchema),
     defaultValues: {
-      tipo: '',
-      modelo: '',
+      nome: '',
       cor: '',
       placa: '',
-      tamanho: undefined
-    }
+      largura: 0,
+      comprimento: 0,
+    },
   });
 
-  // Reset form quando o modal abre/fecha ou o veículo muda
   useEffect(() => {
     if (open) {
       if (vehicle) {
         form.reset({
-          tipo: vehicle.tipo,
-          modelo: vehicle.modelo,
+          nome: vehicle.nome,
           cor: vehicle.cor,
           placa: vehicle.placa,
-          tamanho: vehicle.tamanho
+          largura: vehicle.largura,
+          comprimento: vehicle.comprimento,
         });
       } else {
         form.reset({
-          tipo: '',
-          modelo: '',
+          nome: '',
           cor: '',
           placa: '',
-          tamanho: undefined
+          largura: 0,
+          comprimento: 0,
         });
       }
     }
   }, [open, vehicle, form]);
 
   const handleSubmit = async (data: VehicleFormData) => {
-    const result = await onSubmit(data);
-    if (result !== null) {
+    setIsSubmitting(true);
+    try {
+      await onSubmit(data);
       form.reset();
       onOpenChange(false);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  // Função para formatar placa durante digitação
   const formatPlaca = (value: string) => {
-    // Remove caracteres não alfanuméricos e converte para maiúsculo
-    const cleaned = value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-    
-    // Limita a 7 caracteres
-    return cleaned.slice(0, 7);
+    return value.replace(/[^A-Z0-9]/g, '').toUpperCase().slice(0, 7);
+  };
+
+  const handleCarSelect = (carName: string) => {
+    const selectedCar = cars.find(car => car.marca === carName);
+    if (selectedCar) {
+      form.setValue('nome', carName);
+      // Converter de mm para metros
+      form.setValue('largura', selectedCar.largura / 1000);
+      form.setValue('comprimento', selectedCar.comprimento / 1000);
+    }
+    setOpenCombobox(false);
   };
 
   return (
@@ -122,61 +149,100 @@ export function VehicleFormDialog({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>
-            {isEditing ? 'Editar Veículo' : 'Adicionar Veículo'}
+            {isEditing ? 'Editar Veículo' : 'Cadastrar Novo Veículo'}
           </DialogTitle>
           <DialogDescription>
-            Preencha os dados do veículo abaixo
+            {isEditing
+              ? 'Edite as informações do seu veículo'
+              : 'Preencha os dados do seu veículo'}
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            {/* Tipo */}
             <FormField
               control={form.control}
-              name="tipo"
+              name="nome"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tipo</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: Sedan, SUV, Hatch..." {...field} />
-                  </FormControl>
+                <FormItem className="flex flex-col">
+                  <FormLabel>Nome do Veículo</FormLabel>
+                  <Popover open={openCombobox} onOpenChange={setOpenCombobox}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            'w-full justify-between',
+                            !field.value && 'text-muted-foreground'
+                          )}
+                        >
+                          {field.value
+                            ? cars.find((car) => car.marca === field.value)?.marca
+                            : 'Selecione o veículo'}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <CommandInput placeholder="Buscar veículo..." />
+                        <CommandEmpty>Nenhum veículo encontrado.</CommandEmpty>
+                        <CommandGroup className="max-h-[300px] overflow-auto">
+                          {cars.map((car) => (
+                            <CommandItem
+                              key={car.marca}
+                              value={car.marca}
+                              onSelect={() => handleCarSelect(car.marca)}
+                            >
+                              <Check
+                                className={cn(
+                                  'mr-2 h-4 w-4',
+                                  car.marca === field.value
+                                    ? 'opacity-100'
+                                    : 'opacity-0'
+                                )}
+                              />
+                              {car.marca}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormDescription>
+                    Digite para buscar seu veículo na lista
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Modelo */}
-            <FormField
-              control={form.control}
-              name="modelo"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Modelo</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: Honda Civic, Toyota Corolla..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Cor */}
             <FormField
               control={form.control}
               name="cor"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Cor</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: Preto, Branco, Prata..." {...field} />
-                  </FormControl>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione a cor" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {CORES_DISPONIVEIS.map((cor) => (
+                        <SelectItem key={cor} value={cor}>
+                          {cor}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Placa */}
             <FormField
               control={form.control}
               name="placa"
@@ -185,85 +251,34 @@ export function VehicleFormDialog({
                   <FormLabel>Placa</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="ABC1234 ou ABC1D23"
-                      maxLength={7}
-                      className="uppercase font-mono"
                       {...field}
+                      placeholder="ABC1D23"
                       onChange={(e) => {
                         const formatted = formatPlaca(e.target.value);
                         field.onChange(formatted);
                       }}
+                      maxLength={7}
                     />
                   </FormControl>
-                  <FormDescription className="text-xs">
-                    Formato: ABC1234 (antigo) ou ABC1D23 (Mercosul)
+                  <FormDescription>
+                    Digite a placa sem traços ou espaços
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Tamanho */}
-            <FormField
-              control={form.control}
-              name="tamanho"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tamanho do Veículo</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o tamanho" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="P">
-                        <div className="flex flex-col">
-                          <span className="font-semibold">P - Pequeno</span>
-                          <span className="text-xs text-muted-foreground">
-                            {TAMANHO_REFERENCIAS.P}
-                          </span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="M">
-                        <div className="flex flex-col">
-                          <span className="font-semibold">M - Médio</span>
-                          <span className="text-xs text-muted-foreground">
-                            {TAMANHO_REFERENCIAS.M}
-                          </span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="G">
-                        <div className="flex flex-col">
-                          <span className="font-semibold">G - Grande</span>
-                          <span className="text-xs text-muted-foreground">
-                            {TAMANHO_REFERENCIAS.G}
-                          </span>
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormDescription className="text-xs">
-                    Escolha o tamanho baseado nas dimensões do seu veículo
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <DialogFooter className="gap-2 sm:gap-0">
+            <DialogFooter>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
-                disabled={form.formState.isSubmitting}
+                disabled={isSubmitting}
               >
                 Cancelar
               </Button>
-              <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isEditing ? 'Salvar alterações' : 'Cadastrar veículo'}
               </Button>
             </DialogFooter>

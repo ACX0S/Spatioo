@@ -3,34 +3,41 @@ export type TamanhoVeiculo = 'P' | 'M' | 'G';
 export interface Veiculo {
   id: string;
   user_id: string;
-  tipo: string;
-  modelo: string;
+  nome: string;
   cor: string;
   placa: string;
-  tamanho: TamanhoVeiculo;
+  largura: number; // em metros
+  comprimento: number; // em metros
   created_at: string;
   updated_at: string;
 }
 
 export interface VeiculoInsert {
-  tipo: string;
-  modelo: string;
+  nome: string;
   cor: string;
   placa: string;
-  tamanho: TamanhoVeiculo;
+  largura: number;
+  comprimento: number;
   user_id: string;
 }
 
 export interface VeiculoUpdate {
-  tipo?: string;
-  modelo?: string;
+  nome?: string;
   cor?: string;
   placa?: string;
-  tamanho?: TamanhoVeiculo;
+  largura?: number;
+  comprimento?: number;
 }
 
-export const TAMANHO_REFERENCIAS = {
-  P: 'até 3,8m x 1,7m',
-  M: 'até 4,3m x 1,8m',
-  G: 'acima de 4,3m'
-} as const;
+export const CORES_DISPONIVEIS = [
+  'Preto',
+  'Prata',
+  'Cinza',
+  'Vermelho',
+  'Azul',
+  'Verde',
+  'Marrom',
+  'Bege',
+  'Amarelo',
+  'Laranja'
+] as const;
