@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useState } from 'react';
@@ -93,9 +93,9 @@ export const ReviewNotificationModal = ({
           <DialogTitle className="text-2xl text-center bg-gradient-to-r from-primary to-spatioo-green bg-clip-text text-transparent">
             Avalie sua experiência
           </DialogTitle>
-          <p className="text-center text-muted-foreground mt-2">
+          <DialogDescription className="text-center text-muted-foreground mt-2">
             Como foi sua experiência com {targetName}?
-          </p>
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
