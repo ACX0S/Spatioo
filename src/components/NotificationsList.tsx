@@ -12,6 +12,7 @@ import { useState } from "react";
 import { ReviewNotificationModal } from "./ReviewNotificationModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useReviews } from "@/hooks/useReviews";
 
 const NotificationsList = () => {
   const { 
@@ -23,6 +24,7 @@ const NotificationsList = () => {
     markAllAsRead 
   } = useNotifications();
   const { user } = useAuth();
+  const { refetch: refetchReviews } = useReviews();
   
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
@@ -83,6 +85,8 @@ const NotificationsList = () => {
     setReviewModalOpen(false);
     setSelectedBooking(null);
     setReviewTarget(null);
+    // Recarrega lista de avaliações pendentes
+    refetchReviews();
   };
 
   if (loading) {

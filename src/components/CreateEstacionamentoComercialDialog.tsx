@@ -172,11 +172,11 @@ const CreateEstacionamentoComercialDialog = ({
       return;
     }
 
-    // Validação de fotos (obrigatório pelo menos 1)
-    if (photos.length === 0) {
+    // Validação de fotos (obrigatório no mínimo 2)
+    if (photos.length < 2) {
       toast({
         title: "Erro",
-        description: "Adicione pelo menos uma foto do estacionamento.",
+        description: "Adicione no mínimo 2 fotos do estacionamento.",
         variant: "destructive",
       });
       return;
@@ -390,12 +390,12 @@ const CreateEstacionamentoComercialDialog = ({
 
     const newFiles = Array.from(files);
     
-    // Validação de tamanho (máx 5MB por foto)
-    const oversizedFiles = newFiles.filter(file => file.size > 5 * 1024 * 1024);
+    // Validação de tamanho (máx 100MB por foto)
+    const oversizedFiles = newFiles.filter(file => file.size > 100 * 1024 * 1024);
     if (oversizedFiles.length > 0) {
       toast({
         title: "Erro",
-        description: "Cada foto deve ter no máximo 5MB.",
+        description: "Cada foto deve ter no máximo 100MB.",
         variant: "destructive",
       });
       return;

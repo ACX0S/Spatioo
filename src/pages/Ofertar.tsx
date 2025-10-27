@@ -13,11 +13,8 @@ const Ofertar = () => {
   const [editingEstacionamento, setEditingEstacionamento] = useState<any>(null);
   const { estacionamentos, loading, error, refetch } = useUserEstacionamentos();
 
-  // Filtrar apenas vagas residenciais
-  const residenciais = estacionamentos.filter(e => e.tipo === 'residencial');
-
   const handleEdit = (id: string) => {
-    const est = residenciais.find(e => e.id === id);
+    const est = estacionamentos.find(e => e.id === id);
     if (est) {
       setEditingEstacionamento(est);
     }
@@ -49,12 +46,12 @@ const Ofertar = () => {
         {/* Header */}
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-bold text-foreground mb-2">
-            {residenciais.length > 0 ? "Minhas Vagas Residenciais" : "Nenhuma vaga cadastrada"}
+            {estacionamentos.length > 0 ? "Minhas Vagas" : "Nenhuma vaga cadastrada"}
           </h1>
           <p className="text-muted-foreground">
-            {residenciais.length > 0 
-              ? "Gerencie suas vagas residenciais" 
-              : "Cadastre sua primeira vaga residencial"
+            {estacionamentos.length > 0 
+              ? "Gerencie suas vagas residenciais e estacionamentos" 
+              : "Cadastre sua primeira vaga"
             }
           </p>
         </div>
@@ -71,9 +68,9 @@ const Ofertar = () => {
         </div>
 
         {/* User's Parking Spots */}
-        {residenciais.length > 0 && (
+        {estacionamentos.length > 0 && (
           <div className="space-y-3">
-            {residenciais.map((estacionamento) => (
+            {estacionamentos.map((estacionamento) => (
               <UserParkingCard 
                 key={estacionamento.id} 
                 estacionamento={estacionamento}

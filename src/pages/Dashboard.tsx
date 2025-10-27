@@ -7,6 +7,7 @@ import { Calendar, History, Bell } from "lucide-react";
 import NotificationsList from "@/components/NotificationsList";
 import { ActiveBookingBanner } from "@/components/ActiveBookingBanner";
 import { UserBookingStatus } from "@/components/UserBookingStatus";
+import { PendingReviewBanner } from "@/components/PendingReviewBanner";
 
 const Dashboard = () => {
   const { bookings, loading, error, cancelBooking, activeBookings, historyBookings } = useBookings();
@@ -29,6 +30,9 @@ const Dashboard = () => {
 
   return (
     <div className="container mx-auto px-4 py-6">
+      {/* Banner de avaliação pendente */}
+      <PendingReviewBanner />
+      
       <Tabs defaultValue="active" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="active" className="flex items-center gap-2">
