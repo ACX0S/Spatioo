@@ -172,12 +172,12 @@ export const fetchParkingSpotById = async (id: string): Promise<PublicParkingDat
     if (data.tipo === 'residencial' && data.user_id) {
       const { data: profileData } = await supabase
         .from('profiles')
-        .select('name, apelido')
+        .select('name')
         .eq('id', data.user_id)
         .maybeSingle();
       
       if (profileData) {
-        proprietarioNome = profileData.apelido || profileData.name || undefined;
+        proprietarioNome = profileData.name || undefined;
       }
     }
     
