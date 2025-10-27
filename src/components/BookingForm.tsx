@@ -74,8 +74,12 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
         }
         
         // Verificar compatibilidade com base nas dimensões reais
-        if (vehicles.length > 0 && parkingSpot.tamanho_vaga) {
-          const isCompatible = checkVehicleCompatibility(vehicles[0], parkingSpot.tamanho_vaga);
+        if (vehicles.length > 0 && parkingSpot.largura_vaga && parkingSpot.comprimento_vaga) {
+          const isCompatible = checkVehicleCompatibility(
+            vehicles[0], 
+            parkingSpot.largura_vaga, 
+            parkingSpot.comprimento_vaga
+          );
           setIsVehicleCompatible(isCompatible);
           
           if (!isCompatible) {
@@ -88,31 +92,33 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
     };
     
     fetchUserVehicles();
-  }, [user, parkingSpot.tamanho_vaga]);
+  }, [user, parkingSpot.largura_vaga, parkingSpot.comprimento_vaga]);
 
   // Função helper para verificar compatibilidade
-  const checkVehicleCompatibility = (vehicle: Veiculo, vagaSize: string): boolean => {
-    // Tamanhos de referência em metros
-    const vagaSizes = {
-      'P': { maxLength: 3.8, maxWidth: 1.7 },
-      'M': { maxLength: 4.3, maxWidth: 1.8 },
-      'G': { maxLength: 999, maxWidth: 999 } // Grande sem limite prático
-    };
+  const checkVehicleCompatibility = (
+    vehicle: Veiculo, 
+    vagaLargura: number, 
+    vagaComprimento: number
+  ): boolean => {
+    // Adiciona uma margem de segurança de 10cm (0.1m)
+    const margem = 0.1;
     
-    const vagaLimits = vagaSizes[vagaSize as keyof typeof vagaSizes];
-    if (!vagaLimits) return true;
-    
-    return vehicle.comprimento <= vagaLimits.maxLength && vehicle.largura <= vagaLimits.maxWidth;
+    return vehicle.largura <= (vagaLargura + margem) && 
+           vehicle.comprimento <= (vagaComprimento + margem);
   };
 
   // Validar compatibilidade quando um veículo é selecionado
   useEffect(() => {
-    if (!selectedVehicleId || !parkingSpot.tamanho_vaga) return;
+    if (!selectedVehicleId || !parkingSpot.largura_vaga || !parkingSpot.comprimento_vaga) return;
 
     const selectedVehicle = userVehicles.find(v => v.id === selectedVehicleId);
     if (!selectedVehicle) return;
 
-    const compatible = checkVehicleCompatibility(selectedVehicle, parkingSpot.tamanho_vaga);
+    const compatible = checkVehicleCompatibility(
+      selectedVehicle, 
+      parkingSpot.largura_vaga, 
+      parkingSpot.comprimento_vaga
+    );
     setIsVehicleCompatible(compatible);
     
     if (!compatible) {
@@ -120,7 +126,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
     } else {
       setVehicleCheckMessage('');
     }
-  }, [selectedVehicleId, userVehicles, parkingSpot.tamanho_vaga]);
+  }, [selectedVehicleId, userVehicles, parkingSpot.largura_vaga, parkingSpot.comprimento_vaga]);
 
   // Efeito para buscar os preços e configurações do estacionamento.
   useEffect(() => {

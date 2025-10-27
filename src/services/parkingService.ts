@@ -17,7 +17,8 @@ export type PublicParkingData = {
   longitude: number | null;
   tipo?: string; // 'residencial' ou 'comercial'
   proprietario_nome?: string; // Nome do proprietário (apenas para residenciais)
-  tamanho_vaga?: 'P' | 'M' | 'G'; // Tamanho da vaga
+  largura_vaga?: number | null; // Largura da vaga em metros (apenas residencial)
+  comprimento_vaga?: number | null; // Comprimento da vaga em metros (apenas residencial)
   media_avaliacao?: number | null; // Média das avaliações
   total_avaliacoes?: number; // Total de avaliações recebidas
   total_reservas_concluidas?: number; // Total de reservas concluídas
@@ -134,7 +135,7 @@ export const fetchParkingSpotById = async (id: string): Promise<PublicParkingDat
     const { data, error } = await supabase
       .from('estacionamento')
       .select(`
-        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude, tipo, user_id, tamanho_vaga, media_avaliacao,
+        id, nome, endereco, numero_vagas, horario_funcionamento, preco, fotos, created_at, latitude, longitude, tipo, user_id, largura_vaga, comprimento_vaga, media_avaliacao,
         funcionamento_24h, suporte_carro_eletrico, vaga_coberta, manobrista, suporte_caminhao, vaga_moto,
         estacionamento_precos(preco, horas)
       `)
@@ -194,7 +195,8 @@ export const fetchParkingSpotById = async (id: string): Promise<PublicParkingDat
       longitude: data.longitude,
       tipo: data.tipo,
       proprietario_nome: proprietarioNome,
-      tamanho_vaga: data.tamanho_vaga as 'P' | 'M' | 'G' | undefined,
+      largura_vaga: data.largura_vaga,
+      comprimento_vaga: data.comprimento_vaga,
       media_avaliacao: data.media_avaliacao,
       total_avaliacoes: totalReviews || 0,
       total_reservas_concluidas: totalBookings || 0,

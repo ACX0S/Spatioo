@@ -269,15 +269,17 @@ const CreateEstacionamentoComercialDialog = ({
           latitude: coordinates?.latitude || null,
           longitude: coordinates?.longitude || null,
           // Comodidades do estacionamento comercial
-          funcionamento_24h: comodidades.funcionamento_24h,
-          suporte_carro_eletrico: comodidades.suporte_carro_eletrico,
-          vaga_coberta: comodidades.vaga_coberta,
-          manobrista: comodidades.manobrista,
-          suporte_caminhao: comodidades.suporte_caminhao,
-          vaga_moto: comodidades.vaga_moto,
-        })
-        .select()
-        .single();
+      funcionamento_24h: comodidades.funcionamento_24h,
+      suporte_carro_eletrico: comodidades.suporte_carro_eletrico,
+      vaga_coberta: comodidades.vaga_coberta,
+      manobrista: comodidades.manobrista,
+      suporte_caminhao: comodidades.suporte_caminhao,
+      vaga_moto: comodidades.vaga_moto,
+      largura_vaga: null, // Estacionamento comercial não precisa especificar dimensões individuais
+      comprimento_vaga: null,
+    })
+    .select()
+    .single();
 
       if (estacionamentoError) throw estacionamentoError;
 

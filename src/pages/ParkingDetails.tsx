@@ -136,17 +136,13 @@ const ParkingDetails = () => {
             )}
           </div>
           
-          {/* Tamanho da Vaga */}
-          {parkingSpot.tamanho_vaga && (
+          {/* Dimensões da Vaga */}
+          {parkingSpot.largura_vaga && parkingSpot.comprimento_vaga && (
             <div className="p-3 bg-muted/30 rounded-lg border border-border">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Tamanho máximo da vaga:</span>
+                <span className="text-sm font-medium">Dimensões da vaga:</span>
                 <span className="text-sm font-bold">
-                  {parkingSpot.tamanho_vaga} - {
-                    parkingSpot.tamanho_vaga === 'P' ? 'até 3,8m x 1,7m' :
-                    parkingSpot.tamanho_vaga === 'M' ? 'até 4,3m x 1,8m' :
-                    'acima de 4,3m'
-                  }
+                  {parkingSpot.largura_vaga.toFixed(1)}m x {parkingSpot.comprimento_vaga.toFixed(1)}m
                 </span>
               </div>
             </div>

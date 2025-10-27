@@ -91,7 +91,8 @@ const CreateEstacionamentoDialog = ({
     horaExtra: "", // Valor para hora adicional quando não há preço específico cadastrado
     horaExtraNumeric: 0, // Valor numérico para salvar no banco
     funcionamento_24h: false, // Opção de funcionamento 24 horas
-    tamanho_vaga: "M" as 'P' | 'M' | 'G', // Tamanho da vaga (P, M, G)
+    largura_vaga: "", // Largura da vaga em metros
+    comprimento_vaga: "", // Comprimento da vaga em metros
   });
 
   // Estado para upload de fotos
@@ -297,7 +298,8 @@ const CreateEstacionamentoDialog = ({
             funcionamento_24h: formData.funcionamento_24h, // Marca se funciona 24h
             latitude: coordinates?.latitude || null,
             longitude: coordinates?.longitude || null,
-            tamanho_vaga: formData.tamanho_vaga, // Tamanho da vaga
+            largura_vaga: formData.largura_vaga ? parseFloat(formData.largura_vaga) : null,
+            comprimento_vaga: formData.comprimento_vaga ? parseFloat(formData.comprimento_vaga) : null,
             // Vagas residenciais não possuem outras comodidades
           })
           .select()
@@ -345,7 +347,8 @@ const CreateEstacionamentoDialog = ({
         horaExtra: "",
         horaExtraNumeric: 0,
         funcionamento_24h: false,
-        tamanho_vaga: "M",
+        largura_vaga: "",
+        comprimento_vaga: "",
       });
       setPhotos([]);
       setPhotosPreviews([]);
@@ -713,42 +716,48 @@ const CreateEstacionamentoDialog = ({
             </div>
           </div>
 
-          {/* Tamanho da Vaga */}
+          {/* Dimensões da Vaga */}
           <div className="space-y-2">
-            <Label htmlFor="tamanho-vaga" className="flex items-center gap-2">
+            <Label className="flex items-center gap-2">
               <FaCar className="h-4 w-4 text-spatioo-green" />
-              Tamanho da Vaga *
+              Dimensões da Vaga *
             </Label>
-            <Select 
-              value={formData.tamanho_vaga} 
-              onValueChange={(value: 'P' | 'M' | 'G') => setFormData(prev => ({ ...prev, tamanho_vaga: value }))}
-            >
-              <SelectTrigger id="tamanho-vaga">
-                <SelectValue placeholder="Selecione o tamanho" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="P">
-                  <div className="flex flex-col py-1">
-                    <span className="font-semibold">P - Pequeno</span>
-                    <span className="text-xs text-muted-foreground">até 3,8m x 1,7m</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="M">
-                  <div className="flex flex-col py-1">
-                    <span className="font-semibold">M - Médio</span>
-                    <span className="text-xs text-muted-foreground">até 4,3m x 1,8m</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="G">
-                  <div className="flex flex-col py-1">
-                    <span className="font-semibold">G - Grande</span>
-                    <span className="text-xs text-muted-foreground">acima de 4,3m</span>
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="largura-vaga" className="text-sm text-muted-foreground">
+                  Largura (metros)
+                </Label>
+                <Input
+                  id="largura-vaga"
+                  type="number"
+                  step="0.1"
+                  min="1.5"
+                  max="5"
+                  placeholder="Ex: 2.5"
+                  value={formData.largura_vaga}
+                  onChange={(e) => handleInputChange("largura_vaga", e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="comprimento-vaga" className="text-sm text-muted-foreground">
+                  Comprimento (metros)
+                </Label>
+                <Input
+                  id="comprimento-vaga"
+                  type="number"
+                  step="0.1"
+                  min="3"
+                  max="10"
+                  placeholder="Ex: 5.0"
+                  value={formData.comprimento_vaga}
+                  onChange={(e) => handleInputChange("comprimento_vaga", e.target.value)}
+                  required
+                />
+              </div>
+            </div>
             <p className="text-xs text-muted-foreground">
-              Escolha o tamanho baseado nas dimensões da vaga disponível
+              Informe as dimensões reais da vaga em metros
             </p>
           </div>
 

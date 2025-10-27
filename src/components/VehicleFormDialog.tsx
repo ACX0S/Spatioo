@@ -122,8 +122,16 @@ export function VehicleFormDialog({
       await onSubmit(data);
       form.reset();
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting form:', error);
+      
+      // Check for duplicate plate error
+      if (error?.message?.includes('veiculos_placa_unique') || error?.code === '23505') {
+        form.setError('placa', {
+          type: 'manual',
+          message: 'Esta placa já está cadastrada no sistema'
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }

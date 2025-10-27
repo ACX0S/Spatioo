@@ -72,12 +72,16 @@ export function useVehicles() {
       return data;
     } catch (err: any) {
       console.error('Error adding vehicle:', err);
+      const errorMessage = err.message?.includes('veiculos_placa_unique') || err.code === '23505'
+        ? 'Esta placa já está cadastrada no sistema'
+        : err.message || 'Erro ao cadastrar veículo';
+      
       toast({
         title: 'Erro',
-        description: err.message || 'Erro ao cadastrar veículo',
+        description: errorMessage,
         variant: 'destructive'
       });
-      return null;
+      throw err;
     }
   };
 

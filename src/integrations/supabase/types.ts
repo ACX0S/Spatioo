@@ -107,6 +107,7 @@ export type Database = {
           ativo: boolean
           cep: string
           cnpj: string
+          comprimento_vaga: number | null
           created_at: string
           descricao: string | null
           endereco: string
@@ -115,6 +116,7 @@ export type Database = {
           hora_extra: number | null
           horario_funcionamento: Json
           id: string
+          largura_vaga: number | null
           latitude: number | null
           longitude: number | null
           manobrista: boolean | null
@@ -124,7 +126,6 @@ export type Database = {
           preco: number
           suporte_caminhao: boolean | null
           suporte_carro_eletrico: boolean | null
-          tamanho_vaga: string | null
           tipo: string | null
           updated_at: string
           user_id: string
@@ -135,6 +136,7 @@ export type Database = {
           ativo?: boolean
           cep: string
           cnpj: string
+          comprimento_vaga?: number | null
           created_at?: string
           descricao?: string | null
           endereco: string
@@ -143,6 +145,7 @@ export type Database = {
           hora_extra?: number | null
           horario_funcionamento: Json
           id?: string
+          largura_vaga?: number | null
           latitude?: number | null
           longitude?: number | null
           manobrista?: boolean | null
@@ -152,7 +155,6 @@ export type Database = {
           preco: number
           suporte_caminhao?: boolean | null
           suporte_carro_eletrico?: boolean | null
-          tamanho_vaga?: string | null
           tipo?: string | null
           updated_at?: string
           user_id: string
@@ -163,6 +165,7 @@ export type Database = {
           ativo?: boolean
           cep?: string
           cnpj?: string
+          comprimento_vaga?: number | null
           created_at?: string
           descricao?: string | null
           endereco?: string
@@ -171,6 +174,7 @@ export type Database = {
           hora_extra?: number | null
           horario_funcionamento?: Json
           id?: string
+          largura_vaga?: number | null
           latitude?: number | null
           longitude?: number | null
           manobrista?: boolean | null
@@ -180,7 +184,6 @@ export type Database = {
           preco?: number
           suporte_caminhao?: boolean | null
           suporte_carro_eletrico?: boolean | null
-          tamanho_vaga?: string | null
           tipo?: string | null
           updated_at?: string
           user_id?: string
