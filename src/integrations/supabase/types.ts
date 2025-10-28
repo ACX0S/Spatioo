@@ -484,6 +484,7 @@ export type Database = {
     }
     Functions: {
       can_user_book_today: { Args: { p_user_id: string }; Returns: boolean }
+      cleanup_orphaned_vagas: { Args: never; Returns: undefined }
       expire_pending_bookings: { Args: never; Returns: undefined }
       get_vagas_stats: {
         Args: { estacionamento_id_param: string }
