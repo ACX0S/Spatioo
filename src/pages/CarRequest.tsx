@@ -53,8 +53,12 @@ const CarRequest = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground mb-2">Meus Veículos</h1>
-          <p className="text-muted-foreground">Gerencie seus veículos cadastrados</p>
+          <h1 className="text-2xl font-bold text-foreground mb-2">
+            Meus Veículos
+          </h1>
+          <p className="text-muted-foreground">
+            Gerencie seus veículos cadastrados
+          </p>
         </div>
         <Button className="gap-2" onClick={handleOpenAddDialog}>
           <Plus className="h-4 w-4" />
@@ -82,16 +86,27 @@ const CarRequest = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {vehicles.map((vehicle) => (
-            <Card key={vehicle.id} className="hover:shadow-md transition-shadow">
+            <Card
+              key={vehicle.id}
+              className="hover:shadow-md transition-shadow"
+            >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-10 h-10 rounded-lg bg-spatioo-green/10 flex items-center justify-center">
-                      <Car className="h-5 w-5 text-spatioo-green" />
+                      <img
+                        src=".\Images\logos vclaras\LOGO-REDUZIDA-vclaro.svg"
+                        alt="Spatioo"
+                        className="h-[20px]"
+                      />
                     </div>
                     <div>
-                      <CardTitle className="text-base">{vehicle.nome}</CardTitle>
-                      <p className="text-sm text-muted-foreground">{vehicle.cor}</p>
+                      <CardTitle className="text-base">
+                        {vehicle.nome}
+                      </CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        {vehicle.cor}
+                      </p>
                     </div>
                   </div>
                   <Badge variant="outline" className="font-mono">
@@ -103,7 +118,9 @@ const CarRequest = () => {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Cor:</span>
-                    <span className="font-medium text-foreground">{vehicle.cor}</span>
+                    <span className="font-medium text-foreground">
+                      {vehicle.cor}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Placa:</span>
@@ -126,9 +143,9 @@ const CarRequest = () => {
                 </div>
 
                 <div className="flex gap-2 pt-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className="flex-1 gap-1"
                     onClick={() => handleOpenEditDialog(vehicle)}
                   >

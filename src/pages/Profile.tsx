@@ -198,9 +198,8 @@ const Profile = () => {
       </div>
 
       <Tabs defaultValue="personal" className="w-full">
-        <TabsList className="grid grid-cols-4 mb-6 h-auto">
+        <TabsList className="grid grid-cols-3 mb-6 h-auto">
           <TabsTrigger value="personal" className="text-xs sm:text-sm">Dados</TabsTrigger>
-          <TabsTrigger value="payment" className="text-xs sm:text-sm">Pagamento</TabsTrigger>
           <TabsTrigger value="security" className="text-xs sm:text-sm">Segurança</TabsTrigger>
           <TabsTrigger value="account" className="text-xs sm:text-sm">Conta</TabsTrigger>
         </TabsList>
@@ -309,91 +308,6 @@ const Profile = () => {
           </Card>
         </TabsContent>
 
-        {/* Pagamento */}
-        <TabsContent value="payment">
-          <Card>
-            <CardHeader>
-              <CardTitle>Métodos de Pagamento</CardTitle>
-              <CardDescription>
-                Gerencie seus cartões de crédito e débito
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {paymentCards.length > 0 ? (
-                <div className="space-y-3">
-                  {paymentCards.map((card) => (
-                    <div
-                      key={card.id}
-                      className="relative p-4 border rounded-lg hover:border-primary transition-colors"
-                    >
-                      {card.isDefault && (
-                        <Badge className="absolute top-2 right-2" variant="secondary">
-                          <Check className="h-3 w-3 mr-1" />
-                          Padrão
-                        </Badge>
-                      )}
-                      
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-muted rounded">
-                            <CreditCard className="h-5 w-5 text-muted-foreground" />
-                          </div>
-                          <div>
-                            <p className="font-mono text-lg">•••• •••• •••• {card.last4}</p>
-                            <p className={`text-sm font-medium ${getBrandColor(card.brand)}`}>
-                              {card.brand}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">
-                          Expira em {card.expiryMonth}/{card.expiryYear}
-                        </span>
-                        
-                        <div className="flex gap-2">
-                          {!card.isDefault && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleSetDefaultCard(card.id)}
-                            >
-                              Definir como padrão
-                            </Button>
-                          )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleRemoveCard(card.id)}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  <CreditCard className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                  <p>Nenhum cartão cadastrado</p>
-                </div>
-              )}
-
-              <Button variant="outline" className="w-full" disabled>
-                <Plus className="mr-2 h-4 w-4" />
-                Adicionar novo cartão
-              </Button>
-              
-              <p className="text-xs text-muted-foreground text-center">
-                A integração com gateway de pagamento será implementada em breve
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
         {/* Segurança */}
         <TabsContent value="security">
           <div className="space-y-4">
@@ -423,52 +337,6 @@ const Profile = () => {
                         Alterar
                       </Button>
                     }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 bg-primary/10 rounded-lg">
-                      <Shield className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium">Autenticação em Dois Fatores</p>
-                      <p className="text-sm text-muted-foreground">
-                        Adicione uma camada extra de segurança
-                      </p>
-                    </div>
-                  </div>
-                  <Button variant="outline" size="sm" disabled>
-                    Em breve
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Notificações</CardTitle>
-                <CardDescription>
-                  Gerencie suas preferências de notificação
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                      <Bell className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <div>
-                      <p className="font-medium">Notificações Push</p>
-                      <p className="text-sm text-muted-foreground">
-                        Receba atualizações sobre suas reservas
-                      </p>
-                    </div>
-                  </div>
-                  <input 
-                    type="checkbox" 
-                    defaultChecked 
-                    className="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary"
                   />
                 </div>
               </CardContent>
@@ -506,21 +374,47 @@ const Profile = () => {
               </CardContent>
             </Card>
 
+            <Card>
+              <CardHeader>
+                <CardTitle>Notificações</CardTitle>
+                <CardDescription>
+                  Gerencie suas preferências de notificação
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                      <Bell className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Notificações Push</p>
+                      <p className="text-sm text-muted-foreground">
+                        Receba atualizações sobre suas reservas
+                      </p>
+                    </div>
+                  </div>
+                  <input 
+                    type="checkbox" 
+                    defaultChecked 
+                    className="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
             <Card className="border-destructive/50">
               <CardHeader>
-                <CardTitle className="text-destructive">Zona de Perigo</CardTitle>
-                <CardDescription>
-                  Ações irreversíveis na sua conta
-                </CardDescription>
+                <CardTitle className="text-destructive">Sair da conta</CardTitle>
               </CardHeader>
               <CardContent>
                 <Button
                   variant="outline"
-                  className="w-full border-destructive text-destructive hover:bg-destructive/10"
+                  className="w-full border-destructive text-destructive hover:bg-destructive/10 dark:hover:text-white hover:text-black"
                   onClick={signOut}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
-                  Sair da Conta
+                  Sair
                 </Button>
               </CardContent>
             </Card>

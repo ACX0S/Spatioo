@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Calendar, Building, Star } from 'lucide-react';
-import { FaCar } from 'react-icons/fa';
+import { FaHouseUser, FaCar } from 'react-icons/fa';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import CreateEstacionamentoConfirmDialog from '@/components/CreateEstacionamentoConfirmDialog';
@@ -73,7 +73,7 @@ const UserPanel = () => {
     {
       title: "Vagas Residenciais",
       description: "Gerenciar e cadastrar vagas",
-      icon: FaCar,
+      icon: FaHouseUser,
       action: handleResidentialClick,
       color: "dark:text-spatioo-green light: text-spatioo-primary",
       bgColor: "bg-spatioo-green/10"
@@ -157,7 +157,7 @@ const UserPanel = () => {
       {/* Painel Pessoal */}
       <div className="mb-8">
         <div className="border-b border-border pb-2 mb-4">
-          <h2 className="text-lg font-semibold text-foreground">Painel Pessoal</h2>
+          <h2 className="text-lg font-semibold text-foreground">Pessoal</h2>
         </div>
         <div className="space-y-4">
           {personalOptions.map((option, index) => (
@@ -195,7 +195,7 @@ const UserPanel = () => {
       {/* Painel Administrativo */}
       <div>
         <div className="border-b border-border pb-2 mb-4">
-          <h2 className="text-lg font-semibold text-foreground">Painel Administrativo</h2>
+          <h2 className="text-lg font-semibold text-foreground">Administrativo</h2>
         </div>
         <div className="space-y-4">
           {adminOptions.map((option, index) => (
