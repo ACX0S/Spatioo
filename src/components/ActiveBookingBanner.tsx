@@ -20,9 +20,9 @@ export const ActiveBookingBanner = () => {
       const now = new Date().getTime();
       const timeDiff = now - acceptedTime;
       
-      // Se foi aceita nos últimos 30 segundos, redirecionar automaticamente
+      // Se foi aceita nos últimos 30 segundos, redirecionar automaticamente para ver a rota
       if (timeDiff < 30000 && activeBooking.status === 'reservada') {
-        navigate('/dashboard/reservas');
+        navigate(`/explore?bookingId=${activeBooking.id}`);
       }
     }
   }, [activeBooking, navigate]);
@@ -32,7 +32,8 @@ export const ActiveBookingBanner = () => {
   }
 
   const handleViewRoute = () => {
-    navigate('/dashboard/reservas');
+    // Redirecionar para a página explore com o ID da reserva para mostrar a rota
+    navigate(`/explore?bookingId=${activeBooking.id}`);
   };
 
   return (
