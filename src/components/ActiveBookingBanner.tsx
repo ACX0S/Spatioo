@@ -22,7 +22,7 @@ export const ActiveBookingBanner = () => {
       
       // Se foi aceita nos últimos 30 segundos, redirecionar automaticamente
       if (timeDiff < 30000 && activeBooking.status === 'reservada') {
-        navigate(`/explore?bookingId=${activeBooking.id}`);
+        navigate('/dashboard/reservas');
       }
     }
   }, [activeBooking, navigate]);
@@ -32,7 +32,7 @@ export const ActiveBookingBanner = () => {
   }
 
   const handleViewRoute = () => {
-    navigate(`/explore?bookingId=${activeBooking.id}`);
+    navigate('/dashboard/reservas');
   };
 
   return (

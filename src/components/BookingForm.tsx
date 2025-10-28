@@ -216,17 +216,30 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
     const hoje = new Date();
     const horaAbertura = parse(abertura, 'HH:mm', hoje);
     const horaFechamento = parse(fechamento, 'HH:mm', hoje);
+    const agora = new Date();
+    agora.setSeconds(0, 0);
     
-    // Gera horários de 30 em 30 minutos
+    // Gera horários de 30 em 30 minutos, filtrando passados quando a data é hoje
     let currentTime = horaAbertura;
     
     while (isBefore(currentTime, horaFechamento) || currentTime.getTime() === horaFechamento.getTime()) {
-      times.push(format(currentTime, 'HH:mm'));
-      currentTime = new Date(currentTime.getTime() + 30 * 60 * 1000); // Adiciona 30 minutos
+      const incluir = selectedDate === 'amanha' || currentTime.getTime() >= agora.getTime();
+      if (incluir) {
+        times.push(format(currentTime, 'HH:mm'));
+      }
+      currentTime = new Date(currentTime.getTime() + 30 * 60 * 1000); // +30 min
     }
     
     return times;
   };
+
+  // Ajusta horário selecionado quando opções mudam (impede horários passados em 'hoje')
+  useEffect(() => {
+    const options = generateTimeOptions();
+    if (!options.includes(selectedStartTime)) {
+      setSelectedStartTime(options[0] || '');
+    }
+  }, [selectedDate, parkingSpot.horario_funcionamento?.abertura, parkingSpot.horario_funcionamento?.fechamento]);
 
   /**
    * @function validateBookingTime
@@ -243,6 +256,13 @@ const BookingForm: React.FC<BookingFormProps> = ({ parkingSpot }) => {
     const horaFim = new Date(horaInicio.getTime() + selectedDuration * 60 * 60 * 1000);
     const horaAbertura = parse(abertura, 'HH:mm', hoje);
     const horaFechamento = parse(fechamento, 'HH:mm', hoje);
+
+    // Se for hoje, não permitir horários anteriores ao momento atual
+    if (selectedDate === 'hoje') {
+      const agora = new Date();
+      agora.setSeconds(0, 0);
+      if (isBefore(horaInicio, agora)) return false;
+    }
     
     return (isBefore(horaInicio, horaFechamento) || horaInicio.getTime() === horaFechamento.getTime()) &&
            (isBefore(horaFim, horaFechamento) || horaFim.getTime() === horaFechamento.getTime()) &&
