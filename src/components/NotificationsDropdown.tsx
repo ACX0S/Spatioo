@@ -19,18 +19,28 @@ export const NotificationsDropdown = () => {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const navigate = useNavigate();
 
-  const handleNotificationClick = (notification: any) => {
+  const handleNotificationClick = async (notification: any) => {
     // Marcar como lida
     markAsRead(notification.id);
 
     // Redirecionar baseado no tipo de notificação
     if (notification.estacionamento_id) {
-      // Se tem estacionamento_id, verificar se é comercial ou residencial
-      // Por simplicidade, vamos para o dashboard de estacionamento
-      navigate(`/estacionamento-dashboard/${notification.estacionamento_id}?tab=notificacoes`);
+      // Buscar o tipo do estacionamento para redirecionar corretamente
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: estacionamento } = await supabase
+        .from('estacionamento')
+        .select('tipo')
+        .eq('id', notification.estacionamento_id)
+        .single();
+
+      if (estacionamento?.tipo === 'residencial') {
+        navigate(`/residential-dashboard/${notification.estacionamento_id}`);
+      } else {
+        navigate(`/estacionamento-dashboard/${notification.estacionamento_id}`);
+      }
     } else {
-      // Notificação de motorista
-      navigate('/dashboard');
+      // Notificação de motorista - vai para dashboard de reservas
+      navigate('/dashboard/reservas');
     }
   };
 
