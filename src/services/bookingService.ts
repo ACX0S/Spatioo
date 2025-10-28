@@ -261,12 +261,40 @@ export const fetchPendingBookings = async (estacionamentoId: string): Promise<Bo
 // Cancelar uma reserva
 export const cancelBooking = async (bookingId: string): Promise<void> => {
   try {
+    // Buscar dados da reserva antes de cancelar
+    const { data: booking, error: fetchError } = await supabase
+      .from('bookings')
+      .select('spot_number, estacionamento_id')
+      .eq('id', bookingId)
+      .single();
+    
+    if (fetchError) throw fetchError;
+    if (!booking) throw new Error('Reserva não encontrada');
+
+    // Atualizar status da reserva para cancelada
     const { error } = await supabase
       .from('bookings')
       .update({ status: 'cancelada' })
       .eq('id', bookingId);
     
     if (error) throw error;
+
+    // Liberar a vaga para ficar disponível novamente
+    const { error: vagaError } = await supabase
+      .from('vagas')
+      .update({ 
+        status: 'disponivel',
+        booking_id: null,
+        user_id: null
+      })
+      .eq('numero_vaga', booking.spot_number)
+      .eq('estacionamento_id', booking.estacionamento_id);
+    
+    if (vagaError) {
+      console.error('Erro ao liberar vaga:', vagaError);
+      // Não fazer throw aqui para não bloquear o cancelamento da reserva
+      // A vaga será liberada pela função de expiração se necessário
+    }
   } catch (error: any) {
     console.error('Erro ao cancelar reserva:', error.message);
     throw new Error('Falha ao cancelar sua reserva: ' + error.message);
