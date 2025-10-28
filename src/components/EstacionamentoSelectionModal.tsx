@@ -40,23 +40,23 @@ const EstacionamentoSelectionModal = ({
             <Button
               key={est.id}
               variant="outline"
-              className="h-auto p-4 flex flex-col items-start text-left hover:border-spatioo-green hover:bg-spatioo-green/10 min-w-0"
+              className="h-auto p-4 flex flex-col items-start text-left hover:border-spatioo-green hover:bg-spatioo-green/10 overflow-hidden w-full"
               onClick={() => {
                 onSelect(est.id);
                 onOpenChange(false);
               }}
             >
-              <div className="flex items-center gap-2 mb-2 w-full min-w-0">
+              <div className="flex items-center gap-2 mb-2 w-full overflow-hidden">
                 {est.tipo === 'residencial' ? (
                   <FaCar className="h-5 w-5 text-spatioo-green flex-shrink-0" />
                 ) : (
                   <Building className="h-5 w-5 text-spatioo-green flex-shrink-0" />
                 )}
-                <span className="font-semibold truncate min-w-0" title={est.nome}>{est.nome}</span>
+                <span className="font-semibold truncate flex-1 min-w-0" title={est.nome}>{est.nome}</span>
               </div>
-              <div className="flex items-start gap-2 text-sm text-muted-foreground w-full min-w-0 overflow-hidden">
+              <div className="flex items-start gap-2 text-sm text-muted-foreground w-full overflow-hidden">
                 <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                <span className="line-clamp-2 break-words overflow-hidden" title={est.endereco}>{est.endereco}</span>
+                <span className="line-clamp-2 break-all flex-1 min-w-0" title={est.endereco}>{est.endereco}</span>
               </div>
             </Button>
           ))}
