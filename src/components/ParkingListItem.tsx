@@ -71,7 +71,7 @@ const ParkingListItem: React.FC<ParkingListItemProps> = ({
           <div className="flex-1 min-w-0">
             <div className={`flex items-center gap-2 ${isMobile ? 'mb-1.5' : 'mb-2'} flex-wrap`}>
               {distance !== null ? (
-                <h3 className={`font-bold ${titleSize} text-primary flex-1 min-w-0`}>
+                <h3 className={`font-bold ${titleSize} text-primary flex-2 min-w-0`}>
                   {formatDistance(distance)}
                 </h3>
               ) : (
@@ -94,11 +94,6 @@ const ParkingListItem: React.FC<ParkingListItemProps> = ({
                 </Badge>
               )}
               
-              {isNearby && !isMobile && (
-                <Badge className="bg-primary text-primary-foreground flex-shrink-0">
-                  Próximo
-                </Badge>
-              )}
             </div>
 
             <div className={`space-y-${isMobile ? '1' : '1.5'} text-sm`}>
@@ -116,7 +111,7 @@ const ParkingListItem: React.FC<ParkingListItemProps> = ({
 
               <div className={`flex items-center gap-${isMobile ? '3' : '4'} mt-2 flex-wrap`}>
                 <div className="flex items-center gap-1.5 text-muted-foreground">
-                  <FaCar className={`${iconSize} text-secondary`} />
+                  <FaCar className={`${iconSize} dark:text-spatioo-secondary text-spatioo-primary`} />
                   <span className={isMobile ? '' : 'font-medium'}>{spot.numero_vagas} {!isMobile && 'vagas'}</span>
                 </div>
                 
@@ -137,7 +132,7 @@ const ParkingListItem: React.FC<ParkingListItemProps> = ({
                 currency: 'BRL'
               })}
             </p>
-            <p className="text-xs text-muted-foreground">{isMobile ? '/h' : 'por hora'}</p>
+            <p className="text-xs text-muted-foreground">{isMobile ? '/h' : '1ª hora'}</p>
           </div>
         </div>
       </div>

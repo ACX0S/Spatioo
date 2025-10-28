@@ -31,7 +31,7 @@ export const RatingDisplay = ({
   // Se tem menos de 3 avaliações, mostrar "Novo!"
   if (reviewCount < 3) {
     return (
-      <Badge variant="secondary" className={`${textSizeClasses[size]} ${className} bg-spatioo-green/20 text-spatioo-green border-spatioo-green/30 gap-1`}>
+      <Badge variant="secondary" className={`${textSizeClasses[size]} ${className} bg-transparent text-spatioo-green gap-1 hover:bg-transparent`}>
         <Sparkles className={sizeClasses[size]} />
         Novo!
       </Badge>
