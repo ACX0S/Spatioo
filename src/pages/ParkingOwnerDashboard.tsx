@@ -117,11 +117,11 @@ const ParkingOwnerDashboard = () => {
                     <Card key={parking.id}>
                       <CardHeader className="pb-2">
                         <div className="flex justify-between items-start">
-                          <div>
-                            <CardTitle>{parking.nome}</CardTitle>
+                          <div className="flex-1 min-w-0">
+                            <CardTitle className="truncate" title={parking.nome}>{parking.nome}</CardTitle>
                             <CardDescription className="flex items-center gap-1">
-                              <MapPin className="h-3 w-3" />
-                              {parking.endereco}
+                              <MapPin className="h-3 w-3 flex-shrink-0" />
+                              <span className="line-clamp-1 break-words" title={parking.endereco}>{parking.endereco}</span>
                             </CardDescription>
                           </div>
                           <div className={`px-2 py-1 rounded-full text-xs ${parking.ativo ? 'bg-green-500/20 text-green-600 dark:bg-green-900/40 dark:text-green-400' : 'bg-gray-500/20 text-gray-600'}`}>

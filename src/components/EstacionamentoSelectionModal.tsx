@@ -48,15 +48,15 @@ const EstacionamentoSelectionModal = ({
             >
               <div className="flex items-center gap-2 mb-2">
                 {est.tipo === 'residencial' ? (
-                  <FaCar className="h-5 w-5 text-spatioo-green" />
+                  <FaCar className="h-5 w-5 text-spatioo-green flex-shrink-0" />
                 ) : (
-                  <Building className="h-5 w-5 text-spatioo-green" />
+                  <Building className="h-5 w-5 text-spatioo-green flex-shrink-0" />
                 )}
-                <span className="font-semibold">{est.nome}</span>
+                <span className="font-semibold truncate" title={est.nome}>{est.nome}</span>
               </div>
               <div className="flex items-start gap-2 text-sm text-muted-foreground">
                 <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                <span className="line-clamp-2">{est.endereco}</span>
+                <span className="line-clamp-2 break-words" title={est.endereco}>{est.endereco}</span>
               </div>
             </Button>
           ))}

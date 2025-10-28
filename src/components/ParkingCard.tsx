@@ -60,7 +60,7 @@ const ParkingCard = memo(({
 
           <div className="flex items-center text-xs text-muted-foreground">
             <MapPin className="w-3.5 h-3.5 mr-1 flex-shrink-0 text-spatioo-primary dark:text-spatioo-secondary" />
-            <span className="truncate dark:text-stone-400" title={parkingSpot.endereco}>
+            <span className="line-clamp-1 break-words dark:text-stone-400" title={parkingSpot.endereco}>
               {parkingSpot.endereco}
             </span>
           </div>

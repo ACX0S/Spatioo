@@ -123,7 +123,7 @@ export const UserParkingCard = ({ estacionamento, onEdit, onUpdate }: UserParkin
             </h3>
             <div className="flex items-center text-sm text-muted-foreground mb-2">
               <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
-              <span className="truncate" title={estacionamento.endereco}>
+              <span className="line-clamp-1 break-words" title={estacionamento.endereco}>
                 {estacionamento.endereco}
               </span>
             </div>

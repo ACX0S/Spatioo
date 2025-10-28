@@ -93,8 +93,8 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, onCancelBooking }) =
         <div className="flex justify-between items-start mb-3">
           {/* Seção de informações do estacionamento e status da reserva */}
           <div className="flex-1">
-            <h3 className="font-medium truncate">{booking.parkingName}</h3>
-            <p className="text-sm text-muted-foreground truncate">{booking.parkingAddress}</p>
+            <h3 className="font-medium truncate" title={booking.parkingName}>{booking.parkingName}</h3>
+            <p className="text-sm text-muted-foreground line-clamp-1 break-words" title={booking.parkingAddress}>{booking.parkingAddress}</p>
           </div>
           <Badge className={`${getStatusColor(booking.status)} text-white pointer-events-none select-none rounded-sm`}>
             {getStatusText(booking.status)}
